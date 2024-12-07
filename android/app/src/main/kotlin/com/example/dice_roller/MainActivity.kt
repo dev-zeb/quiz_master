@@ -1,4 +1,4 @@
-package com.example.dice_roller
+package com.example.learn_with_quiz
 
 import io.flutter.embedding.android.FlutterActivity
 

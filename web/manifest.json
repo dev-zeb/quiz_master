@@ -1,6 +1,6 @@
 {
-    "name": "dice_roller",
-    "short_name": "dice_roller",
+    "name": "learn_with_quiz",
+    "short_name": "learn_with_quiz",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
