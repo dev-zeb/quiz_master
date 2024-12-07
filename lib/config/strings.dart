@@ -1,0 +1,27 @@
+class AppStrings {
+  // Common
+  static const String appName = 'Learn & Quiz';
+  
+  // Add Quiz Screen
+  static const String addNewQuiz = 'Add New Quiz';
+  static const String quizTitle = 'Quiz Title';
+  static const String question = 'Question';
+  static const String questions = 'Questions';
+  static const String options = 'Options';
+  static const String addOption = 'Add Option';
+  static const String option = 'Option';
+  static const String saveQuiz = 'Save Quiz';
+  static const String pleaseEnterQuizTitle = 'Please enter a quiz title';
+  static const String pleaseEnterQuestionAndOptions = 'Please fill all questions and options correctly';
+  
+  // Question List Screen
+  static const String quizList = 'Quiz List';
+  static const String noQuizzes = 'No quizzes available';
+  
+  // Start Screen
+  static const String startQuiz = 'Start Quiz';
+  
+  // Result Screen
+  static const String tryAgain = 'Try Again';
+  static const String backToStart = 'Back to Start';
+}
