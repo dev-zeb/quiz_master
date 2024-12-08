@@ -29,7 +29,8 @@ const questions = [
     ],
   ),
   QuestionModel(
-    text: 'Which widget should you try to use more often: StatelessWidget or StatefulWidget?',
+    text:
+        'Which widget should you try to use more often: StatelessWidget or StatefulWidget?',
     answers: [
       'StatelessWidget',
       'StatefulWidget',

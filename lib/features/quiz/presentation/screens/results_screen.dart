@@ -1,12 +1,12 @@
-import 'package:learn_and_quiz/models/quiz_model.dart';
-import 'package:learn_and_quiz/ui/widgets/question_summary.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/start_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/question_summary.dart';
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/ui/screens/questions_screen.dart';
-import 'package:learn_and_quiz/ui/screens/start_screen.dart';
 
 class ResultScreen extends StatelessWidget {
   final List<String> chosenAnswers;
-  final QuizModel quiz;
+  final Quiz quiz;
 
   const ResultScreen({
     super.key,
@@ -58,7 +58,7 @@ class ResultScreen extends StatelessWidget {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => QuestionsScreen(
+                    builder: (context) => QuizPlayScreen(
                       quiz: quiz,
                     ),
                   ),

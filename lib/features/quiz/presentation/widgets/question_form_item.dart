@@ -1,70 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:learn_and_quiz/config/strings.dart';
 import 'package:learn_and_quiz/config/text_styles.dart';
-import 'package:learn_and_quiz/models/question_model.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 
-// ignore: must_be_immutable
 class QuestionFormItem extends StatefulWidget {
-  final questionController = TextEditingController();
-  final List<TextEditingController> optionControllers = [];
-  int selectedAnswerIndex = 0;
+  const QuestionFormItem({super.key});
 
-  QuestionFormItem({super.key}) {
+  @override
+  State<QuestionFormItem> createState() => QuestionFormItemState();
+}
+
+class QuestionFormItemState extends State<QuestionFormItem> {
+  final TextEditingController _questionController = TextEditingController();
+  final List<TextEditingController> _optionControllers = [];
+  int _selectedAnswerIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
     // Start with 2 options
-    addOption();
-    addOption();
+    _addOption();
+    _addOption();
   }
 
+  @override
   void dispose() {
-    questionController.dispose();
-    for (var controller in optionControllers) {
+    _questionController.dispose();
+    for (var controller in _optionControllers) {
       controller.dispose();
     }
+    super.dispose();
   }
 
-  void addOption() {
-    optionControllers.add(TextEditingController());
+  void _addOption() {
+    setState(() {
+      _optionControllers.add(TextEditingController());
+    });
   }
 
-  void removeOption(int index) {
-    if (optionControllers.length <= 2) return; // Maintain minimum 2 options
-    optionControllers[index].dispose();
-    optionControllers.removeAt(index);
-    if (selectedAnswerIndex >= optionControllers.length) {
-      selectedAnswerIndex = optionControllers.length - 1;
-    }
+  void _removeOption(int index) {
+    if (_optionControllers.length <= 2) return; // Maintain minimum 2 options
+    setState(() {
+      _optionControllers[index].dispose();
+      _optionControllers.removeAt(index);
+      if (_selectedAnswerIndex >= _optionControllers.length) {
+        _selectedAnswerIndex = _optionControllers.length - 1;
+      }
+    });
   }
 
-  QuestionModel? getQuestion() {
-    final question = questionController.text.trim();
-    if (question.isEmpty) return null;
-
-    // Get all non-empty options
-    final options = optionControllers
+  bool _hasDuplicateOptions() {
+    // Get all non-empty options and trim them
+    final options = _optionControllers
         .map((c) => c.text.trim())
         .where((text) => text.isNotEmpty)
         .toList();
 
+    // Check for duplicates
+    final uniqueOptions = options.toSet();
+    return uniqueOptions.length != options.length;
+  }
+
+  Question? getQuestion() {
+    final question = _questionController.text.trim();
+    if (question.isEmpty) return null;
+
+    // Get all non-empty options
+    final options = _optionControllers
+        .map((c) => c.text.trim())
+        .where((text) => text.isNotEmpty)
+        .toList();
+
+    // Check for duplicate options
+    if (_hasDuplicateOptions()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Each option must be unique'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return null;
+    }
+
     if (options.length < 2) return null;
 
     // Move the selected answer to the first position
-    if (selectedAnswerIndex < options.length) {
-      final selectedAnswer = options[selectedAnswerIndex];
-      options.removeAt(selectedAnswerIndex);
+    if (_selectedAnswerIndex < options.length) {
+      final selectedAnswer = options[_selectedAnswerIndex];
+      options.removeAt(_selectedAnswerIndex);
       options.insert(0, selectedAnswer);
     }
 
-    return QuestionModel(
+    return Question(
       text: question,
       answers: options,
     );
   }
 
-  @override
-  State<QuestionFormItem> createState() => _QuestionFormItemState();
-}
-
-class _QuestionFormItemState extends State<QuestionFormItem> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -73,7 +105,7 @@ class _QuestionFormItemState extends State<QuestionFormItem> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
           child: TextField(
-            controller: widget.questionController,
+            controller: _questionController,
             style: AppTextStyles.bodyText,
             decoration: InputDecoration(
               labelText: AppStrings.question,
@@ -98,11 +130,7 @@ class _QuestionFormItemState extends State<QuestionFormItem> {
               style: AppTextStyles.titleMedium,
             ),
             TextButton.icon(
-              onPressed: () {
-                setState(() {
-                  widget.addOption();
-                });
-              },
+              onPressed: _addOption,
               icon: const Icon(Icons.add, color: Colors.white, size: 20),
               label: Text(
                 AppStrings.addOption,
@@ -114,17 +142,17 @@ class _QuestionFormItemState extends State<QuestionFormItem> {
           ],
         ),
         const SizedBox(height: 8),
-        for (var i = 0; i < widget.optionControllers.length; i++)
+        for (var i = 0; i < _optionControllers.length; i++)
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Row(
               children: [
                 Radio<int>(
                   value: i,
-                  groupValue: widget.selectedAnswerIndex,
-                  fillColor: WidgetStateProperty.resolveWith<Color>(
-                    (Set<WidgetState> states) {
-                      if (states.contains(WidgetState.selected)) {
+                  groupValue: _selectedAnswerIndex,
+                  fillColor: MaterialStateProperty.resolveWith<Color>(
+                    (Set<MaterialState> states) {
+                      if (states.contains(MaterialState.selected)) {
                         return Colors.white;
                       }
                       return Colors.white.withOpacity(0.6);
@@ -132,13 +160,13 @@ class _QuestionFormItemState extends State<QuestionFormItem> {
                   ),
                   onChanged: (value) {
                     setState(() {
-                      widget.selectedAnswerIndex = value!;
+                      _selectedAnswerIndex = value!;
                     });
                   },
                 ),
                 Expanded(
                   child: TextField(
-                    controller: widget.optionControllers[i],
+                    controller: _optionControllers[i],
                     style: AppTextStyles.bodyText,
                     decoration: InputDecoration(
                       labelText: '${AppStrings.option} ${i + 1}',
@@ -157,17 +185,13 @@ class _QuestionFormItemState extends State<QuestionFormItem> {
                 IconButton(
                   icon: Icon(
                     Icons.remove_circle_outline,
-                    color: widget.optionControllers.length <= 2
+                    color: _optionControllers.length <= 2
                         ? Colors.white.withOpacity(0.3)
                         : Colors.white.withOpacity(0.9),
                   ),
-                  onPressed: widget.optionControllers.length <= 2
+                  onPressed: _optionControllers.length <= 2
                       ? null
-                      : () {
-                          setState(() {
-                            widget.removeOption(i);
-                          });
-                        },
+                      : () => _removeOption(i),
                 ),
               ],
             ),

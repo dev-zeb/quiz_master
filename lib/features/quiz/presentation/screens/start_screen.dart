@@ -1,42 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/ui/widgets/gradient_container.dart';
-import 'package:learn_and_quiz/data/questions.dart';
-import 'package:learn_and_quiz/models/quiz_model.dart';
-import 'package:learn_and_quiz/ui/screens/add_quiz_screen.dart';
-import 'package:learn_and_quiz/ui/screens/quiz_list_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/learn_page_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_list_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/gradient_container.dart';
 
-class StartScreen extends StatefulWidget {
-  const StartScreen({
-    super.key,
-  });
+class StartScreen extends ConsumerWidget {
+  const StartScreen({super.key});
 
   @override
-  State<StartScreen> createState() => _StartScreenState();
-}
-
-class _StartScreenState extends State<StartScreen> {
-  final List<QuizModel> _quizzes = [];
-
-  @override
-  void initState() {
-    super.initState();
-    // Add default quiz from questions data
-    _quizzes.add(
-      const QuizModel(
-        title: 'Flutter Basics',
-        questions: questions,
-      ),
-    );
-  }
-
-  void _handleQuizAdded(QuizModel quiz) {
-    setState(() {
-      _quizzes.add(quiz);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: GradientContainer(
         child: Center(
@@ -50,7 +22,7 @@ class _StartScreenState extends State<StartScreen> {
               ),
               const SizedBox(height: 80),
               const Text(
-                'Learn Flutter the fun way!',
+                'Learn Topics the fun way!',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -65,9 +37,7 @@ class _StartScreenState extends State<StartScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => QuizListScreen(
-                            quizzes: _quizzes,
-                          ),
+                          builder: (context) => const QuizListScreen(),
                         ),
                       );
                     },
@@ -87,9 +57,7 @@ class _StartScreenState extends State<StartScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AddQuizScreen(
-                            onQuizAdded: (quiz) => _handleQuizAdded(quiz),
-                          ),
+                          builder: (context) => const LearnPageScreen(),
                         ),
                       );
                     },
@@ -100,8 +68,8 @@ class _StartScreenState extends State<StartScreen> {
                         vertical: 10,
                       ),
                     ),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add Quiz'),
+                    icon: const Icon(Icons.book),
+                    label: const Text('Learn'),
                   ),
                 ],
               ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/ui/widgets/answer_button.dart';
-import 'package:learn_and_quiz/models/question_model.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/answer_button.dart';
 
 class QuestionCard extends StatelessWidget {
-  final QuestionModel question;
+  final Question question;
   final void Function(String answer) onSelectAnswer;
 
   const QuestionCard({

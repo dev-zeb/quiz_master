@@ -1,25 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/config/colors.dart';
 import 'package:learn_and_quiz/config/strings.dart';
 import 'package:learn_and_quiz/config/text_styles.dart';
-import 'package:learn_and_quiz/models/question_model.dart';
-import 'package:learn_and_quiz/models/quiz_model.dart';
-import 'package:learn_and_quiz/ui/widgets/question_form_item.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/question_form_item.dart';
 
-class AddQuizScreen extends StatefulWidget {
-  final Function(QuizModel quiz) onQuizAdded;
-
-  const AddQuizScreen({
-    super.key,
-    required this.onQuizAdded,
-  });
+class AddQuizScreen extends ConsumerStatefulWidget {
+  const AddQuizScreen({super.key});
 
   @override
-  State<AddQuizScreen> createState() => _AddQuizScreenState();
+  ConsumerState<AddQuizScreen> createState() => _AddQuizScreenState();
 }
 
-class _AddQuizScreenState extends State<AddQuizScreen> {
+class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
   final _titleController = TextEditingController();
+  final List<GlobalKey<QuestionFormItemState>> _questionKeys = [];
   final List<QuestionFormItem> _questions = [];
 
   @override
@@ -31,22 +29,20 @@ class _AddQuizScreenState extends State<AddQuizScreen> {
   @override
   void dispose() {
     _titleController.dispose();
-    for (var question in _questions) {
-      question.dispose();
-    }
     super.dispose();
   }
 
   void _addNewQuestion() {
     setState(() {
-      _questions.add(QuestionFormItem());
+      _questionKeys.add(GlobalKey<QuestionFormItemState>());
+      _questions.add(QuestionFormItem(key: _questionKeys.last));
     });
   }
 
   void _removeQuestion(int index) {
     setState(() {
-      _questions[index].dispose();
       _questions.removeAt(index);
+      _questionKeys.removeAt(index);
     });
   }
 
@@ -58,9 +54,9 @@ class _AddQuizScreenState extends State<AddQuizScreen> {
       return;
     }
 
-    final questions = <QuestionModel>[];
-    for (var item in _questions) {
-      final question = item.getQuestion();
+    final questions = <Question>[];
+    for (var i = 0; i < _questions.length; i++) {
+      final question = _questionKeys[i].currentState?.getQuestion();
       if (question == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -72,12 +68,12 @@ class _AddQuizScreenState extends State<AddQuizScreen> {
       questions.add(question);
     }
 
-    final quiz = QuizModel(
+    final quiz = Quiz(
       title: _titleController.text.trim(),
       questions: questions,
     );
 
-    widget.onQuizAdded(quiz);
+    ref.read(quizNotifierProvider.notifier).addQuiz(quiz);
     Navigator.pop(context);
   }
 

@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/ui/widgets/gradient_container.dart';
-import 'package:learn_and_quiz/ui/widgets/question_card.dart';
-import 'package:learn_and_quiz/models/quiz_model.dart';
-import 'package:learn_and_quiz/ui/screens/result_screen.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/results_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/question_card.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/gradient_container.dart';
 
-class QuestionsScreen extends StatefulWidget {
-  final QuizModel quiz;
+class QuizPlayScreen extends StatefulWidget {
+  final Quiz quiz;
 
-  const QuestionsScreen({
+  const QuizPlayScreen({
     super.key,
     required this.quiz,
   });
 
   @override
-  State<QuestionsScreen> createState() => _QuestionsScreenState();
+  State<QuizPlayScreen> createState() => _QuizPlayScreenState();
 }
 
-class _QuestionsScreenState extends State<QuestionsScreen> {
+class _QuizPlayScreenState extends State<QuizPlayScreen> {
   var currentQuestionIndex = 0;
   final List<String> selectedAnswers = [];
 

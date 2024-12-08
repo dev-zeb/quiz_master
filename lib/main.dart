@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/config/strings.dart';
 import 'package:learn_and_quiz/config/theme.dart';
-import 'package:learn_and_quiz/ui/screens/start_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/start_screen.dart';
 
 void main() {
-  runApp(const Quiz());
+  runApp(
+    const ProviderScope(
+      child: Quiz(),
+    ),
+  );
 }
 
 class Quiz extends StatelessWidget {
