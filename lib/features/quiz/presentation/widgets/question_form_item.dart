@@ -63,7 +63,14 @@ class QuestionFormItemState extends State<QuestionFormItem> {
 
   Question? getQuestion() {
     final question = _questionController.text.trim();
-    if (question.isEmpty) return null;
+    if (question.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.pleaseEnterQuestionAndOptions),
+        ),
+      );
+      return null;
+    }
 
     // Get all non-empty options
     final options = _optionControllers
@@ -75,14 +82,21 @@ class QuestionFormItemState extends State<QuestionFormItem> {
     if (_hasDuplicateOptions()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Each option must be unique'),
+          content: Text(AppStrings.optionsMustBeUnique),
           backgroundColor: Colors.red,
         ),
       );
       return null;
     }
 
-    if (options.length < 2) return null;
+    if (options.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(AppStrings.pleaseEnterQuestionAndOptions),
+        ),
+      );
+      return null;
+    }
 
     // Move the selected answer to the first position
     if (_selectedAnswerIndex < options.length) {
@@ -102,24 +116,21 @@ class QuestionFormItemState extends State<QuestionFormItem> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-          child: TextField(
-            controller: _questionController,
-            style: AppTextStyles.bodyText,
-            decoration: InputDecoration(
-              labelText: AppStrings.question,
-              labelStyle: AppTextStyles.labelText,
-              enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
-              ),
-              focusedBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.white),
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+        TextField(
+          controller: _questionController,
+          style: AppTextStyles.bodyText,
+          decoration: InputDecoration(
+            labelText: AppStrings.question,
+            labelStyle: AppTextStyles.labelText,
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
             ),
-            maxLines: 2,
+            focusedBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 4),
           ),
+          maxLines: 2,
         ),
         const SizedBox(height: 16),
         Row(
@@ -150,9 +161,9 @@ class QuestionFormItemState extends State<QuestionFormItem> {
                 Radio<int>(
                   value: i,
                   groupValue: _selectedAnswerIndex,
-                  fillColor: MaterialStateProperty.resolveWith<Color>(
-                    (Set<MaterialState> states) {
-                      if (states.contains(MaterialState.selected)) {
+                  fillColor: WidgetStateProperty.resolveWith<Color>(
+                    (Set<WidgetState> states) {
+                      if (states.contains(WidgetState.selected)) {
                         return Colors.white;
                       }
                       return Colors.white.withOpacity(0.6);

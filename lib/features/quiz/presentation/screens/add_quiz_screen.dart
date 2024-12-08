@@ -54,15 +54,17 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
       return;
     }
 
+    if (_questions.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(AppStrings.pleaseAddAtLeastOneQuestion)),
+      );
+      return;
+    }
+
     final questions = <Question>[];
     for (var i = 0; i < _questions.length; i++) {
       final question = _questionKeys[i].currentState?.getQuestion();
       if (question == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(AppStrings.pleaseEnterQuestionAndOptions),
-          ),
-        );
         return;
       }
       questions.add(question);
@@ -143,6 +145,7 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                           padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
+                            // mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
@@ -151,18 +154,15 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                                     style: AppTextStyles.titleSmall,
                                   ),
                                   const Spacer(),
-                                  IconButton(
-                                    icon: const Icon(
+                                  InkWell(
+                                    onTap: () => _removeQuestion(i),
+                                    child: const Icon(
                                       Icons.delete,
                                       color: Colors.white,
                                     ),
-                                    onPressed: () => _removeQuestion(i),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
                               _questions[i],
                             ],
                           ),
