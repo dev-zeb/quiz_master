@@ -1,4 +1,3 @@
-import 'package:learn_and_quiz/data/questions.dart';
 import 'package:learn_and_quiz/models/quiz_model.dart';
 import 'package:learn_and_quiz/ui/widgets/question_summary.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +19,8 @@ class ResultScreen extends StatelessWidget {
     for (int i = 0; i < chosenAnswers.length; i++) {
       summary.add({
         'question_index': i,
-        'question': questions[i].text,
-        'correct_answer': questions[i].answers[0],
+        'question': quiz.questions[i].text,
+        'correct_answer': quiz.questions[i].answers[0],
         'user_answer': chosenAnswers[i],
       });
     }
@@ -30,7 +29,7 @@ class ResultScreen extends StatelessWidget {
 
   @override
   Widget build(context) {
-    final numOfTotalQuestions = questions.length;
+    final numOfTotalQuestions = quiz.questions.length;
     final numOfCorrectAnswers = summaryData.where((summary) {
       return summary['correct_answer'] == summary['user_answer'];
     }).length;

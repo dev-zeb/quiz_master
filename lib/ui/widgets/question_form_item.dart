@@ -39,12 +39,20 @@ class QuestionFormItem extends StatefulWidget {
     final question = questionController.text.trim();
     if (question.isEmpty) return null;
 
+    // Get all non-empty options
     final options = optionControllers
         .map((c) => c.text.trim())
         .where((text) => text.isNotEmpty)
         .toList();
 
     if (options.length < 2) return null;
+
+    // Move the selected answer to the first position
+    if (selectedAnswerIndex < options.length) {
+      final selectedAnswer = options[selectedAnswerIndex];
+      options.removeAt(selectedAnswerIndex);
+      options.insert(0, selectedAnswer);
+    }
 
     return QuestionModel(
       text: question,
@@ -136,7 +144,8 @@ class _QuestionFormItemState extends State<QuestionFormItem> {
                       labelText: '${AppStrings.option} ${i + 1}',
                       labelStyle: AppTextStyles.labelText,
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                        borderSide:
+                            BorderSide(color: Colors.white.withOpacity(0.3)),
                       ),
                       focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.white),
@@ -148,8 +157,8 @@ class _QuestionFormItemState extends State<QuestionFormItem> {
                 IconButton(
                   icon: Icon(
                     Icons.remove_circle_outline,
-                    color: widget.optionControllers.length <= 2 
-                        ? Colors.white.withOpacity(0.3) 
+                    color: widget.optionControllers.length <= 2
+                        ? Colors.white.withOpacity(0.3)
                         : Colors.white.withOpacity(0.9),
                   ),
                   onPressed: widget.optionControllers.length <= 2

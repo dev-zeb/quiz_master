@@ -106,7 +106,10 @@ class _AddQuizScreenState extends State<AddQuizScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 0,
+                        vertical: 8,
+                      ),
                       child: TextField(
                         controller: _titleController,
                         style: AppTextStyles.bodyText,
@@ -114,12 +117,14 @@ class _AddQuizScreenState extends State<AddQuizScreen> {
                           labelText: AppStrings.quizTitle,
                           labelStyle: AppTextStyles.labelText,
                           enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
+                            borderSide: BorderSide(
+                                color: Colors.white.withOpacity(0.3)),
                           ),
                           focusedBorder: const UnderlineInputBorder(
                             borderSide: BorderSide(color: Colors.white),
                           ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 4),
                         ),
                       ),
                     ),
@@ -134,7 +139,9 @@ class _AddQuizScreenState extends State<AddQuizScreen> {
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Container(
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white.withOpacity(0.3)),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.all(16),
@@ -149,7 +156,10 @@ class _AddQuizScreenState extends State<AddQuizScreen> {
                                   ),
                                   const Spacer(),
                                   IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.white),
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.white,
+                                    ),
                                     onPressed: () => _removeQuestion(i),
                                     padding: EdgeInsets.zero,
                                     constraints: const BoxConstraints(),
@@ -196,4 +206,3 @@ class _AddQuizScreenState extends State<AddQuizScreen> {
     );
   }
 }
-
