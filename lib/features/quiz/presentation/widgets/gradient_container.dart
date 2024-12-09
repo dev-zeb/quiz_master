@@ -1,28 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:learn_and_quiz/config/colors.dart';
 
 class GradientContainer extends StatelessWidget {
   final Widget child;
-  final List<Color> colors;
+  final List<Color>? colors;
   final AlignmentGeometry begin;
   final AlignmentGeometry end;
 
   const GradientContainer({
     super.key,
     required this.child,
-    this.colors = const [
-      Color.fromARGB(255, 78, 13, 151),
-      Color.fromARGB(255, 107, 15, 168),
-    ],
+    this.colors,
     this.begin = Alignment.topLeft,
     this.end = Alignment.bottomRight,
   });
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+    final gradientColors = colors ?? 
+        (brightness == Brightness.light 
+            ? AppColors.backgroundGradient 
+            : AppColors.darkBackgroundGradient);
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: colors,
+          colors: gradientColors,
           begin: begin,
           end: end,
         ),

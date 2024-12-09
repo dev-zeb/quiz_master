@@ -75,7 +75,7 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
       questions: questions,
     );
 
-    ref.read(quizNotifierProvider.notifier).addQuiz(quiz);
+    ref.read(quizProvider.notifier).addQuiz(quiz);
     Navigator.pop(context);
   }
 
@@ -84,8 +84,6 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(AppStrings.addNewQuiz),
-        backgroundColor: const Color.fromARGB(255, 78, 13, 151),
-        foregroundColor: Colors.white,
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -115,11 +113,12 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                           labelText: AppStrings.quizTitle,
                           labelStyle: AppTextStyles.labelText,
                           enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Colors.white.withOpacity(0.3)),
+                            borderSide:
+                                BorderSide(color: AppColors.borderColor),
                           ),
                           focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
+                            borderSide:
+                                BorderSide(color: AppColors.focusedBorderColor),
                           ),
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 4),
@@ -138,14 +137,13 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
+                              color: AppColors.borderColor,
                             ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
-                            // mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
@@ -158,7 +156,7 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                                     onTap: () => _removeQuestion(i),
                                     child: const Icon(
                                       Icons.delete,
-                                      color: Colors.white,
+                                      color: AppColors.textPrimary,
                                     ),
                                   ),
                                 ],
@@ -181,17 +179,16 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                     onPressed: _addNewQuestion,
                     child: const Icon(Icons.add),
                   ),
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: _saveQuiz,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
+                        horizontal: 24,
+                        vertical: 12,
                       ),
                     ),
-                    child: const Text(AppStrings.saveQuiz),
+                    icon: const Icon(Icons.save),
+                    label: const Text(AppStrings.saveQuiz),
                   ),
                 ],
               ),

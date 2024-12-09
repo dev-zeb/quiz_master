@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/results_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/question_card.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/gradient_container.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/question_card.dart';
 
-class QuizPlayScreen extends StatefulWidget {
+class QuizPlayScreen extends ConsumerStatefulWidget {
   final Quiz quiz;
 
   const QuizPlayScreen({
@@ -13,10 +14,10 @@ class QuizPlayScreen extends StatefulWidget {
   });
 
   @override
-  State<QuizPlayScreen> createState() => _QuizPlayScreenState();
+  ConsumerState<QuizPlayScreen> createState() => _QuizPlayScreenState();
 }
 
-class _QuizPlayScreenState extends State<QuizPlayScreen> {
+class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   var currentQuestionIndex = 0;
   final List<String> selectedAnswers = [];
 
@@ -53,23 +54,17 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
           icon: const Icon(Icons.arrow_back),
         ),
         title: Text(widget.quiz.title),
-        backgroundColor: const Color.fromARGB(255, 78, 13, 151),
-        foregroundColor: Colors.white,
       ),
       body: GradientContainer(
-        child: Container(
-          margin: const EdgeInsets.all(40),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 'Question ${currentQuestionIndex + 1} of ${widget.quiz.questions.length}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.titleMedium,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),

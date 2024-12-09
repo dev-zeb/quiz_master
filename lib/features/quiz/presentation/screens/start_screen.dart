@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/learn_page_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_list_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/gradient_container.dart';
+import 'package:learn_and_quiz/features/settings/presentation/pages/settings_page.dart';
 
 class StartScreen extends ConsumerWidget {
   const StartScreen({super.key});
@@ -10,6 +11,21 @@ class StartScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const SettingsScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.settings),
+          ),
+        ],
+      ),
       body: GradientContainer(
         child: Center(
           child: Column(

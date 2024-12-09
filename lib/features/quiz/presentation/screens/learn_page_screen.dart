@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:learn_and_quiz/config/colors.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/gradient_container.dart';
 
 class LearnPageScreen extends StatelessWidget {
@@ -6,47 +7,67 @@ class LearnPageScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final topics = [
+      'Mathematics',
+      'Science',
+      'History',
+      'Geography',
+      'Literature',
+      'Art',
+      'Music',
+      'Sports',
+      'Technology',
+      'Business',
+      'Politics',
+    ];
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Learn Flutter'),
-        backgroundColor: const Color.fromARGB(255, 78, 13, 151),
-        foregroundColor: Colors.white,
+        title: const Text('Learn'),
       ),
       body: GradientContainer(
-        child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Learn Flutter Fundamentals',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  shadows: [
-                    Shadow(
-                      blurRadius: 10.0,
-                      color: Colors.black.withOpacity(0.5),
-                      offset: const Offset(2.0, 2.0),
-                    ),
-                  ],
-                ),
-                textAlign: TextAlign.center,
+                'Welcome to Learning Section',
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-              const SizedBox(height: 30),
-              const Text(
-                'Coming Soon: Comprehensive Flutter Learning Resources',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 16,
-                ),
-                textAlign: TextAlign.center,
+              const SizedBox(height: 16),
+              Text(
+                'Choose a topic to start learning',
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
-              const SizedBox(height: 50),
-              Icon(
-                Icons.school,
-                size: 100,
-                color: Colors.white.withOpacity(0.7),
+              const SizedBox(height: 32),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: topics
+                      .length, // topics is not defined in the original code, you might need to define it
+                  itemBuilder: (context, index) {
+                    return Card(
+                      color: Theme.of(context).brightness == Brightness.light
+                          ? AppColors.whiteWithOpacity(0.2)
+                          : AppColors.blackWithOpacity(0.2),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: ListTile(
+                        title: Text(
+                          topics[
+                              index], // topics is not defined in the original code, you might need to define it
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        onTap: () {
+                          // Handle topic selection
+                        },
+                      ),
+                    );
+                  },
+                ),
               ),
             ],
           ),
