@@ -1,18 +1,14 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/domain/repositories/quiz_repository.dart';
 import 'package:learn_and_quiz/features/quiz/data/repositories/quiz_repository_impl.dart';
 
-part 'quiz_provider.g.dart';
-
-@riverpod
-class QuizNotifier extends _$QuizNotifier {
+class QuizNotifier extends StateNotifier<List<Quiz>> {
   late final QuizRepository _repository;
 
-  @override
-  List<Quiz> build() {
+  QuizNotifier() : super([]) {
     _repository = QuizRepositoryImpl();
-    return _repository.getQuizzes();
+    state = _repository.getQuizzes();
   }
 
   void addQuiz(Quiz quiz) {
@@ -34,3 +30,7 @@ class QuizNotifier extends _$QuizNotifier {
     state = _repository.getQuizzes();
   }
 }
+
+final quizProvider = StateNotifierProvider<QuizNotifier, List<Quiz>>((ref) {
+  return QuizNotifier();
+});
