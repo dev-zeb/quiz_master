@@ -71,19 +71,15 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
         }
         questions.add(question);
       }
-      print('[sufi] Saving Quiz');
       final quiz = Quiz(
         id: UniqueKey().toString(),
         title: _titleController.text.trim(),
         questions: questions,
       );
-      print('[sufi] Quiz: $quiz');
-
       ref.read(quizNotifierProvider.notifier).addQuiz(quiz);
-      print('[sufi] Quiz: $quiz Added');
     } catch (err, stk) {
-      print("[sufi] Error: $err");
-      print("[sufi] Stack: $stk");
+      debugPrint("Error: $err");
+      debugPrint("Stack: $stk");
     } finally {
       Navigator.pop(context);
     }
@@ -100,9 +96,14 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
             fontWeight: FontWeight.normal,
           ),
         ),
-        leading: Icon(
-          Icons.arrow_back_ios,
-          size: 16,
+        leading: InkWell(
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+          child: Icon(
+            Icons.arrow_back_ios,
+            size: 16,
+          ),
         ),
         foregroundColor: AppColors.textPrimary,
       ),

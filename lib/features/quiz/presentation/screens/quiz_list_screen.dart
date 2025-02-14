@@ -23,9 +23,14 @@ class QuizListScreen extends ConsumerWidget {
             fontWeight: FontWeight.normal,
           ),
         ),
-        leading: Icon(
-          Icons.arrow_back_ios,
-          size: 16,
+        leading: InkWell(
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+          child: Icon(
+            Icons.arrow_back_ios,
+            size: 16,
+          ),
         ),
         foregroundColor: AppColors.textPrimary,
       ),

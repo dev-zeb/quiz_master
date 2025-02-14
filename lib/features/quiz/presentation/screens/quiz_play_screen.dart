@@ -47,13 +47,22 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(Icons.arrow_back),
+        title: Text(
+          widget.quiz.title,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.normal,
+          ),
         ),
-        title: Text(widget.quiz.title),
+        leading: InkWell(
+          onTap: () {
+            Navigator.of(context).pop();
+          },
+          child: Icon(
+            Icons.arrow_back_ios,
+            size: 16,
+          ),
+        ),
       ),
       body: GradientContainer(
         child: Padding(
