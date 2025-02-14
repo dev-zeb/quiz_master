@@ -1,36 +1,42 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:learn_and_quiz/features/quiz/data/repositories/quiz_repository_impl.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/domain/repositories/quiz_repository.dart';
-import 'package:learn_and_quiz/features/quiz/data/repositories/quiz_repository_impl.dart';
 
 class QuizNotifier extends StateNotifier<List<Quiz>> {
-  late final QuizRepository _repository;
+  final QuizRepository repository;
 
-  QuizNotifier() : super([]) {
-    _repository = QuizRepositoryImpl();
-    state = _repository.getQuizzes();
+  QuizNotifier(this.repository) : super([]) {
+    getQuizzes();
+  }
+
+  void getQuizzes() {
+    state = repository.getQuizzes();
   }
 
   void addQuiz(Quiz quiz) {
-    _repository.addQuiz(quiz);
-    state = _repository.getQuizzes();
+    print('[sufi] Quiz provider: $quiz');
+    print('[sufi] Quiz provider: Repository: $repository');
+    repository.addQuiz(quiz);
+    print('[sufi] Quiz provider: $quiz Added');
+    getQuizzes();
   }
 
-  void removeQuiz(Quiz quiz) {
-    _repository.removeQuiz(quiz);
-    state = _repository.getQuizzes();
+  Quiz? getQuizById(String id) => repository.getQuizById(id);
+
+  void deleteQuiz(String id) {
+    repository.deleteQuizById(id);
+    getQuizzes();
   }
 
-  Future<void> saveQuizzes() async {
-    await _repository.saveQuizzes();
-  }
-
-  Future<void> loadQuizzes() async {
-    await _repository.loadQuizzes();
-    state = _repository.getQuizzes();
+  void updateQuiz(Quiz quiz) {
+    repository.updateQuiz(quiz);
+    getQuizzes();
   }
 }
 
-final quizProvider = StateNotifierProvider<QuizNotifier, List<Quiz>>((ref) {
-  return QuizNotifier();
+final quizNotifierProvider =
+    StateNotifierProvider<QuizNotifier, List<Quiz>>((ref) {
+  final repository = ref.watch(quizRepositoryProvider);
+  return QuizNotifier(repository);
 });

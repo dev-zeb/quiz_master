@@ -4,5 +4,5 @@ abstract class Failure {
 }
 
 class QuizFailure extends Failure {
-  const QuizFailure(String message) : super(message);
+  const QuizFailure(super.message);
 }

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/config/colors.dart';
-import 'package:learn_and_quiz/config/strings.dart';
-import 'package:learn_and_quiz/config/text_styles.dart';
+import 'package:learn_and_quiz/core/config/colors.dart';
+import 'package:learn_and_quiz/core/config/strings.dart';
+import 'package:learn_and_quiz/core/config/text_styles.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/gradient_container.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/question_form_item.dart';
 
 class AddQuizScreen extends ConsumerStatefulWidget {
@@ -47,52 +48,65 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
   }
 
   void _saveQuiz() {
-    if (_titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.pleaseEnterQuizTitle)),
-      );
-      return;
-    }
-
-    if (_questions.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppStrings.pleaseAddAtLeastOneQuestion)),
-      );
-      return;
-    }
-
-    final questions = <Question>[];
-    for (var i = 0; i < _questions.length; i++) {
-      final question = _questionKeys[i].currentState?.getQuestion();
-      if (question == null) {
+    try {
+      if (_titleController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.pleaseEnterQuizTitle)),
+        );
         return;
       }
-      questions.add(question);
+
+      if (_questions.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(AppStrings.pleaseAddAtLeastOneQuestion)),
+        );
+        return;
+      }
+
+      final questions = <Question>[];
+      for (var i = 0; i < _questions.length; i++) {
+        final question = _questionKeys[i].currentState?.getQuestion();
+        if (question == null) {
+          return;
+        }
+        questions.add(question);
+      }
+      print('[sufi] Saving Quiz');
+      final quiz = Quiz(
+        id: UniqueKey().toString(),
+        title: _titleController.text.trim(),
+        questions: questions,
+      );
+      print('[sufi] Quiz: $quiz');
+
+      ref.read(quizNotifierProvider.notifier).addQuiz(quiz);
+      print('[sufi] Quiz: $quiz Added');
+    } catch (err, stk) {
+      print("[sufi] Error: $err");
+      print("[sufi] Stack: $stk");
+    } finally {
+      Navigator.pop(context);
     }
-
-    final quiz = Quiz(
-      title: _titleController.text.trim(),
-      questions: questions,
-    );
-
-    ref.read(quizProvider.notifier).addQuiz(quiz);
-    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.addNewQuiz),
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: AppColors.backgroundGradient,
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+        title: Text(
+          AppStrings.addNewQuiz,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.normal,
           ),
         ),
+        leading: Icon(
+          Icons.arrow_back_ios,
+          size: 16,
+        ),
+        foregroundColor: AppColors.textPrimary,
+      ),
+      body: GradientContainer(
         child: Column(
           children: [
             Expanded(
@@ -179,16 +193,17 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                     onPressed: _addNewQuestion,
                     child: const Icon(Icons.add),
                   ),
-                  ElevatedButton.icon(
+                  ElevatedButton(
                     onPressed: _saveQuiz,
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.textPrimary,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
                       ),
                     ),
-                    icon: const Icon(Icons.save),
-                    label: const Text(AppStrings.saveQuiz),
+                    child: const Text(AppStrings.saveQuiz),
                   ),
                 ],
               ),

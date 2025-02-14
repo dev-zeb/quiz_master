@@ -46,3 +46,23 @@ class AppColors {
   static const Color darkBorderColor = Colors.white54;
   static const Color darkFocusedBorderColor = white;
 }
+
+class AppThemeColors {
+  static final lightThemeColors = {
+    'primary': AppColors.primary,
+    'secondary': AppColors.secondary,
+    'backgroundGradient': AppColors.backgroundGradient,
+    'textPrimary': AppColors.textPrimary,
+    'textSecondary': AppColors.textSecondary,
+    'borderColor': AppColors.borderColor,
+  };
+
+  static const darkThemeColors = {
+    'primary': AppColors.darkPrimary,
+    'secondary': AppColors.darkSecondary,
+    'backgroundGradient': AppColors.darkBackgroundGradient,
+    'textPrimary': AppColors.darkTextPrimary,
+    'textSecondary': AppColors.darkTextSecondary,
+    'borderColor': AppColors.darkBorderColor,
+  };
+}

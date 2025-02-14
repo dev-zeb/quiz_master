@@ -3,6 +3,7 @@ class AppStrings {
   static const String appName = 'Learn & Quiz';
 
   // Add Quiz Screen
+  static const String quizzesTitle = 'Quizzes';
   static const String addNewQuiz = 'Add New Quiz';
   static const String quizTitle = 'Quiz Title';
   static const String question = 'Question';
@@ -28,4 +29,8 @@ class AppStrings {
   // Result Screen
   static const String tryAgain = 'Try Again';
   static const String backToStart = 'Back to Start';
+
+  // Hive Box Names
+  static const String quizDataBox = 'quiz_data';
+  static const String themeDataBox = 'theme_data';
 }

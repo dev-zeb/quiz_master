@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/config/colors.dart';
+import 'package:learn_and_quiz/core/config/colors.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/gradient_container.dart';
 
 class LearnPageScreen extends StatelessWidget {

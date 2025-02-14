@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.example.learn_with_quiz"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
     compileOptions {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/config/strings.dart';
-import 'package:learn_and_quiz/config/text_styles.dart';
+import 'package:learn_and_quiz/core/config/strings.dart';
+import 'package:learn_and_quiz/core/config/text_styles.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 
 class QuestionFormItem extends StatefulWidget {
@@ -106,6 +106,7 @@ class QuestionFormItemState extends State<QuestionFormItem> {
     }
 
     return Question(
+      id: UniqueKey().toString(),
       text: question,
       answers: options,
     );

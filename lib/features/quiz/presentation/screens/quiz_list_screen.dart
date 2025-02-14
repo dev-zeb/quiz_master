@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/config/colors.dart';
+import 'package:learn_and_quiz/core/config/colors.dart';
+import 'package:learn_and_quiz/core/config/strings.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/add_quiz_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
@@ -11,25 +12,39 @@ class QuizListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final quizzes = ref.watch(quizProvider);
+    final quizzes = ref.watch(quizNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quizzes'),
+        title: Text(
+          AppStrings.quizzesTitle,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.normal,
+          ),
+        ),
+        leading: Icon(
+          Icons.arrow_back_ios,
+          size: 16,
+        ),
         foregroundColor: AppColors.textPrimary,
       ),
       floatingActionButton: quizzes.isNotEmpty
-          ? FloatingActionButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddQuizScreen(),
-                  ),
-                );
-              },
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: const Icon(Icons.add, color: AppColors.textPrimary),
+          ? Container(
+              padding: EdgeInsets.only(bottom: 12, right: 12),
+              child: FloatingActionButton(
+                shape: CircleBorder(),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddQuizScreen(),
+                    ),
+                  );
+                },
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                child: const Icon(Icons.add, color: AppColors.textPrimary),
+              ),
             )
           : null,
       body: GradientContainer(
@@ -53,15 +68,23 @@ class QuizListScreen extends ConsumerWidget {
                             child: ListTile(
                               title: Text(
                                 quiz.title,
-                                style: Theme.of(context).textTheme.titleMedium,
+                                style: TextStyle(
+                                  color: Color.fromARGB(150, 255, 255, 255),
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                               subtitle: Text(
                                 '${quiz.questions.length} Questions',
-                                style: Theme.of(context).textTheme.bodyLarge,
+                                style: TextStyle(
+                                  color: Color.fromARGB(100, 255, 255, 255),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.normal,
+                                ),
                               ),
                               trailing: Icon(
                                 Icons.play_arrow,
-                                color: Theme.of(context).colorScheme.primary,
+                                color: Color.fromARGB(150, 255, 255, 255),
                               ),
                               onTap: () {
                                 Navigator.push(

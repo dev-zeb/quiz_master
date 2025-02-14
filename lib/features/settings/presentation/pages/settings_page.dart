@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/config/theme_provider.dart';
+import 'package:learn_and_quiz/core/config/theme_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDarkMode = ref.watch(themeNotifierProvider);
+    final themeMode = ref.watch(themeNotifierProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -15,16 +16,24 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
-          Card(
-            child: ListTile(
-              title: const Text('Dark Mode'),
-              trailing: Switch(
-                value: isDarkMode,
+          Row(
+            children: [
+              Text('Dark Mode'),
+              Spacer(),
+              Switch(
+                value: themeMode == ThemeMode.dark,
                 onChanged: (value) {
-                  ref.read(themeNotifierProvider.notifier).toggleTheme();
+                  print('[sufi] Settings | value: $value');
+                  ref
+                      .read(themeNotifierProvider.notifier)
+                      .updateThemeMode(mode: value);
                 },
+                activeColor: Colors.green,
+                activeTrackColor: Colors.greenAccent,
+                inactiveThumbColor: Colors.grey,
+                inactiveTrackColor: Colors.grey.shade200,
               ),
-            ),
+            ],
           ),
         ],
       ),

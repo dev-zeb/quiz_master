@@ -11,21 +11,21 @@ class StartScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SettingsScreen(),
-                ),
-              );
-            },
-            icon: const Icon(Icons.settings),
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   actions: [
+      //     IconButton(
+      //       onPressed: () {
+      //         Navigator.push(
+      //           context,
+      //           MaterialPageRoute(
+      //             builder: (context) => const SettingsScreen(),
+      //           ),
+      //         );
+      //       },
+      //       icon: const Icon(Icons.settings),
+      //     ),
+      //   ],
+      // ),
       body: GradientContainer(
         child: Center(
           child: Column(
@@ -64,29 +64,33 @@ class StartScreen extends ConsumerWidget {
                         vertical: 10,
                       ),
                     ),
-                    icon: const Icon(Icons.play_arrow),
+                    icon: const Icon(
+                      Icons.play_arrow,
+                      color: Color.fromARGB(150, 255, 255, 255),
+                      size: 24,
+                    ),
                     label: const Text('Play Quiz'),
                   ),
-                  const SizedBox(width: 20),
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LearnPageScreen(),
-                        ),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                    ),
-                    icon: const Icon(Icons.book),
-                    label: const Text('Learn'),
-                  ),
+                  // const SizedBox(width: 20),
+                  // OutlinedButton.icon(
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (context) => const LearnPageScreen(),
+                  //       ),
+                  //     );
+                  //   },
+                  //   style: OutlinedButton.styleFrom(
+                  //     foregroundColor: Colors.white,
+                  //     padding: const EdgeInsets.symmetric(
+                  //       horizontal: 20,
+                  //       vertical: 10,
+                  //     ),
+                  //   ),
+                  //   icon: const Icon(Icons.book),
+                  //   label: const Text('Learn'),
+                  // ),
                 ],
               ),
             ],

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/config/colors.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:learn_and_quiz/core/config/colors.dart';
+import 'package:learn_and_quiz/core/config/theme_provider.dart';
 
-class GradientContainer extends StatelessWidget {
+class GradientContainer extends ConsumerWidget {
   final Widget child;
   final List<Color>? colors;
   final AlignmentGeometry begin;
@@ -16,17 +18,15 @@ class GradientContainer extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final brightness = Theme.of(context).brightness;
-    final gradientColors = colors ?? 
-        (brightness == Brightness.light 
-            ? AppColors.backgroundGradient 
-            : AppColors.darkBackgroundGradient);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeNotifierProvider);
 
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: gradientColors,
+          colors: themeMode == ThemeMode.light
+              ? AppColors.backgroundGradient
+              : AppColors.darkBackgroundGradient,
           begin: begin,
           end: end,
         ),
