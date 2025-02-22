@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:learn_and_quiz/core/config/colors.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/results_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/result_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/answer_button.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/gradient_container.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/question_card.dart';
 
 class QuizPlayScreen extends ConsumerStatefulWidget {
   final Quiz quiz;
@@ -63,24 +64,46 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
             size: 16,
           ),
         ),
+        foregroundColor: AppColors.textPrimary,
       ),
       body: GradientContainer(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 10,
+          ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Question ${currentQuestionIndex + 1} of ${widget.quiz.questions.length}',
-                style: Theme.of(context).textTheme.titleMedium,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 20),
-              QuestionCard(
-                question: currentQuestion,
-                onSelectAnswer: answerQuestion,
+              const SizedBox(height: 16),
+              Text(
+                currentQuestion.text,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 16),
+              ...currentQuestion.shuffledAnswers.map((answer) {
+                return AnswerButton(
+                  answerText: answer,
+                  onTap: () {
+                    answerQuestion(answer);
+                  },
+                );
+              }),
             ],
           ),
         ),
