@@ -21,7 +21,7 @@ class Quiz extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
-      title: 'Learn and Quiz',
+      title: 'Learn with Quiz',
       debugShowCheckedModeBanner: false,
       theme: LightTheme().themeData,
       themeMode: ref.watch(themeNotifierProvider),

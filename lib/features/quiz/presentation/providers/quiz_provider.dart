@@ -15,10 +15,7 @@ class QuizNotifier extends StateNotifier<List<Quiz>> {
   }
 
   void addQuiz(Quiz quiz) {
-    print('[sufi] Quiz provider: $quiz');
-    print('[sufi] Quiz provider: Repository: $repository');
     repository.addQuiz(quiz);
-    print('[sufi] Quiz provider: $quiz Added');
     getQuizzes();
   }
 

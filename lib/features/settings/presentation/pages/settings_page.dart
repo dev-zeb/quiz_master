@@ -23,7 +23,6 @@ class SettingsScreen extends ConsumerWidget {
               Switch(
                 value: themeMode == ThemeMode.dark,
                 onChanged: (value) {
-                  print('[sufi] Settings | value: $value');
                   ref
                       .read(themeNotifierProvider.notifier)
                       .updateThemeMode(mode: value);

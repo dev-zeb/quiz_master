@@ -25,11 +25,10 @@ class ThemeProvider extends StateNotifier<ThemeMode> {
     try {
       final Box<ThemeMode> box = Hive.box(AppStrings.themeDataBox);
       ThemeMode? mode = box.get(_themeModeKey, defaultValue: ThemeMode.system);
-      print('[sufi] Mode: $mode');
       _setTheme(mode == ThemeMode.dark);
     } catch (err, stk) {
-      print("[sufi] Error: $err");
-      print("[sufi] Stack: $stk");
+      debugPrint("Error: $err");
+      debugPrint("Stack: $stk");
     }
   }
 
@@ -39,8 +38,8 @@ class ThemeProvider extends StateNotifier<ThemeMode> {
       _setTheme(mode);
       await _saveThemeToHive(mode);
     } catch (err, stk) {
-      print("[sufi] Error: $err");
-      print("[sufi] Stack: $stk");
+      debugPrint("Error: $err");
+      debugPrint("Stack: $stk");
     }
   }
 
@@ -52,8 +51,8 @@ class ThemeProvider extends StateNotifier<ThemeMode> {
           ? AppThemeColors.darkThemeColors
           : AppThemeColors.lightThemeColors;
     } catch (err, stk) {
-      print("[sufi] Error: $err");
-      print("[sufi] Stack: $stk");
+      debugPrint("Error: $err");
+      debugPrint("Stack: $stk");
     }
   }
 
@@ -63,8 +62,8 @@ class ThemeProvider extends StateNotifier<ThemeMode> {
       final Box<ThemeMode> box = Hive.box(AppStrings.themeDataBox);
       await box.put(_themeModeKey, mode ? ThemeMode.dark : ThemeMode.light);
     } catch (err, stk) {
-      print("[sufi] Error: $err");
-      print("[sufi] Stack: $stk");
+      debugPrint("Error: $err");
+      debugPrint("Stack: $stk");
     }
   }
 
