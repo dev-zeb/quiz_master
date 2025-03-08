@@ -6,7 +6,6 @@ import 'package:learn_and_quiz/core/config/text_styles.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/gradient_container.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/question_form_item.dart';
 
 class AddQuizScreen extends ConsumerStatefulWidget {
@@ -49,6 +48,7 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
 
   void _saveQuiz() {
     try {
+      print('[sufi] _titleController.text.trim().isEmpty: ${_titleController.text.trim().isEmpty}');
       if (_titleController.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text(AppStrings.pleaseEnterQuizTitle)),
@@ -77,11 +77,13 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
         questions: questions,
       );
       ref.read(quizNotifierProvider.notifier).addQuiz(quiz);
+      Navigator.pop(context);
     } catch (err, stk) {
       debugPrint("Error: $err");
       debugPrint("Stack: $stk");
-    } finally {
-      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${err.toString()}')),
+      );
     }
   }
 
@@ -105,9 +107,10 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
             size: 16,
           ),
         ),
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: Colors.white,
+        foregroundColor: Color(0xFF013138),
       ),
-      body: GradientContainer(
+      body: Container(
         child: Column(
           children: [
             Expanded(
@@ -171,7 +174,7 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                                     onTap: () => _removeQuestion(i),
                                     child: const Icon(
                                       Icons.delete,
-                                      color: AppColors.textPrimary,
+                                      color: Color(0xFF013138),
                                     ),
                                   ),
                                 ],
@@ -197,8 +200,6 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                   ElevatedButton(
                     onPressed: _saveQuiz,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.textPrimary,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,

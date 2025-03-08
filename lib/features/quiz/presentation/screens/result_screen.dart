@@ -1,4 +1,3 @@
-import 'package:learn_and_quiz/core/config/colors.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/start_screen.dart';
@@ -45,9 +44,11 @@ class ResultScreen extends StatelessWidget {
         ),
         centerTitle: true,
         leading: Container(),
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: Colors.white,
+        foregroundColor: Color(0xFF013138),
       ),
       body: Container(
+        color: Colors.white,
         padding: const EdgeInsets.symmetric(
           horizontal: 28,
           vertical: 20
@@ -59,7 +60,7 @@ class ResultScreen extends StatelessWidget {
               'You answered $numOfCorrectAnswers out of $numOfTotalQuestions questions correctly!',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Color.fromARGB(255, 204, 154, 239),
+                color: Color(0xFF013138),
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -85,13 +86,14 @@ class ResultScreen extends StatelessWidget {
                               border: Border.all(color: Colors.white),
                               borderRadius: BorderRadius.circular(100),
                               color: isCorrectAnswer
-                                  ? const Color.fromARGB(255, 56, 255, 15)
-                                  : const Color.fromARGB(255, 198, 50, 168),
+                                  ? const Color(0xFF03ABCA)
+                                  : const Color(0xFFA30000),
                             ),
                             child: Text(
                               "${data['question_index'] + 1}",
                               style: const TextStyle(
-                                fontSize: 12,
+                                color: Colors.white,
+                                fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -104,7 +106,7 @@ class ResultScreen extends StatelessWidget {
                                 Text(
                                   data['question'],
                                   style: const TextStyle(
-                                    color: Color.fromARGB(255, 197, 185, 228),
+                                    color: Color(0xFF013138),
                                     fontSize: 16,
                                     fontWeight: FontWeight.w800,
                                     height: 1,
@@ -115,7 +117,7 @@ class ResultScreen extends StatelessWidget {
                                   Text(
                                     'Your answer: ${data['user_answer']}',
                                     style: TextStyle(
-                                      color: isCorrectAnswer ? Color.fromARGB(255, 7, 255, 0): Color.fromARGB(255, 198, 50, 168),
+                                      color: isCorrectAnswer ? Color(0xFF03ABCA): const Color(0xFFA30000),
                                       fontSize: 12,
                                       fontWeight: FontWeight.w800,
                                       height: 1,
@@ -125,7 +127,7 @@ class ResultScreen extends StatelessWidget {
                                 Text(
                                   'Correct answer: ${data['correct_answer']}',
                                   style: const TextStyle(
-                                    color: Color.fromARGB(255, 140, 114, 225),
+                                    color: Color(0xFF03ABCA),
                                     fontSize: 12,
                                     fontWeight: FontWeight.w800,
                                     height: 1,
@@ -155,12 +157,12 @@ class ResultScreen extends StatelessWidget {
               },
               icon: const Icon(
                 Icons.restart_alt_outlined,
-                color: Colors.blue,
+                color: Color(0xFF013138),
               ),
               label: const Text(
                 'Restart Quiz',
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: Color(0xFF013138),
                 ),
               ),
             ),
@@ -175,12 +177,12 @@ class ResultScreen extends StatelessWidget {
               },
               icon: const Icon(
                 Icons.home_outlined,
-                color: Colors.blue,
+                color: Color(0xFF013138),
               ),
               label: const Text(
                 'Go to Home',
                 style: TextStyle(
-                  color: Colors.blue,
+                  color: Color(0xFF013138),
                 ),
               ),
             ),

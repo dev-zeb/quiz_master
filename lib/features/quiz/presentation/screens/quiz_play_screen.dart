@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/config/colors.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/result_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/answer_button.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/gradient_container.dart';
 
 class QuizPlayScreen extends ConsumerStatefulWidget {
   final Quiz quiz;
@@ -64,9 +62,11 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
             size: 16,
           ),
         ),
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: Colors.white,
+        foregroundColor: Color(0xFF013138),
       ),
-      body: GradientContainer(
+      body: Container(
+        color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 20,
@@ -79,7 +79,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               Text(
                 'Question ${currentQuestionIndex + 1} of ${widget.quiz.questions.length}',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF013138),
                   fontSize: 14,
                   fontWeight: FontWeight.normal,
                 ),
@@ -89,7 +89,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               Text(
                 currentQuestion.text,
                 style: const TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFF013138),
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),

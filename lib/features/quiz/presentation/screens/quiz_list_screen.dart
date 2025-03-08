@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/config/colors.dart';
 import 'package:learn_and_quiz/core/config/strings.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/add_quiz_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/gradient_container.dart';
 
 class QuizListScreen extends ConsumerWidget {
   const QuizListScreen({super.key});
@@ -32,7 +31,8 @@ class QuizListScreen extends ConsumerWidget {
             size: 16,
           ),
         ),
-        foregroundColor: AppColors.textPrimary,
+        backgroundColor: Colors.white,
+        foregroundColor: Color(0xFF013138),
       ),
       floatingActionButton: quizzes.isNotEmpty
           ? Container(
@@ -47,12 +47,13 @@ class QuizListScreen extends ConsumerWidget {
                     ),
                   );
                 },
-                backgroundColor: Theme.of(context).colorScheme.primary,
-                child: const Icon(Icons.add, color: AppColors.textPrimary),
+                backgroundColor: Colors.white,
+                child: const Icon(Icons.add, color: Color(0xFF013138)),
               ),
             )
           : null,
-      body: GradientContainer(
+      body: Container(
+        color: Colors.white,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -61,49 +62,7 @@ class QuizListScreen extends ConsumerWidget {
               Expanded(
                 child: quizzes.isEmpty
                     ? _buildEmptyState(context)
-                    : ListView.builder(
-                        itemCount: quizzes.length,
-                        itemBuilder: (context, index) {
-                          final quiz = quizzes[index];
-                          return Card(
-                            color:
-                                Theme.of(context).brightness == Brightness.light
-                                    ? AppColors.whiteWithOpacity(0.2)
-                                    : AppColors.blackWithOpacity(0.2),
-                            child: ListTile(
-                              title: Text(
-                                quiz.title,
-                                style: TextStyle(
-                                  color: Color.fromARGB(150, 255, 255, 255),
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Text(
-                                '${quiz.questions.length} Questions',
-                                style: TextStyle(
-                                  color: Color.fromARGB(100, 255, 255, 255),
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                              trailing: Icon(
-                                Icons.play_arrow,
-                                color: Color.fromARGB(150, 255, 255, 255),
-                              ),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        QuizPlayScreen(quiz: quiz),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
+                    : _buildQuizListWidget(quizzes),
               ),
             ],
           ),
@@ -120,13 +79,13 @@ class QuizListScreen extends ConsumerWidget {
           Icon(
             Icons.quiz_outlined,
             size: 100,
-            color: Colors.white.withOpacity(0.7),
+            color: Color(0xFF013138),
           ),
           const SizedBox(height: 20),
           Text(
             'No quizzes available',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Color(0xFF013138),
               fontSize: 18,
             ),
           ),
@@ -141,14 +100,60 @@ class QuizListScreen extends ConsumerWidget {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white.withOpacity(0.2),
-              foregroundColor: Colors.white,
+              backgroundColor: Color(0xFF9FCCCC),
+              foregroundColor: Color(0xFF013138),
             ),
-            icon: const Icon(Icons.add),
+            icon: const Icon(
+              Icons.add,
+              color: Color(0xFF013138),
+            ),
             label: const Text('Create First Quiz'),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildQuizListWidget(List<Quiz> quizzes) {
+    return ListView.builder(
+      itemCount: quizzes.length,
+      itemBuilder: (context, index) {
+        final quiz = quizzes[index];
+        return Card(
+          color: Color(0xFFD8ECEC),
+          child: ListTile(
+            title: Text(
+              quiz.title,
+              style: TextStyle(
+                color: Color(0xFF013138),
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              '${quiz.questions.length} Questions',
+              style: TextStyle(
+                color: Color(0xFF013138),
+                fontSize: 18,
+                fontWeight: FontWeight.normal,
+              ),
+            ),
+            trailing: Icon(
+              Icons.play_arrow,
+              color: Color(0xFF013138),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      QuizPlayScreen(quiz: quiz),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

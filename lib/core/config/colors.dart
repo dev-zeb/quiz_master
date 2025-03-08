@@ -4,8 +4,12 @@ class AppColors {
   // Light Theme Colors
   // static const Color primary = Color.fromARGB(255, 78, 13, 151);
   // static const Color secondary = Color.fromARGB(255, 107, 15, 168);
-  static const Color primary = Color.fromARGB(255, 6, 65, 92);
-  static const Color secondary = Color.fromARGB(255, 0, 54, 49);
+
+  // static const Color primary = Color.fromARGB(255, 6, 65, 92);
+  // static const Color secondary = Color.fromARGB(255, 0, 54, 49);
+
+  static const Color primary = Color.fromARGB(255, 6, 237, 210);
+  static const Color secondary = Color.fromARGB(255, 0, 217, 255);
   static const Color white = Colors.white;
   static const Color black = Colors.black;
   static const Color green = Colors.green;
@@ -41,8 +45,8 @@ class AppColors {
   static const Color darkTextSecondary = Colors.white70;
 
   // Border colors
-  static Color borderColor = whiteWithOpacity(0.3);
-  static const Color focusedBorderColor = white;
+  static Color borderColor = Color(0xFF013138);
+  static const Color focusedBorderColor = Color(0xFF013138);
   static const Color darkBorderColor = Colors.white54;
   static const Color darkFocusedBorderColor = white;
 }
