@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:learn_and_quiz/core/config/strings.dart';
-import 'package:learn_and_quiz/core/config/text_styles.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 
-class QuestionFormItem extends StatefulWidget {
-  const QuestionFormItem({super.key});
+class QuizFormQuestionItem extends StatefulWidget {
+  const QuizFormQuestionItem({super.key});
 
   @override
-  State<QuestionFormItem> createState() => QuestionFormItemState();
+  State<QuizFormQuestionItem> createState() => QuizFormQuestionItemState();
 }
 
-class QuestionFormItemState extends State<QuestionFormItem> {
+class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
   final TextEditingController _questionController = TextEditingController();
   final List<TextEditingController> _optionControllers = [];
   int _selectedAnswerIndex = 0;
@@ -114,21 +113,25 @@ class QuestionFormItemState extends State<QuestionFormItem> {
 
   @override
   Widget build(BuildContext context) {
-    //TODO: Fix border colors
+    final colorScheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         TextField(
           controller: _questionController,
-          style: AppTextStyles.bodyText,
+          style: TextStyle(
+            color: colorScheme.primary,
+          ),
           decoration: InputDecoration(
-            labelText: AppStrings.question,
-            labelStyle: AppTextStyles.labelText,
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF013138)),
+            hintText: AppStrings.question,
+            hintStyle: TextStyle(
+              color: colorScheme.primary,
             ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF013138)),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: colorScheme.primary),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: colorScheme.primary),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 4),
           ),
@@ -138,17 +141,36 @@ class QuestionFormItemState extends State<QuestionFormItem> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               AppStrings.options,
-              style: AppTextStyles.titleMedium,
+              style: TextStyle(
+                color: colorScheme.primary,
+              ),
             ),
-            TextButton.icon(
-              onPressed: _addOption,
-              icon: const Icon(Icons.add, color: Color(0xFF013138), size: 20),
-              label: Text(
-                AppStrings.addOption,
-                style: TextStyle(
-                  color: Color(0xFF013138),
+            GestureDetector(
+              onTap: _addOption,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.add,
+                      color: colorScheme.onPrimary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      AppStrings.addOption,
+                      style: TextStyle(
+                        color: colorScheme.onPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
                 ),
               ),
             ),
@@ -166,9 +188,9 @@ class QuestionFormItemState extends State<QuestionFormItem> {
                   fillColor: WidgetStateProperty.resolveWith<Color>(
                     (Set<WidgetState> states) {
                       if (states.contains(WidgetState.selected)) {
-                        return Color(0xFF013138);
+                        return colorScheme.primary;
                       }
-                      return Color(0xFF013138);
+                      return colorScheme.primary;
                     },
                   ),
                   onChanged: (value) {
@@ -180,16 +202,17 @@ class QuestionFormItemState extends State<QuestionFormItem> {
                 Expanded(
                   child: TextField(
                     controller: _optionControllers[i],
-                    style: AppTextStyles.bodyText,
+                    style: TextStyle(color: colorScheme.primary),
                     decoration: InputDecoration(
-                      labelText: '${AppStrings.option} ${i + 1}',
-                      labelStyle: AppTextStyles.labelText,
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: Color(0xFF013138)),
+                      hintText: '${AppStrings.option} ${i + 1}',
+                      hintStyle: TextStyle(
+                        color: colorScheme.primary.withOpacity(0.75),
                       ),
-                      focusedBorder: const UnderlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xFF013138)),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: colorScheme.primary),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: colorScheme.primary),
                       ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 4),
                     ),
@@ -199,8 +222,8 @@ class QuestionFormItemState extends State<QuestionFormItem> {
                   icon: Icon(
                     Icons.remove_circle_outline,
                     color: _optionControllers.length <= 2
-                        ? Color(0xFF013138).withOpacity(0.3)
-                        : Color(0xFF013138).withOpacity(0.9),
+                        ? colorScheme.primary.withOpacity(0.3)
+                        : colorScheme.primary.withOpacity(0.9),
                   ),
                   onPressed: _optionControllers.length <= 2
                       ? null

@@ -3,6 +3,12 @@ import 'package:learn_and_quiz/features/quiz/data/repositories/quiz_repository_i
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/domain/repositories/quiz_repository.dart';
 
+final quizNotifierProvider =
+StateNotifierProvider<QuizNotifier, List<Quiz>>((ref) {
+  final repository = ref.watch(quizRepositoryProvider);
+  return QuizNotifier(repository);
+});
+
 class QuizNotifier extends StateNotifier<List<Quiz>> {
   final QuizRepository repository;
 
@@ -31,9 +37,3 @@ class QuizNotifier extends StateNotifier<List<Quiz>> {
     getQuizzes();
   }
 }
-
-final quizNotifierProvider =
-    StateNotifierProvider<QuizNotifier, List<Quiz>>((ref) {
-  final repository = ref.watch(quizRepositoryProvider);
-  return QuizNotifier(repository);
-});

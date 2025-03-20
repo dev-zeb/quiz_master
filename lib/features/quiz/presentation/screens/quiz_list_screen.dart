@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/core/config/strings.dart';
+import 'package:learn_and_quiz/core/ui/widget/app_bar_back_button.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/add_quiz_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_outlined_button.dart';
 
 class QuizListScreen extends ConsumerWidget {
   const QuizListScreen({super.key});
@@ -15,139 +17,104 @@ class QuizListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          AppStrings.quizzesTitle,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
-        leading: InkWell(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: Icon(
-            Icons.arrow_back_ios,
-            size: 16,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: Color(0xFF013138),
+        title: Text(AppStrings.quizzesTitle),
+        leading: AppBarBackButton(),
       ),
       floatingActionButton: quizzes.isNotEmpty
-          ? Container(
-              padding: EdgeInsets.only(bottom: 12, right: 12),
-              child: FloatingActionButton(
-                shape: CircleBorder(),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddQuizScreen(),
-                    ),
-                  );
-                },
-                backgroundColor: Colors.white,
-                child: const Icon(Icons.add, color: Color(0xFF013138)),
-              ),
+          ? QuizOutlinedButton(
+              text: 'Add Quiz',
+              icon: Icons.add,
+              isRightAligned: true,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AddQuizScreen(),
+                  ),
+                );
+              },
             )
           : null,
-      body: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: quizzes.isEmpty
-                    ? _buildEmptyState(context)
-                    : _buildQuizListWidget(quizzes),
-              ),
-            ],
-          ),
-        ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: quizzes.isEmpty
+            ? _buildEmptyState(context)
+            : _buildQuizListWidget(context, ref, quizzes),
       ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.quiz_outlined,
-            size: 100,
-            color: Color(0xFF013138),
-          ),
-          const SizedBox(height: 20),
+          Icon(Icons.quiz_outlined, size: 100, color: colorScheme.primary),
+          const SizedBox(height: 8),
           Text(
             'No quizzes available',
             style: TextStyle(
-              color: Color(0xFF013138),
-              fontSize: 18,
+              color: colorScheme.primary,
+              fontSize: 24,
             ),
           ),
           const SizedBox(height: 20),
           ElevatedButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AddQuizScreen(),
-                ),
-              );
-            },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFF9FCCCC),
-              foregroundColor: Color(0xFF013138),
+              backgroundColor: colorScheme.primary,
             ),
-            icon: const Icon(
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AddQuizScreen(),
+              ),
+            ),
+            icon: Icon(
               Icons.add,
-              color: Color(0xFF013138),
+              color: colorScheme.onPrimary,
+              size: 24,
             ),
-            label: const Text('Create First Quiz'),
+            label: Text(
+              'Create First Quiz',
+              style: TextStyle(
+                color: colorScheme.onPrimary,
+                fontSize: 16,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildQuizListWidget(List<Quiz> quizzes) {
+  Widget _buildQuizListWidget(
+    BuildContext context,
+    WidgetRef ref,
+    List<Quiz> quizzes,
+  ) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return ListView.builder(
       itemCount: quizzes.length,
       itemBuilder: (context, index) {
         final quiz = quizzes[index];
         return Card(
-          color: Color(0xFFD8ECEC),
           child: ListTile(
-            title: Text(
-              quiz.title,
-              style: TextStyle(
-                color: Color(0xFF013138),
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            title: Text(quiz.title, style: textTheme.titleLarge),
             subtitle: Text(
               '${quiz.questions.length} Questions',
-              style: TextStyle(
-                color: Color(0xFF013138),
-                fontSize: 18,
-                fontWeight: FontWeight.normal,
-              ),
+              style: textTheme.bodyMedium,
             ),
-            trailing: Icon(
-              Icons.play_arrow,
-              color: Color(0xFF013138),
-            ),
+            trailing: Icon(Icons.play_arrow, color: colorScheme.primary),
             onTap: () {
+              ref.invalidate(selectedAnswersProvider);
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      QuizPlayScreen(quiz: quiz),
+                  builder: (context) => QuizPlayScreen(quiz: quiz),
                 ),
               );
             },
