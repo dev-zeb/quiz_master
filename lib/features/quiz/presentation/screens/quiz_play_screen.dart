@@ -1,112 +1,121 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:learn_and_quiz/core/ui/widget/app_bar_back_button.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/result_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/answer_button.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_question_card.dart';
+
+final selectedAnswersProvider = StateProvider<List<String>>((ref) {
+  return [];
+});
 
 class QuizPlayScreen extends ConsumerStatefulWidget {
   final Quiz quiz;
 
-  const QuizPlayScreen({
-    super.key,
-    required this.quiz,
-  });
+  const QuizPlayScreen({super.key, required this.quiz});
 
   @override
   ConsumerState<QuizPlayScreen> createState() => _QuizPlayScreenState();
 }
 
 class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
-  var currentQuestionIndex = 0;
-  final List<String> selectedAnswers = [];
+  int _currentQuestionIndex = 0;
+  List<Question> _questions = [];
 
-  void answerQuestion(String selectedAnswer) {
-    selectedAnswers.add(selectedAnswer);
+  @override
+  void initState() {
+    super.initState();
+    _questions = widget.quiz.questions;
+  }
 
-    if (selectedAnswers.length == widget.quiz.questions.length) {
+  void _handleNextButtonClick() {
+    if (_currentQuestionIndex == (_questions.length - 1)) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => ResultScreen(
-            chosenAnswers: selectedAnswers,
             quiz: widget.quiz,
           ),
         ),
       );
     } else {
       setState(() {
-        currentQuestionIndex++;
+        _currentQuestionIndex++;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final currentQuestion = widget.quiz.questions[currentQuestionIndex];
+    final colorScheme = Theme.of(context).colorScheme;
+    final currentQuestion = _questions[_currentQuestionIndex];
+    final isLastQuestion =
+        _currentQuestionIndex == widget.quiz.questions.length - 1;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          widget.quiz.title,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.normal,
-          ),
-        ),
-        leading: InkWell(
-          onTap: () {
-            Navigator.of(context).pop();
-          },
-          child: Icon(
-            Icons.arrow_back_ios,
-            size: 16,
-          ),
-        ),
-        backgroundColor: Colors.white,
-        foregroundColor: Color(0xFF013138),
+        title: Text(widget.quiz.title),
+        leading: AppBarBackButton(),
       ),
-      body: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 10,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          Container(
+            height: 6,
+            decoration: BoxDecoration(
+              border: Border.all(color: colorScheme.primary, width: 0.5),
+            ),
+            child: LinearProgressIndicator(
+              value: (_currentQuestionIndex + 1) / widget.quiz.questions.length,
+              backgroundColor: colorScheme.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
+            ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Question ${currentQuestionIndex + 1} of ${widget.quiz.questions.length}',
-                style: TextStyle(
-                  color: Color(0xFF013138),
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                currentQuestion.text,
-                style: const TextStyle(
-                  color: Color(0xFF013138),
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              ...currentQuestion.shuffledAnswers.map((answer) {
-                return AnswerButton(
-                  answerText: answer,
-                  onTap: () {
-                    answerQuestion(answer);
-                  },
-                );
-              }),
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 20,
+            ),
+            child: Text(
+              'Question ${_currentQuestionIndex + 1} of ${_questions.length}',
+            ),
           ),
-        ),
+          Expanded(
+            child: QuizQuestionCard(
+              questionText: currentQuestion.text,
+              questionIndex: _currentQuestionIndex,
+              answers: currentQuestion.shuffledAnswers,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 60,
+              vertical: 20,
+            ),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton(
+                onPressed: _handleNextButtonClick,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      isLastQuestion ? 'Submit' : 'Next',
+                    ),
+                    const SizedBox(width: 12),
+                    Icon(
+                      isLastQuestion
+                          ? Icons.arrow_upward_outlined
+                          : Icons.arrow_right_alt_rounded,
+                    )
+                  ],
+                ),
+              ),
+            ),
+          )
+        ],
       ),
     );
   }
