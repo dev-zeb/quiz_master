@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/core/config/strings.dart';
 import 'package:learn_and_quiz/core/ui/widget/app_bar_back_button.dart';
@@ -17,6 +18,8 @@ class AddQuizScreen extends ConsumerStatefulWidget {
 
 class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
   final _titleController = TextEditingController();
+  final _minutesController = TextEditingController(text: '02');
+  final _secondsController = TextEditingController(text: '00');
   final List<GlobalKey<QuizFormQuestionItemState>> _questionKeys = [];
   final List<GlobalKey> _questionContainerKeys = [];
   final List<QuizFormQuestionItem> _questions = [];
@@ -52,11 +55,12 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
-      // _checkLastQuestionVisibility();
     });
   }
 
   void _removeQuestion(int index) {
+    if (_questions.length <= 1) return;
+
     setState(() {
       _questions.removeAt(index);
       _questionKeys.removeAt(index);
@@ -67,13 +71,6 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
     });
   }
 
-  // void _checkLastQuestionVisibility() {
-  //   final maxScroll = _scrollController.position.maxScrollExtent;
-  //   final currentScroll = _scrollController.position.pixels;
-  //   setState(() {
-  //     _showScrollDownButton = currentScroll < maxScroll;
-  //   });
-  // }
   bool _showScrollUpButton = false;
 
   void _checkLastQuestionVisibility() {
@@ -101,6 +98,22 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
         );
         return;
       }
+      if ((_minutesController.text.trim().isEmpty &&
+          _secondsController.text.trim().isEmpty)) {
+        ScaffoldMessenger.of(context).showMaterialBanner(
+          MaterialBanner(
+            content: const Text('Please set the time for the quiz'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          ),
+        );
+      }
 
       final questions = <Question>[];
       for (var i = 0; i < _questions.length; i++) {
@@ -109,10 +122,15 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
         questions.add(question);
       }
 
+      int minutes = int.parse(_minutesController.text.trim());
+      int seconds = int.parse(_secondsController.text.trim());
+      int totalDuration = (minutes * 60) + seconds;
+
       final quiz = Quiz(
         id: UniqueKey().toString(),
         title: _titleController.text.trim(),
         questions: questions,
+        durationSeconds: totalDuration,
       );
 
       ref.read(quizNotifierProvider.notifier).addQuiz(quiz);
@@ -157,6 +175,7 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                           style: TextStyle(color: colorScheme.primary),
                           decoration: InputDecoration(
                             hintText: AppStrings.quizTitle,
+                            isDense: true,
                             labelStyle: TextStyle(color: colorScheme.primary),
                             enabledBorder: UnderlineInputBorder(
                               borderSide:
@@ -170,47 +189,116 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 20),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Quiz time limit",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                            Spacer(),
+                            // Minutes Input Field
+                            Container(
+                              margin: EdgeInsets.symmetric(horizontal: 8),
+                              width: 40,
+                              child: TextField(
+                                controller: _minutesController,
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    vertical: 4,
+                                    horizontal: 4,
+                                  ),
+                                ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  // Allow only numbers
+                                  LengthLimitingTextInputFormatter(2),
+                                  // Max 2 digits
+                                ],
+                              ),
+                            ),
+                            Text('min'),
+                            Container(
+                              margin: EdgeInsets.symmetric(horizontal: 8),
+                              width: 40,
+                              child: TextField(
+                                controller: _secondsController,
+                                keyboardType: TextInputType.number,
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    vertical: 4,
+                                    horizontal: 4,
+                                  ),
+                                ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  // Allow only numbers
+                                  LengthLimitingTextInputFormatter(2),
+                                  // Max 2 digits
+                                ],
+                              ),
+                            ),
+                            Text('sec'),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
                         Text(
                           AppStrings.questions,
                           style: TextStyle(color: colorScheme.primary),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 10),
                         ..._questions.asMap().entries.map((question) {
                           final index = question.key;
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
-                            child: Container(
-                              key: _questionContainerKeys[index],
-                              decoration: BoxDecoration(
-                                border: Border.all(color: colorScheme.outline),
-                                borderRadius: BorderRadius.circular(8),
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: colorScheme.primary,
+                                width: 2,
                               ),
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Question ${index + 1}',
-                                        style: TextStyle(
-                                          color: colorScheme.primary,
-                                        ),
+                            ),
+                            key: _questionContainerKeys[index],
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            margin: const EdgeInsets.only(bottom: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Question ${index + 1}',
+                                      style: TextStyle(
+                                        color: colorScheme.primary,
                                       ),
-                                      const Spacer(),
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.delete,
-                                          color: colorScheme.primary,
-                                        ),
-                                        onPressed: () => _removeQuestion(index),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: _questions.length > 1
+                                            ? Colors.red
+                                            : colorScheme.primary
+                                                .withOpacity(0.3),
                                       ),
-                                    ],
-                                  ),
-                                  question.value,
-                                ],
-                              ),
+                                      onPressed: () => _removeQuestion(index),
+                                    ),
+                                  ],
+                                ),
+                                question.value,
+                              ],
                             ),
                           );
                         }),
@@ -242,63 +330,77 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
               const SizedBox(height: 8),
             ],
           ),
-          if (_showScrollUpButton)
-            Positioned(
-              bottom: _showScrollDownButton ? 140 : 80,
-              left: 8,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(50),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black26, blurRadius: 10, spreadRadius: 2),
-                  ],
-                ),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_upward,
-                    color: colorScheme.primary,
-                  ),
-                  onPressed: () {
-                    _scrollController.animateTo(
-                      0, // Scroll to top
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOut,
-                    );
-                  },
-                ),
-              ),
-            ),
-          if (_showScrollDownButton)
-            Positioned(
-              bottom: 80,
-              left: 8,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(50),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black26, blurRadius: 10, spreadRadius: 2),
-                  ],
-                ),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.arrow_downward,
-                    color: colorScheme.primary,
-                  ),
-                  onPressed: () {
-                    _scrollController.animateTo(
-                      _scrollController.position.maxScrollExtent,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOut,
-                    );
-                  },
-                ),
-              ),
-            ),
+          JumpScrollButton(
+            scrollController: _scrollController,
+            isVisible: _showScrollUpButton,
+            iconData: Icons.arrow_upward,
+            bottomPosition: _showScrollDownButton ? 140 : 80,
+            onTap: () {
+              _scrollController.animateTo(
+                0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              );
+            },
+          ),
+          JumpScrollButton(
+            scrollController: _scrollController,
+            isVisible: _showScrollDownButton,
+            iconData: Icons.arrow_downward,
+            bottomPosition: 80,
+            onTap: () {
+              _scrollController.animateTo(
+                _scrollController.position.maxScrollExtent,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOut,
+              );
+            },
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class JumpScrollButton extends StatelessWidget {
+  final double bottomPosition;
+  final bool isVisible;
+  final IconData iconData;
+  final VoidCallback onTap;
+  final ScrollController scrollController;
+
+  const JumpScrollButton({
+    super.key,
+    required this.bottomPosition,
+    required this.isVisible,
+    required this.iconData,
+    required this.onTap,
+    required this.scrollController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Visibility(
+      visible: isVisible,
+      child: Positioned(
+        bottom: bottomPosition,
+        left: 0,
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: colorScheme.primary,
+            ),
+            child: Icon(
+              iconData,
+              color: colorScheme.onPrimary,
+            ),
+          ),
+        ),
       ),
     );
   }
