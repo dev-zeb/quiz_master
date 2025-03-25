@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/core/config/strings.dart';
 import 'package:learn_and_quiz/core/ui/widget/app_bar_back_button.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/helpers/dto_models/quiz_time.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/add_quiz_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
@@ -111,6 +112,8 @@ class QuizListScreen extends ConsumerWidget {
             trailing: Icon(Icons.play_arrow, color: colorScheme.primary),
             onTap: () {
               ref.invalidate(selectedAnswersProvider);
+              // Update the remaining time here
+              QuizTimeDTO.elapsedTimeSeconds = quiz.durationSeconds ?? 120;
               Navigator.push(
                 context,
                 MaterialPageRoute(

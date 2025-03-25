@@ -123,9 +123,10 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
             color: colorScheme.primary,
           ),
           decoration: InputDecoration(
-            hintText: AppStrings.question,
+            isDense: true,
+            hintText: 'Enter question',
             hintStyle: TextStyle(
-              color: colorScheme.primary,
+              color: colorScheme.primary.withOpacity(0.3),
             ),
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: colorScheme.primary),
@@ -133,9 +134,10 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
             focusedBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: colorScheme.primary),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+            contentPadding: EdgeInsets.only(bottom: 4),
           ),
-          maxLines: 2,
+          minLines: 1,
+          maxLines: 4,
         ),
         const SizedBox(height: 16),
         Row(
@@ -188,7 +190,7 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
                   fillColor: WidgetStateProperty.resolveWith<Color>(
                     (Set<WidgetState> states) {
                       if (states.contains(WidgetState.selected)) {
-                        return colorScheme.primary;
+                        return Colors.green;
                       }
                       return colorScheme.primary;
                     },
@@ -204,9 +206,10 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
                     controller: _optionControllers[i],
                     style: TextStyle(color: colorScheme.primary),
                     decoration: InputDecoration(
+                      isDense: true,
                       hintText: '${AppStrings.option} ${i + 1}',
                       hintStyle: TextStyle(
-                        color: colorScheme.primary.withOpacity(0.75),
+                        color: colorScheme.primary.withOpacity(0.3),
                       ),
                       enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: colorScheme.primary),
@@ -214,8 +217,10 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
                       focusedBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: colorScheme.primary),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                      contentPadding: const EdgeInsets.only(bottom: 4),
                     ),
+                    minLines: 1,
+                    maxLines: 4,
                   ),
                 ),
                 IconButton(
@@ -223,7 +228,7 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
                     Icons.remove_circle_outline,
                     color: _optionControllers.length <= 2
                         ? colorScheme.primary.withOpacity(0.3)
-                        : colorScheme.primary.withOpacity(0.9),
+                        : Colors.redAccent,
                   ),
                   onPressed: _optionControllers.length <= 2
                       ? null
@@ -232,6 +237,7 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
               ],
             ),
           ),
+        SizedBox(height: 16),
       ],
     );
   }
