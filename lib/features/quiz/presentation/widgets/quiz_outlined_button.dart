@@ -20,6 +20,7 @@ class QuizOutlinedButton extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment:
           isRightAligned ? MainAxisAlignment.end : MainAxisAlignment.center,
       children: [
@@ -28,15 +29,11 @@ class QuizOutlinedButton extends ConsumerWidget {
           style: OutlinedButton.styleFrom(
             backgroundColor: colorScheme.primary,
             foregroundColor: colorScheme.onPrimary,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 10,
-            ),
           ),
           icon: Icon(
             icon,
             color: colorScheme.onPrimary,
-            size: 24,
+            size: 20,
           ),
           label: Text(text),
         ),

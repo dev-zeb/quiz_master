@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/core/ui/widget/app_bar_back_button.dart';
+import 'package:learn_and_quiz/core/ui/widget/blinking_timer_widget.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/helpers/dto_models/quiz_time.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/result_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_question_card.dart';
 
-final selectedAnswersProvider = StateProvider<List<String>>((ref) {
+final selectedAnswersProvider = StateProvider<List<String?>>((ref) {
   return [];
 });
 
@@ -21,11 +23,13 @@ class QuizPlayScreen extends ConsumerStatefulWidget {
 
 class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   int _currentQuestionIndex = 0;
+  late int _quizTimeSeconds;
   List<Question> _questions = [];
 
   @override
   void initState() {
     super.initState();
+    _quizTimeSeconds = widget.quiz.durationSeconds ?? 120;
     _questions = widget.quiz.questions;
   }
 
@@ -57,6 +61,32 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
       appBar: AppBar(
         title: Text(widget.quiz.title),
         leading: AppBarBackButton(),
+        actions: [
+          BlinkingTimerWidget(
+            maxSeconds: _quizTimeSeconds,
+            onTimeUp: () {
+              final answerList = ref.read(selectedAnswersProvider);
+              final totalQuestions = widget.quiz.questions.length;
+
+              while (answerList.length < totalQuestions) {
+                answerList.add(null);
+              }
+              ref
+                  .read(selectedAnswersProvider.notifier)
+                  .update((_) => answerList);
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ResultScreen(
+                    quiz: widget.quiz,
+                    elapsedTimeSeconds: QuizTimeDTO.elapsedTimeSeconds,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +144,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

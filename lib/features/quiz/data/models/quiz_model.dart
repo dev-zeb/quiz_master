@@ -14,11 +14,14 @@ class QuizModel {
 
   @HiveField(2)
   final List<QuestionModel> questions;
+  @HiveField(3)
+  final int? durationSeconds;
 
   QuizModel({
     required this.id,
     required this.title,
     required this.questions,
+    this.durationSeconds,
   });
 
   // Convert from domain entity to data model
@@ -26,7 +29,9 @@ class QuizModel {
     return QuizModel(
       id: quiz.id,
       title: quiz.title,
-      questions: quiz.questions.map((q) => QuestionModel.fromEntity(q)).toList(),
+      questions:
+          quiz.questions.map((q) => QuestionModel.fromEntity(q)).toList(),
+      durationSeconds: quiz.durationSeconds ?? 120,
     );
   }
 
@@ -36,6 +41,7 @@ class QuizModel {
       id: id,
       title: title,
       questions: questions.map((q) => q.toEntity()).toList(),
+      durationSeconds: durationSeconds ?? 120,
     );
   }
 }

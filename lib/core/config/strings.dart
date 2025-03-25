@@ -30,10 +30,6 @@ class AppStrings {
   static const String tryAgain = 'Try Again';
   static const String backToStart = 'Back to Start';
 
-  // Emojis
-  static const String correctEmoji = '✅';
-  static const String errorEmoji = '❌';
-
   // Hive Box Names
   static const String quizDataBox = 'quiz_data';
   static const String themeDataBox = 'theme_data';
