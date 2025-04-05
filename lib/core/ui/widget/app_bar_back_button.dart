@@ -6,7 +6,6 @@ class AppBarBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
     return IconButton(
       icon: Container(
         clipBehavior: Clip.antiAlias,
@@ -15,11 +14,11 @@ class AppBarBackButton extends StatelessWidget {
           color: colorScheme.primary,
         ),
         padding: EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 6,
+          horizontal: 6,
+          vertical: 2,
         ),
         child: Icon(
-          Icons.arrow_back_ios,
+          Icons.arrow_back_sharp,
           color: colorScheme.onPrimary,
         ),
       ),

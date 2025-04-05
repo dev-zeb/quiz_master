@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:learn_and_quiz/core/config/utils.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/helpers/dto_models/question_summary.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/helpers/dto_models/quiz_time.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/start_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_chart_item.dart';
@@ -15,11 +14,13 @@ import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_time_widg
 class ResultScreen extends ConsumerStatefulWidget {
   final Quiz quiz;
   final int? elapsedTimeSeconds;
+  final int? totalDurationSeconds;
 
   const ResultScreen({
     super.key,
     required this.quiz,
     this.elapsedTimeSeconds,
+    this.totalDurationSeconds,
   });
 
   @override
@@ -147,27 +148,22 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
   }
 
   Widget _buildTimeChart({required int quizDuration}) {
-    // Calculate remaining time
-    final remainingTime = QuizTimeDTO.elapsedTimeSeconds;
+    final elapsedTime = widget.elapsedTimeSeconds ?? 0;
+    final remainingTime = (widget.totalDurationSeconds ?? 120) - elapsedTime;
+
     final [remainingMinutes, remainingSeconds] =
-        getMinutesAndSeconds(remainingTime);
+    getMinutesAndSeconds(remainingTime);
+    final [elapsedMinutes, elapsedSeconds] =
+    getMinutesAndSeconds(elapsedTime);
+    final [totalMinutes, totalSeconds] =
+    getMinutesAndSeconds(widget.totalDurationSeconds ?? 120);
 
-    // Calculate elapsed time
-    final elapsedTime = quizDuration - remainingTime;
-    final [elapsedMinutes, elapsedSeconds] = getMinutesAndSeconds(elapsedTime);
-
-    // Format quiz duration
-    final [quizDurationMinutes, quizDurationSecs] =
-        getMinutesAndSeconds(quizDuration);
-
-    double progress = remainingTime / quizDuration;
+    double progress = elapsedTime / (widget.totalDurationSeconds ?? 120);
     Color progressColor = progress <= 0.2
-        ? Colors.red
+        ? Colors.blue[500]!
         : progress <= 0.5
-            ? Colors.orange
-            : Colors.blue[500]!;
-
-    final colorScheme = Theme.of(context).colorScheme;
+        ? Colors.orange
+        : Colors.red;
 
     return QuizChartItem(
       chartTitle: 'Time Stats',
@@ -180,30 +176,26 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
             child: CircularProgressIndicator(
               value: progress.clamp(0.0, 1.0),
               strokeWidth: 12,
-              backgroundColor: progressColor,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                Color(0xFF29C531),
-              ),
+              backgroundColor: Colors.grey[200],
+              valueColor: AlwaysStoppedAnimation<Color>(progressColor),
             ),
           ),
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Quiz Time',
+                'Total Time',
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.grey[600],
                 ),
               ),
               Text(
-                elapsedTime > 0
-                    ? "$quizDurationMinutes:$quizDurationSecs"
-                    : "02:00",
+                '$totalMinutes:${totalSeconds.toString().padLeft(2, '0')}',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: colorScheme.primary,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
@@ -214,14 +206,14 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
         const SizedBox(height: 12),
         QuizTimeWidget(
           optionTitle: 'Elapsed Time',
-          optionValue: '$elapsedMinutes:$elapsedSeconds',
+          optionValue: '$elapsedMinutes:${elapsedSeconds.toString().padLeft(2, '0')}',
           optionColor: progressColor,
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         QuizTimeWidget(
           optionTitle: 'Remaining Time',
-          optionValue: '$remainingMinutes:$remainingSeconds',
-          optionColor: Color(0xFF29C531),
+          optionValue: '$remainingMinutes:${remainingSeconds.toString().padLeft(2, '0')}',
+          optionColor: const Color(0xFF29C531),
         ),
       ],
     );
@@ -288,7 +280,6 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           onTap: () {
             ref.invalidate(selectedAnswersProvider);
             // Update the remaining time here
-            QuizTimeDTO.elapsedTimeSeconds = widget.quiz.durationSeconds ?? 120;
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(

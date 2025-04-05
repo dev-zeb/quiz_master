@@ -54,6 +54,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  blinking_timer:
+    dependency: "direct main"
+    description:
+      name: blinking_timer
+      sha256: "22cfbb3130c6bb340d7515a94a3c4456ed1642cc6c1160bb07ebd895a38d6898"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   boolean_selector:
     dependency: transitive
     description:
