@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/core/config/strings.dart';
-import 'package:learn_and_quiz/core/ui/widget/app_bar_back_button.dart';
+import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/add_quiz_screen.dart';

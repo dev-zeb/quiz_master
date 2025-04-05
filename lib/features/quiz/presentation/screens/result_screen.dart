@@ -152,18 +152,17 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
     final remainingTime = (widget.totalDurationSeconds ?? 120) - elapsedTime;
 
     final [remainingMinutes, remainingSeconds] =
-    getMinutesAndSeconds(remainingTime);
-    final [elapsedMinutes, elapsedSeconds] =
-    getMinutesAndSeconds(elapsedTime);
+        getMinutesAndSeconds(remainingTime);
+    final [elapsedMinutes, elapsedSeconds] = getMinutesAndSeconds(elapsedTime);
     final [totalMinutes, totalSeconds] =
-    getMinutesAndSeconds(widget.totalDurationSeconds ?? 120);
+        getMinutesAndSeconds(widget.totalDurationSeconds ?? 120);
 
     double progress = elapsedTime / (widget.totalDurationSeconds ?? 120);
     Color progressColor = progress <= 0.2
         ? Colors.blue[500]!
         : progress <= 0.5
-        ? Colors.orange
-        : Colors.red;
+            ? Colors.orange
+            : Colors.red;
 
     return QuizChartItem(
       chartTitle: 'Time Stats',
@@ -206,13 +205,15 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
         const SizedBox(height: 12),
         QuizTimeWidget(
           optionTitle: 'Elapsed Time',
-          optionValue: '$elapsedMinutes:${elapsedSeconds.toString().padLeft(2, '0')}',
+          optionValue:
+              '$elapsedMinutes:${elapsedSeconds.toString().padLeft(2, '0')}',
           optionColor: progressColor,
         ),
         const SizedBox(height: 12),
         QuizTimeWidget(
           optionTitle: 'Remaining Time',
-          optionValue: '$remainingMinutes:${remainingSeconds.toString().padLeft(2, '0')}',
+          optionValue:
+              '$remainingMinutes:${remainingSeconds.toString().padLeft(2, '0')}',
           optionColor: const Color(0xFF29C531),
         ),
       ],

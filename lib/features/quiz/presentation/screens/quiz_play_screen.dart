@@ -1,7 +1,8 @@
 import 'package:blinking_timer/blinking_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/ui/widget/app_bar_back_button.dart';
+import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
+import 'package:learn_and_quiz/core/ui/widgets/border_progress_painter.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/result_screen.dart';
@@ -68,58 +69,69 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
         title: Text(widget.quiz.title),
         leading: AppBarBackButton(),
         actions: [
-          BlinkingTimer(
-            duration: Duration(seconds: _quizTimeSeconds),
-            customTimerUI: (text, color, progress, _, isBlinking) {
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: CircularProgressIndicator(
-                      value: progress,
-                      strokeWidth: 4,
-                      color: color,
-                      backgroundColor: color.withOpacity(0.1),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: BlinkingTimer(
+              duration: Duration(seconds: _quizTimeSeconds),
+              customTimerUI: (text, color, progress, _, isBlinking) {
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Custom border progress
+                    SizedBox(
+                      width: 100,
+                      height: 30,
+                      child: CustomPaint(
+                        painter: BorderProgressPainter(
+                          progress: progress,
+                          color: color,
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.lock_clock),
+                        const SizedBox(width: 8),
+                        Text(
+                          text,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: isBlinking ? color.withOpacity(0.7) : color,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
+              onTimeUpThreshold: () {
+                final answerList = ref.read(selectedAnswersProvider);
+                final totalQuestions = widget.quiz.questions.length;
+
+                while (answerList.length < totalQuestions) {
+                  answerList.add(null);
+                }
+                ref
+                    .read(selectedAnswersProvider.notifier)
+                    .update((_) => answerList);
+
+                final elapsedTime =
+                    (DateTime.now().millisecondsSinceEpoch - _startTime) ~/
+                        1000;
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ResultScreen(
+                      quiz: widget.quiz,
+                      elapsedTimeSeconds: elapsedTime,
+                      totalDurationSeconds: _quizTimeSeconds,
                     ),
                   ),
-                  Text(
-                    text,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: isBlinking ? color.withOpacity(0.7) : color,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              );
-            },
-            onTimeUpThreshold: () {
-              final answerList = ref.read(selectedAnswersProvider);
-              final totalQuestions = widget.quiz.questions.length;
-
-              while (answerList.length < totalQuestions) {
-                answerList.add(null);
-              }
-              ref
-                  .read(selectedAnswersProvider.notifier)
-                  .update((_) => answerList);
-
-              final elapsedTime =
-                  (DateTime.now().millisecondsSinceEpoch - _startTime) ~/ 1000;
-
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ResultScreen(
-                    quiz: widget.quiz,
-                    elapsedTimeSeconds: elapsedTime,
-                    totalDurationSeconds: _quizTimeSeconds,
-                  ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ],
       ),
