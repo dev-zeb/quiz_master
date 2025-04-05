@@ -1,10 +1,9 @@
+import 'package:blinking_timer/blinking_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/core/ui/widget/app_bar_back_button.dart';
-import 'package:learn_and_quiz/core/ui/widget/blinking_timer_widget.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/helpers/dto_models/quiz_time.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/result_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_question_card.dart';
 
@@ -25,21 +24,28 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   int _currentQuestionIndex = 0;
   late int _quizTimeSeconds;
   List<Question> _questions = [];
+  late int _startTime;
 
   @override
   void initState() {
     super.initState();
     _quizTimeSeconds = widget.quiz.durationSeconds ?? 120;
     _questions = widget.quiz.questions;
+    _startTime = DateTime.now().millisecondsSinceEpoch;
   }
 
   void _handleNextButtonClick() {
     if (_currentQuestionIndex == (_questions.length - 1)) {
+      final elapsedTime =
+          (DateTime.now().millisecondsSinceEpoch - _startTime) ~/ 1000;
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (context) => ResultScreen(
             quiz: widget.quiz,
+            elapsedTimeSeconds: elapsedTime,
+            totalDurationSeconds: _quizTimeSeconds,
           ),
         ),
       );
@@ -62,9 +68,34 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
         title: Text(widget.quiz.title),
         leading: AppBarBackButton(),
         actions: [
-          BlinkingTimerWidget(
-            maxSeconds: _quizTimeSeconds,
-            onTimeUp: () {
+          BlinkingTimer(
+            duration: Duration(seconds: _quizTimeSeconds),
+            customTimerUI: (text, color, progress, _, isBlinking) {
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: CircularProgressIndicator(
+                      value: progress,
+                      strokeWidth: 4,
+                      color: color,
+                      backgroundColor: color.withOpacity(0.1),
+                    ),
+                  ),
+                  Text(
+                    text,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isBlinking ? color.withOpacity(0.7) : color,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              );
+            },
+            onTimeUpThreshold: () {
               final answerList = ref.read(selectedAnswersProvider);
               final totalQuestions = widget.quiz.questions.length;
 
@@ -75,12 +106,16 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                   .read(selectedAnswersProvider.notifier)
                   .update((_) => answerList);
 
+              final elapsedTime =
+                  (DateTime.now().millisecondsSinceEpoch - _startTime) ~/ 1000;
+
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ResultScreen(
                     quiz: widget.quiz,
-                    elapsedTimeSeconds: QuizTimeDTO.elapsedTimeSeconds,
+                    elapsedTimeSeconds: elapsedTime,
+                    totalDurationSeconds: _quizTimeSeconds,
                   ),
                 ),
               );

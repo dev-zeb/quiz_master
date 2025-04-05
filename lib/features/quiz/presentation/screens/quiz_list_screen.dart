@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/core/config/strings.dart';
 import 'package:learn_and_quiz/core/ui/widget/app_bar_back_button.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/helpers/dto_models/quiz_time.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/add_quiz_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
@@ -17,10 +16,6 @@ class QuizListScreen extends ConsumerWidget {
     final quizzes = ref.watch(quizNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.quizzesTitle),
-        leading: AppBarBackButton(),
-      ),
       floatingActionButton: quizzes.isNotEmpty
           ? QuizOutlinedButton(
               text: 'Add Quiz',
@@ -36,12 +31,9 @@ class QuizListScreen extends ConsumerWidget {
               },
             )
           : null,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: quizzes.isEmpty
-            ? _buildEmptyState(context)
-            : _buildQuizListWidget(context, ref, quizzes),
-      ),
+      body: quizzes.isEmpty
+          ? _buildEmptyState(context)
+          : _buildQuizListWidget(context, ref, quizzes),
     );
   }
 
@@ -98,32 +90,67 @@ class QuizListScreen extends ConsumerWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return ListView.builder(
-      itemCount: quizzes.length,
-      itemBuilder: (context, index) {
-        final quiz = quizzes[index];
-        return Card(
-          child: ListTile(
-            title: Text(quiz.title, style: textTheme.titleLarge),
-            subtitle: Text(
-              '${quiz.questions.length} Questions',
-              style: textTheme.bodyMedium,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        SizedBox(height: MediaQuery.of(context).padding.top),
+        Row(
+          children: [
+            AppBarBackButton(),
+            const SizedBox(width: 8),
+            Text(
+              AppStrings.quizList,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20),
             ),
-            trailing: Icon(Icons.play_arrow, color: colorScheme.primary),
-            onTap: () {
-              ref.invalidate(selectedAnswersProvider);
-              // Update the remaining time here
-              QuizTimeDTO.elapsedTimeSeconds = quiz.durationSeconds ?? 120;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => QuizPlayScreen(quiz: quiz),
-                ),
-              );
-            },
+          ],
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 12.0,
+              // vertical: 4,
+            ),
+            child: ListView.builder(
+              itemCount: quizzes.length,
+              itemBuilder: (context, index) {
+                final quiz = quizzes[index];
+                return Container(
+                  margin: EdgeInsets.only(bottom: 8),
+                  child: Card(
+                    child: ListTile(
+                      title: Text(
+                        quiz.title,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Text(
+                        '${quiz.questions.length} Questions',
+                        style: textTheme.bodyMedium,
+                      ),
+                      leading:
+                          Icon(Icons.play_arrow, color: colorScheme.primary),
+                      onTap: () {
+                        ref.invalidate(selectedAnswersProvider);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuizPlayScreen(quiz: quiz),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 }

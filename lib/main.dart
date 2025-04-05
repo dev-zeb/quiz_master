@@ -1,3 +1,4 @@
+import 'package:blinking_timer/blinking_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/core/config/hive_init.dart';
@@ -21,11 +22,24 @@ void main() async {
   );
 }
 
-class QuizMaster extends ConsumerWidget {
+class QuizMaster extends ConsumerStatefulWidget {
   const QuizMaster({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<QuizMaster> createState() => _QuizMasterState();
+}
+
+class _QuizMasterState extends ConsumerState<QuizMaster> {
+  late final BlinkingTimerController timerController;
+
+  @override
+  void initState() {
+    super.initState();
+    timerController = BlinkingTimerController();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
 
     return MaterialApp(

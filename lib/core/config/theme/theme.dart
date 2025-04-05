@@ -15,6 +15,7 @@ class AppColors {
   static const Color onBackground = Colors.white;
   static const Color onSurface = Colors.white;
 
+  // static const Color primaryDark = Color(0xFF02454E);
   static const Color primaryDark = Color(0xFF02454E);
   static const Color primaryVariantDark = Color(0xFF001E23);
   static const Color secondaryDark = Color(0xFF558B82);
@@ -37,55 +38,53 @@ class AppColors {
 
 class AppThemes {
   static ThemeData get lightTheme => ThemeData(
-    useMaterial3: true,
-    colorScheme: const ColorScheme(
-      brightness: Brightness.light,
-      primary: AppColors.primary,
-      primaryContainer: AppColors.primaryVariant,
-      onPrimary: AppColors.background,
-      secondary: AppColors.secondary,
-      secondaryContainer: AppColors.secondaryVariant,
-      onSecondary: AppColors.background,
-      error: AppColors.error,
-      onError: AppColors.background,
-      surface: AppColors.background,
-      onSurface: AppColors.primary,
-      tertiary: AppColors.tertiary,
-    ),
-    scaffoldBackgroundColor: AppColors.background,
-    textTheme: TextTheme(
-      bodyLarge: TextStyle(color: AppColors.primary),
-      bodyMedium: TextStyle(color: AppColors.primary),
-      titleLarge: TextStyle(
-          color: AppColors.primary,
-          fontWeight: FontWeight.bold
-      ),
-    ),
-    iconTheme: const IconThemeData(color: AppColors.primary),
-    splashFactory: InkRipple.splashFactory,
-    highlightColor: AppColors.transparent,
-    splashColor: AppColors.tertiary,
-  );
+        useMaterial3: true,
+        colorScheme: const ColorScheme(
+          brightness: Brightness.light,
+          primary: AppColors.primary,
+          primaryContainer: AppColors.primaryVariant,
+          onPrimary: AppColors.background,
+          secondary: AppColors.secondary,
+          secondaryContainer: AppColors.secondaryVariant,
+          onSecondary: AppColors.background,
+          error: AppColors.error,
+          onError: AppColors.background,
+          surface: AppColors.background,
+          onSurface: AppColors.primary,
+          tertiary: AppColors.tertiary,
+        ),
+        scaffoldBackgroundColor: AppColors.background,
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: AppColors.primary),
+          bodyMedium: TextStyle(color: AppColors.primary),
+          titleLarge:
+              TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+        ),
+        iconTheme: const IconThemeData(color: AppColors.primary),
+        splashFactory: InkRipple.splashFactory,
+        highlightColor: AppColors.transparent,
+        splashColor: AppColors.tertiary,
+      );
 
   static ThemeData get darkTheme => ThemeData(
-    useMaterial3: true,
-    colorScheme: const ColorScheme(
-      brightness: Brightness.dark,
-      primary: AppColors.background,
-      primaryContainer: AppColors.primaryVariant,
-      onPrimary: AppColors.primary,
-      secondary: AppColors.secondary,
-      secondaryContainer: AppColors.secondaryVariant,
-      onSecondary: AppColors.primary,
-      error: AppColors.error,
-      onError: AppColors.primary,
-      surface: AppColors.primary,
-      onSurface: AppColors.background,
-    ),
-    scaffoldBackgroundColor: AppColors.primary,
-    iconTheme: const IconThemeData(color: AppColors.background),
-    splashFactory: InkRipple.splashFactory,
-    highlightColor: AppColors.transparent,
-    splashColor: AppColors.primary.withOpacity(0.1),
-  );
+        useMaterial3: true,
+        colorScheme: const ColorScheme(
+          brightness: Brightness.dark,
+          primary: AppColors.background,
+          primaryContainer: AppColors.primaryVariant,
+          onPrimary: AppColors.primary,
+          secondary: AppColors.secondary,
+          secondaryContainer: AppColors.secondaryVariant,
+          onSecondary: AppColors.primary,
+          error: AppColors.error,
+          onError: AppColors.primary,
+          surface: AppColors.primary,
+          onSurface: AppColors.background,
+        ),
+        scaffoldBackgroundColor: AppColors.primary,
+        iconTheme: const IconThemeData(color: AppColors.background),
+        splashFactory: InkRipple.splashFactory,
+        highlightColor: AppColors.transparent,
+        splashColor: AppColors.primary.withOpacity(0.1),
+      );
 }

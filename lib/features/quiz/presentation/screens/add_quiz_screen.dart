@@ -149,14 +149,22 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.addNewQuiz),
-        leading: const AppBarBackButton(),
-      ),
       body: Stack(
         children: [
           Column(
             children: [
+              SizedBox(height: MediaQuery.of(context).padding.top),
+              Row(
+                children: [
+                  AppBarBackButton(),
+                  const SizedBox(width: 8),
+                  Text(
+                    AppStrings.addNewQuiz,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ],
+              ),
               Expanded(
                 child: Scrollbar(
                   controller: _scrollController,
@@ -166,7 +174,10 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                   thumbVisibility: true,
                   child: SingleChildScrollView(
                     controller: _scrollController,
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 4,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -174,9 +185,11 @@ class _AddQuizScreenState extends ConsumerState<AddQuizScreen> {
                           controller: _titleController,
                           style: TextStyle(color: colorScheme.primary),
                           decoration: InputDecoration(
-                            hintText: AppStrings.quizTitle,
                             isDense: true,
-                            labelStyle: TextStyle(color: colorScheme.primary),
+                            hintText: AppStrings.quizTitle,
+                            hintStyle: TextStyle(
+                              color: colorScheme.primary.withOpacity(0.3),
+                            ),
                             enabledBorder: UnderlineInputBorder(
                               borderSide:
                                   BorderSide(color: colorScheme.primary),
