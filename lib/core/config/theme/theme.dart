@@ -1,5 +1,6 @@
 // app_themes.dart
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   // Primary Teal Palette
@@ -54,12 +55,7 @@ class AppThemes {
           tertiary: AppColors.tertiary,
         ),
         scaffoldBackgroundColor: AppColors.background,
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: AppColors.primary),
-          bodyMedium: TextStyle(color: AppColors.primary),
-          titleLarge:
-              TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-        ),
+        textTheme: GoogleFonts.langarTextTheme(),
         iconTheme: const IconThemeData(color: AppColors.primary),
         splashFactory: InkRipple.splashFactory,
         highlightColor: AppColors.transparent,
@@ -86,5 +82,6 @@ class AppThemes {
         splashFactory: InkRipple.splashFactory,
         highlightColor: AppColors.transparent,
         splashColor: AppColors.primary.withOpacity(0.1),
+        textTheme: GoogleFonts.langarTextTheme(),
       );
 }

@@ -28,12 +28,10 @@ class ResultScreen extends ConsumerStatefulWidget {
 }
 
 class _ResultScreenState extends ConsumerState<ResultScreen> {
-  final Color correctColor = Colors.green;
-  final Color wrongColor = Colors.red;
-  final Color progressHigh = Colors.blue[500]!;
-  final Color progressMedium = Colors.orange;
-  final Color progressLow = Colors.red;
-  final Color timeRemainingColor = const Color(0xFF29C531);
+  final Color progressHigh = Color(0xFF004350);
+  final Color progressMedium = Color(0xFFA87700);
+  final Color progressLow = Color(0xFFAF0000);
+  final Color correctColor = const Color(0xFF009106);
 
   bool _showSummary = false;
 
@@ -105,7 +103,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           sectionsSpace: 2,
           sections: [
             PieChartSectionData(
-              color: Colors.red,
+              color: progressLow,
               value: (total - correct).toDouble(),
               title: '$wrongAnswerPercentage%',
               radius: 72,
@@ -117,7 +115,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
               titlePositionPercentageOffset: titleOffset,
             ),
             PieChartSectionData(
-              color: Colors.green,
+              color: correctColor,
               value: correct.toDouble(),
               title: '$correctAnswerPercentage%',
               radius: 72,
@@ -132,17 +130,12 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
         ),
       ),
       infoWidget: [
-        const SizedBox(height: 12),
-        _buildTag(Icons.play_circle_filled, "Total", total, progressHigh),
-        const SizedBox(height: 12),
-        _buildTag(Icons.check_circle, "Correct", correct, correctColor),
-        const SizedBox(height: 12),
-        _buildTag(
-          Icons.cancel,
-          "Wrong",
-          total - correct,
-          wrongColor,
-        ),
+        const SizedBox(height: 16),
+        _buildTag(Icons.list_alt, "Total", total, progressHigh),
+        const SizedBox(height: 4),
+        _buildTag(Icons.check_circle_outline, "Correct", correct, correctColor),
+        const SizedBox(height: 4),
+        _buildTag(Icons.cancel_outlined, "Wrong", total - correct, progressLow),
       ],
     );
   }
@@ -158,11 +151,12 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
         getMinutesAndSeconds(widget.totalDurationSeconds ?? 120);
 
     double progress = elapsedTime / (widget.totalDurationSeconds ?? 120);
-    Color progressColor = progress <= 0.2
-        ? Colors.blue[500]!
-        : progress <= 0.5
-            ? Colors.orange
-            : Colors.red;
+    double remainingProgress = 1 - progress;
+    Color progressColor = remainingProgress <= 0.2
+        ? progressLow
+        : remainingProgress <= 0.5
+            ? progressMedium
+            : progressHigh;
 
     return QuizChartItem(
       chartTitle: 'Time Stats',
@@ -175,7 +169,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
             child: CircularProgressIndicator(
               value: progress.clamp(0.0, 1.0),
               strokeWidth: 12,
-              backgroundColor: Colors.grey[200],
+              backgroundColor: correctColor,
               valueColor: AlwaysStoppedAnimation<Color>(progressColor),
             ),
           ),
@@ -214,7 +208,7 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           optionTitle: 'Remaining Time',
           optionValue:
               '$remainingMinutes:${remainingSeconds.toString().padLeft(2, '0')}',
-          optionColor: const Color(0xFF29C531),
+          optionColor: correctColor,
         ),
       ],
     );

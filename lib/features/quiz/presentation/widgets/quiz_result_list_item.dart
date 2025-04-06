@@ -11,6 +11,9 @@ class QuizResultListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Color correctColor = const Color(0xFF009106);
+    final Color errorColor = Color(0xFFAF0000);
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       elevation: 3,
@@ -22,7 +25,7 @@ class QuizResultListItem extends StatelessWidget {
             CircleAvatar(
               radius: 15,
               backgroundColor:
-                  questionSummary.isCorrect ? Colors.green : Colors.red,
+                  questionSummary.isCorrect ? correctColor : errorColor,
               child: Icon(
                 questionSummary.isCorrect ? Icons.check : Icons.close,
                 color: Colors.white,
@@ -47,13 +50,13 @@ class QuizResultListItem extends StatelessWidget {
                           ? "Not Answered!"
                           : "Your Answer: ${questionSummary.userAnswer}",
                       style: TextStyle(
-                        color: Colors.red,
+                        color: errorColor,
                       ),
                     ),
                   Text(
                     "Correct Answer: ${questionSummary.correctAnswer}",
                     style: TextStyle(
-                      color: Colors.green,
+                      color: correctColor,
                     ),
                   ),
                 ],

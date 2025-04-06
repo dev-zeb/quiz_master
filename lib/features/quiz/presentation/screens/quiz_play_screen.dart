@@ -73,6 +73,8 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
             padding: const EdgeInsets.only(right: 8.0),
             child: BlinkingTimer(
               duration: Duration(seconds: _quizTimeSeconds),
+              slowBlinkingThreshold: 0.5,
+              fastBlinkingThreshold: 0.25,
               customTimerUI: (text, color, progress, _, isBlinking) {
                 return Stack(
                   alignment: Alignment.center,
@@ -90,7 +92,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                     ),
                     Row(
                       children: [
-                        Icon(Icons.lock_clock),
+                        Icon(Icons.timer_outlined),
                         const SizedBox(width: 8),
                         Text(
                           text,
