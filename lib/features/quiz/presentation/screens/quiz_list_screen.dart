@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/config/strings.dart';
 import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
+import 'package:learn_and_quiz/core/ui/widgets/splashed_button.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/add_quiz_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_editor_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_item.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_outlined_button.dart';
 
 class QuizListScreen extends ConsumerWidget {
@@ -13,9 +13,18 @@ class QuizListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final colorScheme = Theme.of(context).colorScheme;
     final quizzes = ref.watch(quizNotifierProvider);
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Quiz List'),
+        titleSpacing: 0,
+        leading: AppBarBackButton(),
+      ),
+      body: quizzes.isEmpty
+          ? _buildEmptyState(context, colorScheme)
+          : _buildQuizListWidget(context, colorScheme, ref, quizzes),
       floatingActionButton: quizzes.isNotEmpty
           ? QuizOutlinedButton(
               text: 'Add Quiz',
@@ -25,21 +34,19 @@ class QuizListScreen extends ConsumerWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AddQuizScreen(),
+                    builder: (context) => const QuizEditorScreen(),
                   ),
                 );
               },
             )
           : null,
-      body: quizzes.isEmpty
-          ? _buildEmptyState(context)
-          : _buildQuizListWidget(context, ref, quizzes),
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
+  Widget _buildEmptyState(
+    BuildContext context,
+    ColorScheme colorScheme,
+  ) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -54,29 +61,33 @@ class QuizListScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 20),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colorScheme.primary,
+          SplashedButton(
+            childWidget: Row(
+              children: [
+                Icon(
+                  Icons.add,
+                  color: colorScheme.onPrimary,
+                  size: 24,
+                ),
+                SizedBox(width: 4),
+                Text(
+                  'Create First Quiz',
+                  style: TextStyle(
+                    color: colorScheme.onPrimary,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
             ),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AddQuizScreen(),
-              ),
-            ),
-            icon: Icon(
-              Icons.add,
-              color: colorScheme.onPrimary,
-              size: 24,
-            ),
-            label: Text(
-              'Create First Quiz',
-              style: TextStyle(
-                color: colorScheme.onPrimary,
-                fontSize: 16,
-              ),
-            ),
-          ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const QuizEditorScreen(),
+                ),
+              );
+            },
+          )
         ],
       ),
     );
@@ -84,73 +95,26 @@ class QuizListScreen extends ConsumerWidget {
 
   Widget _buildQuizListWidget(
     BuildContext context,
+    ColorScheme colorScheme,
     WidgetRef ref,
     List<Quiz> quizzes,
   ) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        SizedBox(height: MediaQuery.of(context).padding.top),
-        Row(
-          children: [
-            AppBarBackButton(),
-            const SizedBox(width: 8),
-            Text(
-              AppStrings.quizList,
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 20),
-            ),
-          ],
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12.0,
-              // vertical: 4,
-            ),
-            child: ListView.builder(
-              itemCount: quizzes.length,
-              itemBuilder: (context, index) {
-                final quiz = quizzes[index];
-                return Container(
-                  margin: EdgeInsets.only(bottom: 8),
-                  child: Card(
-                    child: ListTile(
-                      title: Text(
-                        quiz.title,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      subtitle: Text(
-                        '${quiz.questions.length} Questions',
-                        style: textTheme.bodyMedium,
-                      ),
-                      leading:
-                          Icon(Icons.play_arrow, color: colorScheme.primary),
-                      onTap: () {
-                        ref.invalidate(selectedAnswersProvider);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => QuizPlayScreen(quiz: quiz),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 12
+      ),
+      child: ListView.builder(
+        itemCount: quizzes.length + 1,
+        itemBuilder: (_, idx) {
+          if (idx == quizzes.length) return const SizedBox(height: 60);
+          final quiz = quizzes[idx];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: QuizItem(quiz: quiz),
+          );
+        },
+      ),
     );
   }
 }

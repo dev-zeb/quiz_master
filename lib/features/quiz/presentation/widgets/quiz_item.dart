@@ -1,0 +1,146 @@
+import 'package:flutter/material.dart';
+import 'package:learn_and_quiz/core/ui/widgets/badge_item.dart';
+import 'package:learn_and_quiz/core/ui/widgets/popup_menu.dart';
+import 'package:learn_and_quiz/core/ui/widgets/popup_option_item.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_editor_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
+
+class QuizItem extends StatelessWidget {
+  final Quiz quiz;
+
+  const QuizItem({super.key, required this.quiz});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    final String minutes = (quiz.durationSeconds ~/ 60).toString();
+    final String seconds = (quiz.durationSeconds % 60).toString();
+
+    final timerText = minutes == ''
+        ? '$seconds sec'
+        : seconds == ''
+            ? '$minutes min'
+            : '${minutes}m ${seconds}s';
+
+    return Card(
+      color: Colors.white,
+      clipBehavior: Clip.antiAlias,
+      elevation: 3,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => QuizPlayScreen(
+                quiz: quiz,
+              ),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.play_arrow_rounded,
+                color: colorScheme.primary,
+                size: 32,
+              ),
+              SizedBox(width: 12),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      quiz.title,
+                      style: TextStyle(
+                        color: colorScheme.primary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      children: [
+                        BadgeItem(
+                          badgeIcon: Icons.quiz,
+                          badgeTitle: '${quiz.questions.length} Ques.',
+                        ),
+                        SizedBox(width: 8),
+                        BadgeItem(
+                          badgeIcon: Icons.timer_outlined,
+                          badgeTitle: timerText,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              TopRightPopupMenuIcon<String>(
+                iconColor: colorScheme.primary,
+                iconSize: 28,
+                menuBuilder: () => [
+                  ...[
+                    PopupMenuItem(
+                      value: 'play',
+                      child: PopupOptionItem(
+                        color: colorScheme.onPrimary,
+                        title: 'Play',
+                        iconData: Icons.play_arrow,
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: PopupOptionItem(
+                        color: colorScheme.onPrimary,
+                        title: 'Edit',
+                        iconData: Icons.edit,
+                      ),
+                    ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: PopupOptionItem(
+                        color: colorScheme.onPrimary,
+                        title: 'Delete',
+                        iconData: Icons.delete,
+                      ),
+                    ),
+                  ],
+                ],
+                onSelected: (selected) async {
+                  switch (selected) {
+                    case 'play':
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuizPlayScreen(
+                            quiz: quiz,
+                          ),
+                        ),
+                      );
+                    case 'edit':
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => QuizEditorScreen(quiz: quiz),
+                        ),
+                      );
+                      break;
+                    case 'delete':
+                      // TODO: Handle Delete Quiz
+                      break;
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -1,12 +1,21 @@
 import 'package:blinking_timer/blinking_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:learn_and_quiz/core/config/theme/theme.dart';
+import 'package:learn_and_quiz/core/config/utils.dart';
 import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
-import 'package:learn_and_quiz/core/ui/widgets/border_progress_painter.dart';
+import 'package:learn_and_quiz/core/ui/widgets/circular_border_progress_painter.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/result_screen.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/helpers/dto_models/question_summary.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_result_screen.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_play_button.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_question_card.dart';
+
+// TODO:
+// [] Next/Prev button working but the answer list is getting shuffled
 
 final selectedAnswersProvider = StateProvider<List<String?>>((ref) {
   return [];
@@ -30,31 +39,9 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   @override
   void initState() {
     super.initState();
-    _quizTimeSeconds = widget.quiz.durationSeconds ?? 120;
+    _quizTimeSeconds = widget.quiz.durationSeconds;
     _questions = widget.quiz.questions;
     _startTime = DateTime.now().millisecondsSinceEpoch;
-  }
-
-  void _handleNextButtonClick() {
-    if (_currentQuestionIndex == (_questions.length - 1)) {
-      final elapsedTime =
-          (DateTime.now().millisecondsSinceEpoch - _startTime) ~/ 1000;
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResultScreen(
-            quiz: widget.quiz,
-            elapsedTimeSeconds: elapsedTime,
-            totalDurationSeconds: _quizTimeSeconds,
-          ),
-        ),
-      );
-    } else {
-      setState(() {
-        _currentQuestionIndex++;
-      });
-    }
   }
 
   @override
@@ -67,82 +54,14 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.quiz.title),
+        titleSpacing: 0,
         leading: AppBarBackButton(),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: BlinkingTimer(
-              duration: Duration(seconds: _quizTimeSeconds),
-              slowBlinkingThreshold: 0.5,
-              fastBlinkingThreshold: 0.25,
-              customTimerUI: (text, color, progress, _, isBlinking) {
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    // Custom border progress
-                    SizedBox(
-                      width: 100,
-                      height: 30,
-                      child: CustomPaint(
-                        painter: BorderProgressPainter(
-                          progress: progress,
-                          color: color,
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Icon(Icons.timer_outlined),
-                        const SizedBox(width: 8),
-                        Text(
-                          text,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: isBlinking ? color.withOpacity(0.7) : color,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
-              onTimeUpThreshold: () {
-                final answerList = ref.read(selectedAnswersProvider);
-                final totalQuestions = widget.quiz.questions.length;
-
-                while (answerList.length < totalQuestions) {
-                  answerList.add(null);
-                }
-                ref
-                    .read(selectedAnswersProvider.notifier)
-                    .update((_) => answerList);
-
-                final elapsedTime =
-                    (DateTime.now().millisecondsSinceEpoch - _startTime) ~/
-                        1000;
-
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ResultScreen(
-                      quiz: widget.quiz,
-                      elapsedTimeSeconds: elapsedTime,
-                      totalDurationSeconds: _quizTimeSeconds,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 8),
           Container(
-            height: 6,
+            height: 4,
             decoration: BoxDecoration(
               border: Border.all(color: colorScheme.primary, width: 0.5),
             ),
@@ -152,13 +71,75 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
             ),
           ),
+          SizedBox(height: 16),
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 20,
-            ),
-            child: Text(
-              'Question ${_currentQuestionIndex + 1} of ${_questions.length}',
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Question ${_currentQuestionIndex + 1} of ${_questions.length}',
+                  style: TextStyle(fontSize: 16),
+                ),
+                BlinkingTimer(
+                  duration: Duration(seconds: _quizTimeSeconds),
+                  slowBlinkingThreshold: 0.5,
+                  fastBlinkingThreshold: 0.25,
+                  initialColor: AppColors.lightPink,
+                  customTimerUI: (text, color, progress, _, isBlinking) {
+                    final convertedTimeText = convertToMinuteSecond(text);
+
+                    return Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          width: 72,
+                          height: 28,
+                          child: CustomPaint(
+                            painter: CircularBorderProgressPainter(
+                              progress: progress,
+                              color: color,
+                              borderRadius: 16.0,
+                            ),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.timer_outlined,
+                              color: isBlinking
+                                  ? color.withValues(alpha: 0.7)
+                                  : color,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              convertedTimeText,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: isBlinking
+                                    ? color.withValues(alpha: 0.7)
+                                    : color,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  },
+                  onTimeUpThreshold: () async {
+                    await _navigateToResultScreen(
+                      title: "Time's Up!",
+                      iconColor: Colors.redAccent,
+                      delay: Duration(
+                        milliseconds: 700,
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -168,34 +149,152 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               answers: currentQuestion.shuffledAnswers,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 60,
-              vertical: 20,
-            ),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: _handleNextButtonClick,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      isLastQuestion ? 'Submit' : 'Next',
-                    ),
-                    const SizedBox(width: 12),
-                    Icon(
-                      isLastQuestion
-                          ? Icons.arrow_upward_outlined
-                          : Icons.arrow_right_alt_rounded,
-                    )
-                  ],
+          Container(
+            color: Colors.transparent,
+            padding: EdgeInsets.symmetric(vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                QuizPlayButton(
+                  isIconFirst: true,
+                  text: 'Previous',
+                  iconWidget: Icon(Icons.arrow_circle_left),
+                  onTap: () {
+                    setState(() {
+                      _currentQuestionIndex--;
+                    });
+                  },
                 ),
-              ),
+                const SizedBox(width: 12),
+                QuizPlayButton(
+                  isIconFirst: false,
+                  text: isLastQuestion ? 'Submit' : 'Next',
+                  iconWidget: isLastQuestion
+                      ? Transform.rotate(
+                          angle: 4.7,
+                          child: Icon(Icons.arrow_circle_right),
+                        )
+                      : Icon(Icons.arrow_circle_right),
+                  onTap: _handleNextButtonClick,
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  Future<void> _handleNextButtonClick() async {
+    final isLastQuestion = _currentQuestionIndex == (_questions.length - 1);
+    if (isLastQuestion) {
+      await _navigateToResultScreen(
+        title: "Well Done!",
+        iconColor: Colors.green,
+        delay: Duration(
+          milliseconds: 700,
+        ),
+      );
+    } else {
+      setState(() {
+        _currentQuestionIndex++;
+      });
+    }
+  }
+
+  Future<void> _navigateToResultScreen({
+    required String title,
+    required Color iconColor,
+    required Duration delay,
+  }) async {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 24.0,
+            horizontal: 20.0,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.alarm,
+                size: 48,
+                color: iconColor,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "You're now being redirected to the results screen.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    final totalQuestions = widget.quiz.questions.length;
+
+    final selectedAnswers = ref.read(selectedAnswersProvider);
+    while (selectedAnswers.length < totalQuestions) {
+      selectedAnswers.add('');
+    }
+    ref.read(selectedAnswersProvider.notifier).state = selectedAnswers;
+
+    final elapsedTime =
+        (DateTime.now().millisecondsSinceEpoch - _startTime) ~/ 1000;
+
+    final quizHistory = QuizHistory(
+      id: UniqueKey().toString(),
+      quizId: widget.quiz.id,
+      quizTitle: widget.quiz.title,
+      selectedAnswers: ref.read(selectedAnswersProvider),
+      questions: _questions,
+      playedAt: DateTime.now(),
+      elapsedTimeSeconds: elapsedTime,
+      totalDurationSeconds: widget.quiz.durationSeconds,
+    );
+
+    await ref.read(quizNotifierProvider.notifier).addQuizHistory(quizHistory);
+    await Future.delayed(delay);
+
+    final quizSummaryList = List.generate(selectedAnswers.length, (i) {
+      return QuestionSummary(
+        index: i,
+        question: widget.quiz.questions[i].text,
+        correctAnswer: widget.quiz.questions[i].answers[0],
+        userAnswer: selectedAnswers[i],
+      );
+    });
+
+    ref.invalidate(selectedAnswersProvider);
+
+    if (mounted) {
+      Navigator.pop(context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultScreen(
+            quiz: widget.quiz,
+            quizSummaryList: quizSummaryList,
+            elapsedTimeSeconds: elapsedTime,
+            totalDurationSeconds: _quizTimeSeconds,
+          ),
+        ),
+      );
+    }
   }
 }

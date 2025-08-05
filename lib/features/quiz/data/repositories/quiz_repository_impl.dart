@@ -3,7 +3,10 @@ import 'package:learn_and_quiz/features/quiz/data/datasources/local/quiz_local_d
 import 'package:learn_and_quiz/features/quiz/data/datasources/local/quiz_local_data_source_impl.dart';
 import 'package:learn_and_quiz/features/quiz/data/models/quiz_model.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
 import 'package:learn_and_quiz/features/quiz/domain/repositories/quiz_repository.dart';
+
+import '../models/quiz_history_model.dart';
 
 final quizRepositoryProvider = Provider<QuizRepository>((ref) {
   final quizLocalDataSource = ref.watch(hiveLocalDataSourceProvider);
@@ -16,18 +19,18 @@ class QuizRepositoryImpl implements QuizRepository {
   QuizRepositoryImpl(this.quizLocalDataSource);
 
   @override
-  List<Quiz> getQuizzes() {
-    return quizLocalDataSource.getQuizzes().map((q) => q.toEntity()).toList();
+  Future<void> addQuiz(Quiz quiz) async {
+    await quizLocalDataSource.addQuiz(QuizModel.fromEntity(quiz));
   }
 
   @override
-  void addQuiz(Quiz quiz) {
-    quizLocalDataSource.addQuiz(QuizModel.fromEntity(quiz));
+  Future<void> deleteQuizById(String id) async {
+    await quizLocalDataSource.deleteQuizById(id);
   }
 
   @override
-  void deleteQuizById(String id) {
-    quizLocalDataSource.deleteQuizById(id);
+  Future<void> updateQuiz(Quiz quiz) async {
+    await quizLocalDataSource.updateQuiz(QuizModel.fromEntity(quiz));
   }
 
   @override
@@ -37,8 +40,29 @@ class QuizRepositoryImpl implements QuizRepository {
   }
 
   @override
-  void updateQuiz(Quiz quiz) {
-    quizLocalDataSource.updateQuiz(QuizModel.fromEntity(quiz));
+  List<Quiz> getQuizzes() {
+    final quizModelList = quizLocalDataSource.getQuizzes();
+    return quizModelList.map((q) => q.toEntity()).toList();
+  }
+
+  @override
+  Future<void> addQuizHistory(QuizHistory quizHistory) async {
+    await quizLocalDataSource.addQuizHistory(
+      QuizHistoryModel.fromEntity(quizHistory),
+    );
+  }
+
+  @override
+  List<QuizHistory> getQuizHistoryList() {
+    final quizHistoryModelList = quizLocalDataSource.getQuizHistoryList();
+    return quizHistoryModelList
+        .map((quizHistoryModel) => quizHistoryModel.toEntity())
+        .toList();
+  }
+
+  @override
+  QuizHistory? getQuizHistoryById(String id) {
+    final quizHistoryModel = quizLocalDataSource.getQuizHistoryById(id);
+    return quizHistoryModel?.toEntity();
   }
 }
-

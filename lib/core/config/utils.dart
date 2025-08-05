@@ -29,3 +29,23 @@ List<String> getMinutesAndSeconds(int timeInSeconds) {
 
   return [minutes, seconds];
 }
+
+
+String convertToMinuteSecond(String input) {
+  final cleaned = input.replaceAll('Text:', '').trim();
+  final parts = cleaned.split(':').map(int.parse).toList();
+
+  int hours = 0, minutes = 0, seconds = 0;
+
+  if (parts.length == 3) {
+    hours = parts[0];
+    minutes = parts[1];
+    seconds = parts[2];
+  } else if (parts.length == 2) {
+    minutes = parts[0];
+    seconds = parts[1];
+  }
+
+  final totalMinutes = hours * 60 + minutes;
+  return '${totalMinutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+}
