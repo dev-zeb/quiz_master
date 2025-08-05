@@ -15,7 +15,7 @@ class ThemeNotifier extends StateNotifier<ThemeMode> {
 
   Future<void> initializeTheme() async {
     try {
-      _themeBox = Hive.box<ThemeMode>(AppStrings.themeDataBox);
+      _themeBox = Hive.box<ThemeMode>(AppStrings.themeBoxName);
       final savedTheme = _themeBox.get(_themeModeKey, defaultValue: ThemeMode.system);
       state = savedTheme ?? ThemeMode.system;
     } catch (err, stk) {

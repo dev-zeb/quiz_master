@@ -1,14 +1,16 @@
-// app_themes.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
+  static const Color lightPink = Color(0xFFA94CE0); // Color(0xFF03707D);
+
   // Primary Teal Palette
   static const Color primary = Color(0xFF013138);
   static const Color primaryVariant = Color(0xFF00282E);
   static const Color secondary = Color(0xFF03707D);
   static const Color secondaryVariant = Color(0xFF7CB3AC);
-  static const Color tertiary = Color(0xFF8FBC8F);
+
+  // static const Color tertiary = Color(0xFF8FBC8F);
   static const Color background = Color(0xFFF5F5F5);
   static const Color surface = Color(0xFF1E1E1E);
   static const Color onPrimary = Colors.white;
@@ -21,7 +23,8 @@ class AppColors {
   static const Color primaryVariantDark = Color(0xFF001E23);
   static const Color secondaryDark = Color(0xFF558B82);
   static const Color secondaryVariantDark = Color(0xFF7CB3AC);
-  static const Color tertiaryDark = Color(0xFF669966);
+
+  // static const Color tertiaryDark = Color(0xFF669966);
   static const Color backgroundDark = Color(0xFF121212);
   static const Color surfaceDark = Color(0xFF1E1E1E);
   static const Color onPrimaryDark = Colors.white;
@@ -52,14 +55,14 @@ class AppThemes {
           onError: AppColors.background,
           surface: AppColors.background,
           onSurface: AppColors.primary,
-          tertiary: AppColors.tertiary,
+          // tertiary: AppColors.tertiary,
         ),
         scaffoldBackgroundColor: AppColors.background,
         textTheme: GoogleFonts.langarTextTheme(),
         iconTheme: const IconThemeData(color: AppColors.primary),
         splashFactory: InkRipple.splashFactory,
         highlightColor: AppColors.transparent,
-        splashColor: AppColors.tertiary,
+        // splashColor: AppColors.tertiary,
       );
 
   static ThemeData get darkTheme => ThemeData(
@@ -81,7 +84,7 @@ class AppThemes {
         iconTheme: const IconThemeData(color: AppColors.background),
         splashFactory: InkRipple.splashFactory,
         highlightColor: AppColors.transparent,
-        splashColor: AppColors.primary.withOpacity(0.1),
+        splashColor: AppColors.primary.withValues(alpha: 0.1),
         textTheme: GoogleFonts.langarTextTheme(),
       );
 }

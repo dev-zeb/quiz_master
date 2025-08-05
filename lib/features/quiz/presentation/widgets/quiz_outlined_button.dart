@@ -19,25 +19,24 @@ class QuizOutlinedButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment:
-          isRightAligned ? MainAxisAlignment.end : MainAxisAlignment.center,
-      children: [
-        OutlinedButton.icon(
-          onPressed: onTap,
-          style: OutlinedButton.styleFrom(
-            backgroundColor: colorScheme.primary,
-            foregroundColor: colorScheme.onPrimary,
-          ),
-          icon: Icon(
-            icon,
-            color: colorScheme.onPrimary,
-            size: 20,
-          ),
-          label: Text(text),
+    return OutlinedButton.icon(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.secondaryContainer,
+      ),
+      icon: Padding(
+        padding: const EdgeInsets.only(bottom: 2.0),
+        child: Icon(
+          icon,
+          color: colorScheme.secondaryContainer,
+          size: 24,
         ),
-      ],
+      ),
+      label: Text(
+        text,
+        style: TextStyle(fontSize: 16),
+      ),
     );
   }
 }
