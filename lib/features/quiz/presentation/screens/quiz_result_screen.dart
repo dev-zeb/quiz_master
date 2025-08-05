@@ -2,10 +2,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:learn_and_quiz/core/config/utils.dart';
+import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/helpers/dto_models/question_summary.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/start_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_chart_item.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_outlined_button.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_result_list_item.dart';
@@ -13,12 +13,14 @@ import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_time_widg
 
 class ResultScreen extends ConsumerStatefulWidget {
   final Quiz quiz;
+  final List<QuestionSummary> quizSummaryList;
   final int? elapsedTimeSeconds;
   final int? totalDurationSeconds;
 
   const ResultScreen({
     super.key,
     required this.quiz,
+    required this.quizSummaryList,
     this.elapsedTimeSeconds,
     this.totalDurationSeconds,
   });
@@ -35,31 +37,19 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
 
   bool _showSummary = false;
 
-  List<QuestionSummary> getSummaryData(List<String?> chosenAnswers) {
-    return List.generate(chosenAnswers.length, (i) {
-      return QuestionSummary(
-        index: i,
-        question: widget.quiz.questions[i].text,
-        correctAnswer: widget.quiz.questions[i].answers[0],
-        userAnswer: chosenAnswers[i],
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final summaryData = getSummaryData(ref.watch(selectedAnswersProvider));
-
+    final quizSummaryList = widget.quizSummaryList;
     final numOfTotalQuestions = widget.quiz.questions.length;
     final numOfCorrectAnswers =
-        summaryData.where((summary) => summary.isCorrect).length;
+        quizSummaryList.where((summary) => summary.isCorrect).length;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Quiz Result'),
-        centerTitle: true,
-        leading: Container(),
+        titleSpacing: 0,
+        leading: AppBarBackButton(),
       ),
       body: Container(
         padding: const EdgeInsets.all(16.0),
@@ -67,13 +57,11 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           children: [
             _buildScoreChart(numOfCorrectAnswers, numOfTotalQuestions),
             const SizedBox(height: 20),
-            _buildTimeChart(
-              quizDuration: widget.quiz.durationSeconds ?? 120,
-            ),
+            _buildTimeChart(quizDuration: widget.quiz.durationSeconds),
             const SizedBox(height: 20),
             _buildSummaryToggleButton(),
             if (_showSummary)
-              _buildQuestionSummaryList(summaryData, colorScheme),
+              _buildQuestionSummaryList(quizSummaryList, colorScheme),
             if (!_showSummary) Spacer(),
             _buildActionButtons(),
           ],
@@ -273,7 +261,6 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           text: 'Restart Quiz',
           icon: Icons.restart_alt_outlined,
           onTap: () {
-            ref.invalidate(selectedAnswersProvider);
             // Update the remaining time here
             Navigator.pushReplacement(
               context,
@@ -289,11 +276,9 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           text: 'Go To Home',
           icon: Icons.home_outlined,
           onTap: () {
-            Navigator.push(
+            Navigator.popUntil(
               context,
-              MaterialPageRoute(
-                builder: (context) => StartScreen(),
-              ),
+              (route) => route.isFirst,
             );
           },
           isRightAligned: false,

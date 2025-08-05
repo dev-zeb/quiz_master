@@ -14,6 +14,7 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
+        titleSpacing: 0,
         leading: AppBarBackButton(),
       ),
       body: ListView(

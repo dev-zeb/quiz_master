@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_history_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_list_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_outlined_button.dart';
 import 'package:learn_and_quiz/features/settings/presentation/pages/settings_page.dart';
@@ -23,7 +24,7 @@ class StartScreen extends ConsumerWidget {
               Image.asset(
                 'assets/images/learn_with_quiz_icon.png',
                 color: colorScheme.primary,
-                width: 300,
+                width: 180,
               ),
               const SizedBox(height: 60),
               QuizOutlinedButton(
@@ -35,6 +36,20 @@ class StartScreen extends ConsumerWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const QuizListScreen(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+              QuizOutlinedButton(
+                text: 'History ',
+                icon: Icons.history,
+                isRightAligned: false,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const QuizHistoryScreen(),
                     ),
                   );
                 },

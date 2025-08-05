@@ -6,23 +6,25 @@ class AppBarBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return IconButton(
-      icon: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: colorScheme.primary,
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10),
+      child: Material(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
         ),
-        padding: EdgeInsets.symmetric(
-          horizontal: 6,
-          vertical: 2,
-        ),
-        child: Icon(
-          Icons.arrow_back_sharp,
-          color: colorScheme.onPrimary,
+        color: colorScheme.primary,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12.0),
+          splashColor: colorScheme.secondary,
+          child: Icon(
+            Icons.arrow_back_sharp,
+            color: colorScheme.secondaryContainer,
+            size: 20,
+          ),
+          onTap: () => Navigator.pop(context),
         ),
       ),
-      onPressed: () => Navigator.pop(context),
     );
   }
 }
