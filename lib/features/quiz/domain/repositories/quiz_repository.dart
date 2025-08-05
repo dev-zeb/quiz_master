@@ -1,9 +1,20 @@
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
 
 abstract class QuizRepository {
-  void addQuiz(Quiz quiz);
-  void deleteQuizById(String id);
-  void updateQuiz(Quiz quiz);
-  Quiz? getQuizById(String id);
+  Future<void> addQuiz(Quiz quiz);
+
+  Future<void> deleteQuizById(String id);
+
+  Future<void> updateQuiz(Quiz quiz);
+
   List<Quiz> getQuizzes();
+
+  Quiz? getQuizById(String id);
+
+  Future<void> addQuizHistory(QuizHistory quizHistory);
+
+  List<QuizHistory> getQuizHistoryList();
+
+  QuizHistory? getQuizHistoryById(String id);
 }

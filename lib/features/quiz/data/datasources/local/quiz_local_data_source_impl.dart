@@ -2,25 +2,29 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:learn_and_quiz/core/config/strings.dart';
 import 'package:learn_and_quiz/features/quiz/data/datasources/local/quiz_local_data_source.dart';
+import 'package:learn_and_quiz/features/quiz/data/models/quiz_history_model.dart';
 import 'package:learn_and_quiz/features/quiz/data/models/quiz_model.dart';
 
 final hiveLocalDataSourceProvider = Provider<QuizLocalDataSource>((ref) {
-  final quizBox = Hive.box<QuizModel>(AppStrings.quizDataBox);
-  return HiveLocalDataSource(quizBox);
+  final quizBox = Hive.box<QuizModel>(AppStrings.quizBoxName);
+  final quizHistoryBox = Hive.box<QuizHistoryModel>(AppStrings.quizHistoryBoxName);
+  return HiveLocalDataSource(quizBox, quizHistoryBox);
 });
 
 class HiveLocalDataSource implements QuizLocalDataSource {
   final Box<QuizModel> quizBox;
-  HiveLocalDataSource(this.quizBox);
+  final Box<QuizHistoryModel> quizHistoryBox;
+
+  HiveLocalDataSource(this.quizBox, this.quizHistoryBox);
 
   @override
-  void addQuiz(QuizModel quiz) {
-    quizBox.put(quiz.id, quiz);
+  Future<void> addQuiz(QuizModel quiz) async {
+    await quizBox.put(quiz.id, quiz);
   }
 
   @override
-  void deleteQuizById(String id) {
-    quizBox.delete(id);
+  Future<void> deleteQuizById(String id) async {
+    await quizBox.delete(id);
   }
 
   @override
@@ -34,7 +38,22 @@ class HiveLocalDataSource implements QuizLocalDataSource {
   }
 
   @override
-  void updateQuiz(QuizModel quiz) {
-    quizBox.put(quiz.id, quiz);
+  Future<void> updateQuiz(QuizModel quiz) async {
+    await quizBox.put(quiz.id, quiz);
+  }
+
+  @override
+  Future<void> addQuizHistory(QuizHistoryModel quizHistory) async {
+    await quizHistoryBox.put(quizHistory.id, quizHistory);
+  }
+
+  @override
+  List<QuizHistoryModel> getQuizHistoryList() {
+    return quizHistoryBox.values.toList();
+  }
+
+  @override
+  QuizHistoryModel? getQuizHistoryById(String id) {
+    return quizHistoryBox.get(id);
   }
 }

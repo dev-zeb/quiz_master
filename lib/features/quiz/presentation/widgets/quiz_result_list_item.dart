@@ -20,7 +20,7 @@ class QuizResultListItem extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CircleAvatar(
               radius: 15,
@@ -46,7 +46,7 @@ class QuizResultListItem extends StatelessWidget {
                   ),
                   if (!questionSummary.isCorrect)
                     Text(
-                      questionSummary.userAnswer == null
+                      questionSummary.userAnswer == ''
                           ? "Not Answered!"
                           : "Your Answer: ${questionSummary.userAnswer}",
                       style: TextStyle(
