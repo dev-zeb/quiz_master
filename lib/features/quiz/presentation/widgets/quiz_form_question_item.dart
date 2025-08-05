@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:learn_and_quiz/core/config/strings.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 
+import 'quiz_text_field.dart';
+
 class QuizFormQuestionItem extends StatefulWidget {
-  const QuizFormQuestionItem({super.key});
+  final Question? question;
+
+  const QuizFormQuestionItem({
+    super.key,
+    this.question,
+  });
 
   @override
   State<QuizFormQuestionItem> createState() => QuizFormQuestionItemState();
@@ -12,14 +19,23 @@ class QuizFormQuestionItem extends StatefulWidget {
 class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
   final TextEditingController _questionController = TextEditingController();
   final List<TextEditingController> _optionControllers = [];
+  final GlobalKey<FormState> questionFormKey = GlobalKey();
   int _selectedAnswerIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    // Start with 2 options
-    _addOption();
-    _addOption();
+
+    if (widget.question != null) {
+      _questionController.text = widget.question!.text;
+      widget.question?.answers.forEach((answer) {
+        _addOption(optionText: answer);
+      });
+    } else {
+      // Start with 2 options
+      _addOption();
+      _addOption();
+    }
   }
 
   @override
@@ -31,9 +47,93 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
     super.dispose();
   }
 
-  void _addOption() {
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Form(
+          key: questionFormKey,
+          child: QuizTextField(
+            hintText: 'Enter question',
+            textEditingController: _questionController,
+            onChanged: (_) {
+              if (questionFormKey.currentState != null) {
+                questionFormKey.currentState!.validate();
+              }
+            },
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter the question.';
+              }
+              return null;
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              AppStrings.options,
+              style: TextStyle(
+                color: colorScheme.primary,
+              ),
+            ),
+            GestureDetector(
+              onTap: _addOption,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.add,
+                      color: colorScheme.onPrimary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      AppStrings.addOption,
+                      style: TextStyle(
+                        color: colorScheme.onPrimary,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        for (var i = 0; i < _optionControllers.length; i++)
+          QuestionOptionItem(
+            radioButtonValue: i,
+            selectedAnswerIndex: _selectedAnswerIndex,
+            isDeleteButtonDisabled: _optionControllers.length <= 2,
+            optionTextController: _optionControllers[i],
+            onRadioButtonTap: (value) => setState(() {
+              _selectedAnswerIndex = value!;
+            }),
+            onRemoveOptionIconTap: _removeOption,
+          ),
+        SizedBox(height: 16),
+      ],
+    );
+  }
+
+  void _addOption({String? optionText}) {
     setState(() {
-      _optionControllers.add(TextEditingController());
+      _optionControllers.add(
+        TextEditingController(
+          text: optionText,
+        ),
+      );
     });
   }
 
@@ -110,135 +210,83 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
       answers: options,
     );
   }
+}
+
+class QuestionOptionItem extends StatelessWidget {
+  final int radioButtonValue;
+  final int selectedAnswerIndex;
+  final bool isDeleteButtonDisabled;
+
+  final GlobalKey<FormState> optionFormKey = GlobalKey();
+
+  final TextEditingController optionTextController;
+  final void Function(int?)? onRadioButtonTap;
+  final void Function(int index) onRemoveOptionIconTap;
+
+  QuestionOptionItem({
+    super.key,
+    required this.radioButtonValue,
+    required this.selectedAnswerIndex,
+    required this.isDeleteButtonDisabled,
+    required this.optionTextController,
+    this.onRadioButtonTap,
+    required this.onRemoveOptionIconTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        TextField(
-          controller: _questionController,
-          style: TextStyle(
-            color: colorScheme.primary,
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Radio<int>(
+            value: radioButtonValue,
+            groupValue: selectedAnswerIndex,
+            fillColor: WidgetStateProperty.resolveWith<Color>(
+              (Set<WidgetState> states) {
+                if (states.contains(WidgetState.selected)) {
+                  return Colors.green;
+                }
+                return colorScheme.primary;
+              },
+            ),
+            onChanged: onRadioButtonTap,
           ),
-          decoration: InputDecoration(
-            isDense: true,
-            hintText: 'Enter question',
-            hintStyle: TextStyle(
-              color: colorScheme.primary.withOpacity(0.3),
-            ),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: colorScheme.primary),
-            ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: colorScheme.primary),
-            ),
-            contentPadding: EdgeInsets.only(bottom: 4),
-          ),
-          minLines: 1,
-          maxLines: 4,
-        ),
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              AppStrings.options,
-              style: TextStyle(
-                color: colorScheme.primary,
+          Expanded(
+            child: Form(
+              key: optionFormKey,
+              child: QuizTextField(
+                hintText: '${AppStrings.option} ${radioButtonValue + 1}',
+                textEditingController: optionTextController,
+                onChanged: (_) {
+                  if (optionFormKey.currentState != null) {
+                    optionFormKey.currentState!.validate();
+                  }
+                },
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter the option';
+                  }
+                  return null;
+                },
               ),
             ),
-            GestureDetector(
-              onTap: _addOption,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.add,
-                      color: colorScheme.onPrimary,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      AppStrings.addOption,
-                      style: TextStyle(
-                        color: colorScheme.onPrimary,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        for (var i = 0; i < _optionControllers.length; i++)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: [
-                Radio<int>(
-                  value: i,
-                  groupValue: _selectedAnswerIndex,
-                  fillColor: WidgetStateProperty.resolveWith<Color>(
-                    (Set<WidgetState> states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return Colors.green;
-                      }
-                      return colorScheme.primary;
-                    },
-                  ),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedAnswerIndex = value!;
-                    });
-                  },
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _optionControllers[i],
-                    style: TextStyle(color: colorScheme.primary),
-                    decoration: InputDecoration(
-                      isDense: true,
-                      hintText: '${AppStrings.option} ${i + 1}',
-                      hintStyle: TextStyle(
-                        color: colorScheme.primary.withOpacity(0.3),
-                      ),
-                      enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.primary),
-                      ),
-                      focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: colorScheme.primary),
-                      ),
-                      contentPadding: const EdgeInsets.only(bottom: 4),
-                    ),
-                    minLines: 1,
-                    maxLines: 4,
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.remove_circle_outline,
-                    color: _optionControllers.length <= 2
-                        ? colorScheme.primary.withOpacity(0.3)
-                        : Colors.redAccent,
-                  ),
-                  onPressed: _optionControllers.length <= 2
-                      ? null
-                      : () => _removeOption(i),
-                ),
-              ],
-            ),
           ),
-        SizedBox(height: 16),
-      ],
+          IconButton(
+            icon: Icon(
+              Icons.remove_circle_outline,
+              color: isDeleteButtonDisabled
+                  ? colorScheme.primary.withValues(alpha: 0.3)
+                  : Colors.redAccent,
+            ),
+            onPressed: isDeleteButtonDisabled
+                ? null
+                : () => onRemoveOptionIconTap(radioButtonValue),
+          ),
+        ],
+      ),
     );
   }
 }

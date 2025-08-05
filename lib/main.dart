@@ -1,10 +1,14 @@
-import 'package:blinking_timer/blinking_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/core/config/hive_init.dart';
 import 'package:learn_and_quiz/core/config/theme/theme.dart';
 import 'package:learn_and_quiz/core/config/theme/theme_provider.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/start_screen.dart';
+import 'package:learn_and_quiz/core/ui/screens/start_screen.dart';
+
+// TODO:
+// [-] Fix routing navigation.
+// [] Modify the UIs of the quiz add and quiz play screens.
+// [] Integrate AI Quiz maker from text.
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,24 +26,11 @@ void main() async {
   );
 }
 
-class QuizMaster extends ConsumerStatefulWidget {
+class QuizMaster extends ConsumerWidget {
   const QuizMaster({super.key});
 
   @override
-  ConsumerState<QuizMaster> createState() => _QuizMasterState();
-}
-
-class _QuizMasterState extends ConsumerState<QuizMaster> {
-  late final BlinkingTimerController timerController;
-
-  @override
-  void initState() {
-    super.initState();
-    timerController = BlinkingTimerController();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeProvider);
 
     return MaterialApp(
