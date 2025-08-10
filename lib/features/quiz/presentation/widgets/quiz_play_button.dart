@@ -5,7 +5,7 @@ class QuizPlayButton extends StatelessWidget {
   final String text;
   final Widget iconWidget;
   final bool isIconFirst;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   const QuizPlayButton({
     super.key,
@@ -17,9 +17,12 @@ class QuizPlayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Material(
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
+        splashColor: colorScheme.secondaryContainer,
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(

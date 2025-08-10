@@ -8,14 +8,10 @@ import 'package:learn_and_quiz/core/ui/widgets/circular_border_progress_painter.
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/helpers/dto_models/question_summary.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_result_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_play_button.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_question_card.dart';
-
-// TODO:
-// [] Next/Prev button working but the answer list is getting shuffled
 
 final selectedAnswersProvider = StateProvider<List<String?>>((ref) {
   return [];
@@ -40,7 +36,9 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   void initState() {
     super.initState();
     _quizTimeSeconds = widget.quiz.durationSeconds;
-    _questions = widget.quiz.questions;
+    _questions = widget.quiz.questions
+        .map((question) => question.copyWith(answers: question.shuffledAnswers))
+        .toList();
     _startTime = DateTime.now().millisecondsSinceEpoch;
   }
 
@@ -88,7 +86,9 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                   fastBlinkingThreshold: 0.25,
                   initialColor: AppColors.lightPink,
                   customTimerUI: (text, color, progress, _, isBlinking) {
-                    final convertedTimeText = convertToMinuteSecond(text);
+                    final displayText = text == "Time Up!"
+                        ? "00:00"
+                        : convertToMinuteSecond(text);
 
                     return Stack(
                       alignment: Alignment.center,
@@ -104,27 +104,35 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                             ),
                           ),
                         ),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.timer_outlined,
-                              color: isBlinking
-                                  ? color.withValues(alpha: 0.7)
-                                  : color,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              convertedTimeText,
-                              style: TextStyle(
-                                fontSize: 14,
+                        SizedBox(
+                          width: 72,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.timer_outlined,
                                 color: isBlinking
                                     ? color.withValues(alpha: 0.7)
                                     : color,
-                                fontWeight: FontWeight.bold,
+                                size: 20,
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: 4),
+                              Expanded(
+                                // Add this to prevent text overflow
+                                child: Text(
+                                  displayText,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isBlinking
+                                        ? color.withValues(alpha: 0.7)
+                                        : color,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     );
@@ -146,7 +154,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
             child: QuizQuestionCard(
               questionText: currentQuestion.text,
               questionIndex: _currentQuestionIndex,
-              answers: currentQuestion.shuffledAnswers,
+              answers: currentQuestion.answers,
             ),
           ),
           Container(
@@ -155,18 +163,20 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                QuizPlayButton(
-                  isIconFirst: true,
-                  text: 'Previous',
-                  iconWidget: Icon(Icons.arrow_circle_left),
-                  onTap: () {
-                    setState(() {
+                if (_currentQuestionIndex != 0) ...[
+                  QuizPlayButton(
+                    key: ValueKey('previous_$_currentQuestionIndex'),
+                    isIconFirst: true,
+                    text: 'Previous',
+                    iconWidget: Icon(Icons.arrow_circle_left),
+                    onTap: () => setState(() {
                       _currentQuestionIndex--;
-                    });
-                  },
-                ),
-                const SizedBox(width: 12),
+                    }),
+                  ),
+                  const SizedBox(width: 12),
+                ],
                 QuizPlayButton(
+                  key: ValueKey('next_$_currentQuestionIndex'),
                   isIconFirst: false,
                   text: isLastQuestion ? 'Submit' : 'Next',
                   iconWidget: isLastQuestion
@@ -271,15 +281,6 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     await ref.read(quizNotifierProvider.notifier).addQuizHistory(quizHistory);
     await Future.delayed(delay);
 
-    final quizSummaryList = List.generate(selectedAnswers.length, (i) {
-      return QuestionSummary(
-        index: i,
-        question: widget.quiz.questions[i].text,
-        correctAnswer: widget.quiz.questions[i].answers[0],
-        userAnswer: selectedAnswers[i],
-      );
-    });
-
     ref.invalidate(selectedAnswersProvider);
 
     if (mounted) {
@@ -287,11 +288,9 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => ResultScreen(
+          builder: (context) => QuizResultScreen(
             quiz: widget.quiz,
-            quizSummaryList: quizSummaryList,
-            elapsedTimeSeconds: elapsedTime,
-            totalDurationSeconds: _quizTimeSeconds,
+            quizHistory: quizHistory,
           ),
         ),
       );

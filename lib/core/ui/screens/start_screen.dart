@@ -40,7 +40,7 @@ class StartScreen extends ConsumerWidget {
                   );
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               QuizOutlinedButton(
                 text: 'History ',
                 icon: Icons.history,
@@ -54,7 +54,7 @@ class StartScreen extends ConsumerWidget {
                   );
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               QuizOutlinedButton(
                 text: 'Settings ',
                 icon: Icons.settings,

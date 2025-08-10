@@ -19,12 +19,15 @@ class QuizQuestionCard extends ConsumerStatefulWidget {
 }
 
 class _QuestionItemState extends ConsumerState<QuizQuestionCard> {
-  String? selected;
   final ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final selectedAnswers = ref.watch(selectedAnswersProvider);
+    final selected = widget.questionIndex < selectedAnswers.length
+        ? selectedAnswers[widget.questionIndex]
+        : null;
 
     return Scrollbar(
       controller: _scrollController,
@@ -65,32 +68,24 @@ class _QuestionItemState extends ConsumerState<QuizQuestionCard> {
                         ),
                         value: answer,
                         groupValue: selected,
-                        onChanged: (String? value) {
-                          final selectedAnswers =
-                              ref.read(selectedAnswersProvider);
-                          int currentQuestionIndex = selectedAnswers.length - 1;
-
-                          if (selectedAnswers.isEmpty ||
-                              currentQuestionIndex < widget.questionIndex) {
-                            selectedAnswers.add(value!);
-                          } else {
-                            selectedAnswers[currentQuestionIndex] = value!;
-                          }
-
-                          ref
-                              .read(selectedAnswersProvider.notifier)
-                              .update((_) => selectedAnswers);
-
-                          setState(() {
-                            selected = value;
-                          });
-                        },
-                        activeColor: colorScheme.secondaryContainer,
+                        selected: answer == selected,
                         selectedTileColor: colorScheme.primary,
+                        activeColor: colorScheme.secondaryContainer,
                         controlAffinity: ListTileControlAffinity.leading,
                         dense: true,
                         visualDensity: VisualDensity.compact,
-                        selected: answer == selected,
+                        onChanged: (String? value) {
+                          ref
+                              .read(selectedAnswersProvider.notifier)
+                              .update((state) {
+                            final newState = [...state];
+                            while (newState.length <= widget.questionIndex) {
+                              newState.add(null);
+                            }
+                            newState[widget.questionIndex] = value;
+                            return newState;
+                          });
+                        },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
