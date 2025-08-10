@@ -28,13 +28,15 @@ class QuizHistoryScreen extends ConsumerWidget {
               child: Text('No History!'),
             )
           : Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12,
+              ),
               child: ListView.builder(
                 itemCount: sortedHistory.length + 1,
                 itemBuilder: (_, idx) {
                   if (idx == sortedHistory.length) {
-                    return const SizedBox(height: 60);
+                    return const SizedBox(height: 12);
                   }
                   final quizHistory = sortedHistory[idx];
                   return Padding(

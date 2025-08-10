@@ -3,47 +3,49 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:learn_and_quiz/core/config/utils.dart';
 import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/helpers/dto_models/question_summary.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_history_detail.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_chart_item.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_outlined_button.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_result_list_item.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_time_widget.dart';
 
-class ResultScreen extends ConsumerStatefulWidget {
+class QuizResultScreen extends ConsumerStatefulWidget {
   final Quiz quiz;
-  final List<QuestionSummary> quizSummaryList;
-  final int? elapsedTimeSeconds;
-  final int? totalDurationSeconds;
+  final QuizHistory quizHistory;
 
-  const ResultScreen({
+  const QuizResultScreen({
     super.key,
     required this.quiz,
-    required this.quizSummaryList,
-    this.elapsedTimeSeconds,
-    this.totalDurationSeconds,
+    required this.quizHistory,
   });
 
   @override
-  ConsumerState<ResultScreen> createState() => _ResultScreenState();
+  ConsumerState<QuizResultScreen> createState() => _QuizResultScreenState();
 }
 
-class _ResultScreenState extends ConsumerState<ResultScreen> {
+class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
   final Color progressHigh = Color(0xFF004350);
   final Color progressMedium = Color(0xFFA87700);
   final Color progressLow = Color(0xFFAF0000);
   final Color correctColor = const Color(0xFF009106);
 
-  bool _showSummary = false;
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final quizSummaryList = widget.quizSummaryList;
+    final quizHistory = widget.quizHistory;
     final numOfTotalQuestions = widget.quiz.questions.length;
-    final numOfCorrectAnswers =
-        quizSummaryList.where((summary) => summary.isCorrect).length;
+    int numOfCorrectAnswers = 0;
+    final selectedAnswers = widget.quizHistory.selectedAnswers;
+    final questions = widget.quiz.questions;
+
+    for (int idx = 0; idx < selectedAnswers.length; idx++) {
+      if (questions[idx].correctAnswer == selectedAnswers[idx]) {
+        numOfCorrectAnswers++;
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -51,22 +53,65 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
         titleSpacing: 0,
         leading: AppBarBackButton(),
       ),
-      body: Container(
-        padding: const EdgeInsets.all(16.0),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           children: [
-            _buildScoreChart(numOfCorrectAnswers, numOfTotalQuestions),
-            const SizedBox(height: 20),
-            _buildTimeChart(quizDuration: widget.quiz.durationSeconds),
-            const SizedBox(height: 20),
-            _buildSummaryToggleButton(),
-            if (_showSummary)
-              _buildQuestionSummaryList(quizSummaryList, colorScheme),
-            if (!_showSummary) Spacer(),
+            SizedBox(height: 12),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildScoreChart(numOfCorrectAnswers, numOfTotalQuestions),
+                    const SizedBox(height: 12),
+                    _buildTimeChart(quizHistory: quizHistory),
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'Your Answers:',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    _buildQuestionSummaryList(
+                      questions,
+                      selectedAnswers,
+                      colorScheme,
+                    ),
+                  ],
+                ),
+              ),
+            ),
             _buildActionButtons(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildQuestionSummaryList(
+    List<Question> questions,
+    List<String?> selectedAnswers,
+    ColorScheme colorScheme,
+  ) {
+    return ListView.builder(
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: questions.length + 1,
+      itemBuilder: (context, index) {
+        if (index == questions.length) {
+          return SizedBox(height: 20);
+        }
+        return QuizHistoryDetailItem(
+          question: questions[index],
+          questionIndex: index,
+          selectedAnswer: selectedAnswers[index],
+        );
+      },
     );
   }
 
@@ -128,17 +173,17 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
     );
   }
 
-  Widget _buildTimeChart({required int quizDuration}) {
-    final elapsedTime = widget.elapsedTimeSeconds ?? 0;
-    final remainingTime = (widget.totalDurationSeconds ?? 120) - elapsedTime;
+  Widget _buildTimeChart({required QuizHistory quizHistory}) {
+    final elapsedTime = quizHistory.elapsedTimeSeconds;
+    final remainingTime = quizHistory.totalDurationSeconds - elapsedTime;
 
     final [remainingMinutes, remainingSeconds] =
         getMinutesAndSeconds(remainingTime);
     final [elapsedMinutes, elapsedSeconds] = getMinutesAndSeconds(elapsedTime);
     final [totalMinutes, totalSeconds] =
-        getMinutesAndSeconds(widget.totalDurationSeconds ?? 120);
+        getMinutesAndSeconds(quizHistory.totalDurationSeconds);
 
-    double progress = elapsedTime / (widget.totalDurationSeconds ?? 120);
+    double progress = elapsedTime / (quizHistory.totalDurationSeconds);
     double remainingProgress = 1 - progress;
     Color progressColor = remainingProgress <= 0.2
         ? progressLow
@@ -199,56 +244,6 @@ class _ResultScreenState extends ConsumerState<ResultScreen> {
           optionColor: correctColor,
         ),
       ],
-    );
-  }
-
-  /// Toggle Button for Question Summary
-  Widget _buildSummaryToggleButton() {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _showSummary = !_showSummary;
-        });
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        elevation: 4,
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-            children: [
-              Text(_showSummary ? "Hide Answers" : "Show Answers"),
-              const Spacer(),
-              Icon(
-                _showSummary ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Question Summary List
-  Widget _buildQuestionSummaryList(
-    List<QuestionSummary> summaryData,
-    ColorScheme colorScheme,
-  ) {
-    return Expanded(
-      child: ListView.builder(
-        itemCount: summaryData.length,
-        itemBuilder: (context, index) {
-          final questionSummary = summaryData[index];
-          return Container(
-            margin: EdgeInsets.symmetric(horizontal: 4),
-            child: QuizResultListItem(
-              questionSummary: questionSummary,
-            ),
-          );
-        },
-      ),
     );
   }
 

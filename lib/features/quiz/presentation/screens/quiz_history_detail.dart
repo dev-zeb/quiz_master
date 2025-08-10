@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
+import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
 
 class QuizAttemptDetail extends StatelessWidget {
@@ -10,7 +11,6 @@ class QuizAttemptDetail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final formattedDate = DateFormat('MMM d, y').format(entry.playedAt);
     final formattedTime = DateFormat('hh:mm a').format(entry.playedAt);
 
@@ -72,91 +72,115 @@ class QuizAttemptDetail extends StatelessWidget {
                     return SizedBox(height: 16);
                   }
 
-                  final q = entry.questions[index];
                   final selectedAnswer = entry.selectedAnswers[index];
-                  final correctAnswer = q.correctAnswer;
-                  final [answerInfo, color] =
-                      _getAnswerInfoText(selectedAnswer, correctAnswer);
-
-                  return Card(
-                    color: Colors.white,
-                    clipBehavior: Clip.antiAlias,
-                    elevation: 1.5,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Q${index + 1}. ${q.text}',
-                            style: TextStyle(
-                              color: colorScheme.primary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          ...q.answers.map((a) {
-                            final isCorrect = a == correctAnswer;
-                            final isSelected = a == selectedAnswer;
-
-                            Color bg;
-                            Icon? icon;
-
-                            if (isSelected && isCorrect) {
-                              bg = Colors.green.shade100;
-                              icon = const Icon(
-                                Icons.check_circle,
-                                color: Colors.green,
-                              );
-                            } else if (isSelected && !isCorrect) {
-                              bg = Colors.red.shade100;
-                              icon = const Icon(
-                                Icons.cancel,
-                                color: Colors.red,
-                              );
-                            } else if (isCorrect) {
-                              bg = Colors.green.shade50;
-                              icon = const Icon(
-                                Icons.check,
-                                color: Colors.green,
-                              );
-                            } else {
-                              bg = Colors.grey.shade100;
-                              icon = null;
-                            }
-
-                            return Container(
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 10,
-                              ),
-                              decoration: BoxDecoration(
-                                color: bg,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(child: Text(a)),
-                                  if (icon != null) icon,
-                                  if (icon != null) const SizedBox(width: 8),
-                                ],
-                              ),
-                            );
-                          }),
-                          Padding(
-                            padding: EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              answerInfo,
-                              style: TextStyle(color: color),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  return QuizHistoryDetailItem(
+                    question: entry.questions[index],
+                    questionIndex: index,
+                    selectedAnswer: selectedAnswer,
                   );
                 },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class QuizHistoryDetailItem extends StatelessWidget {
+  final Question question;
+  final int questionIndex;
+  final String? selectedAnswer;
+
+  const QuizHistoryDetailItem({
+    super.key,
+    required this.question,
+    required this.questionIndex,
+    required this.selectedAnswer,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final correctAnswer = question.correctAnswer;
+    final [answerInfo, color] = _getAnswerInfoText(
+      selectedAnswer,
+      correctAnswer,
+    );
+
+    return Card(
+      color: Colors.white,
+      clipBehavior: Clip.antiAlias,
+      elevation: 1.5,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Q${questionIndex + 1}. ${question.text}',
+              style: TextStyle(
+                color: colorScheme.primary,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 12),
+            ...question.answers.map((ans) {
+              final isCorrect = ans == correctAnswer;
+              final isSelected = ans == selectedAnswer;
+
+              Color bg;
+              Icon? icon;
+
+              if (isSelected && isCorrect) {
+                bg = Colors.green.shade100;
+                icon = const Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                );
+              } else if (isSelected && !isCorrect) {
+                bg = Colors.red.shade100;
+                icon = const Icon(
+                  Icons.cancel,
+                  color: Colors.red,
+                );
+              } else if (isCorrect) {
+                bg = Colors.green.shade50;
+                icon = const Icon(
+                  Icons.check,
+                  color: Colors.green,
+                );
+              } else {
+                bg = Colors.grey.shade100;
+                icon = null;
+              }
+
+              return Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: bg,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(child: Text(ans)),
+                    if (icon != null) icon,
+                    if (icon != null) const SizedBox(width: 8),
+                  ],
+                ),
+              );
+            }),
+            Padding(
+              padding: EdgeInsets.only(top: 8.0),
+              child: Text(
+                answerInfo,
+                style: TextStyle(color: color),
               ),
             ),
           ],

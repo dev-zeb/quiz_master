@@ -15,11 +15,11 @@ class QuizChartItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      // color: Color(0xFF01242B),
+      color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      elevation: 4,
+      elevation: 2.0,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         height: 150,
