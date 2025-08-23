@@ -6,10 +6,10 @@ import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_editor_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
 
-class QuizItem extends StatelessWidget {
+class QuizListItem extends StatelessWidget {
   final Quiz quiz;
 
-  const QuizItem({super.key, required this.quiz});
+  const QuizListItem({super.key, required this.quiz});
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +25,9 @@ class QuizItem extends StatelessWidget {
             : '${minutes}m ${seconds}s';
 
     return Card(
-      color: Colors.white,
+      color: colorScheme.surfaceContainer,
       clipBehavior: Clip.antiAlias,
-      elevation: 3,
+      elevation: 2,
       child: InkWell(
         onTap: () {
           Navigator.push(

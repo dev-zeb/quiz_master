@@ -51,7 +51,7 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Form(
           key: questionFormKey,
@@ -72,43 +72,9 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
           ),
         ),
         const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              AppStrings.options,
-              style: TextStyle(
-                color: colorScheme.primary,
-              ),
-            ),
-            GestureDetector(
-              onTap: _addOption,
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: colorScheme.primary,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.add,
-                      color: colorScheme.onPrimary,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      AppStrings.addOption,
-                      style: TextStyle(
-                        color: colorScheme.onPrimary,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                  ],
-                ),
-              ),
-            ),
-          ],
+        Text(
+          AppStrings.options,
+          style: TextStyle(color: colorScheme.primary),
         ),
         const SizedBox(height: 8),
         for (var i = 0; i < _optionControllers.length; i++)
@@ -122,6 +88,45 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
             }),
             onRemoveOptionIconTap: _removeOption,
           ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Material(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              clipBehavior: Clip.antiAlias,
+              color: colorScheme.primary,
+              child: InkWell(
+                onTap: _addOption,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 4,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Icon(
+                        Icons.add,
+                        color: colorScheme.onPrimary,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        AppStrings.addOption,
+                        style: TextStyle(
+                          color: colorScheme.onPrimary,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
         SizedBox(height: 16),
       ],
     );
@@ -247,9 +252,9 @@ class QuestionOptionItem extends StatelessWidget {
             fillColor: WidgetStateProperty.resolveWith<Color>(
               (Set<WidgetState> states) {
                 if (states.contains(WidgetState.selected)) {
-                  return Colors.green;
+                  return colorScheme.primary;
                 }
-                return colorScheme.primary;
+                return colorScheme.primary.withValues(alpha: 0.6);
               },
             ),
             onChanged: onRadioButtonTap,
@@ -279,7 +284,7 @@ class QuestionOptionItem extends StatelessWidget {
               Icons.remove_circle_outline,
               color: isDeleteButtonDisabled
                   ? colorScheme.primary.withValues(alpha: 0.3)
-                  : Colors.redAccent,
+                  : colorScheme.error,
             ),
             onPressed: isDeleteButtonDisabled
                 ? null

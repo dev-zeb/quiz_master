@@ -14,8 +14,10 @@ class QuizChartItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Card(
-      color: Colors.white,
+      color: colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -33,6 +35,7 @@ class QuizChartItem extends StatelessWidget {
                 Text(
                   chartTitle,
                   style: TextStyle(
+                    color: colorScheme.primary,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),

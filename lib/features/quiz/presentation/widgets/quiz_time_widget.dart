@@ -14,13 +14,15 @@ class QuizTimeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           optionTitle,
           style: TextStyle(
-            color: Colors.grey[600],
+            color: colorScheme.primary,
             fontSize: 14,
             height: 1,
           ),

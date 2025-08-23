@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class QuizPlayButton extends StatelessWidget {
@@ -20,21 +19,31 @@ class QuizPlayButton extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Material(
+      borderRadius: BorderRadius.circular(16),
+      color: colorScheme.primary,
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        splashColor: colorScheme.secondaryContainer,
         onTap: onTap,
         child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 1),
-            borderRadius: BorderRadius.circular(16),
-          ),
           padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: Row(
             children: [
-              isIconFirst ? iconWidget : Text(text),
+              isIconFirst
+                  ? iconWidget
+                  : Text(
+                      text,
+                      style: TextStyle(
+                        color: colorScheme.onPrimary,
+                      ),
+                    ),
               SizedBox(width: 8),
-              isIconFirst ? Text(text) : iconWidget,
+              isIconFirst
+                  ? Text(
+                      text,
+                      style: TextStyle(
+                        color: colorScheme.onPrimary,
+                      ),
+                    )
+                  : iconWidget,
             ],
           ),
         ),

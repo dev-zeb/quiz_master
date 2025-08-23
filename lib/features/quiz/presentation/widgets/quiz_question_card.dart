@@ -36,9 +36,7 @@ class _QuestionItemState extends ConsumerState<QuizQuestionCard> {
       thickness: 4.0,
       thumbVisibility: true,
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         child: SingleChildScrollView(
           controller: _scrollController,
           child: Column(
@@ -57,40 +55,66 @@ class _QuestionItemState extends ConsumerState<QuizQuestionCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ...widget.answers.map(
-                    (answer) => Card(
-                      elevation: 2.0,
-                      margin: EdgeInsets.only(bottom: 16),
-                      child: RadioListTile<String>(
-                        tileColor: Colors.white,
-                        title: Text(
-                          answer,
-                          style: TextStyle(fontSize: 16),
+                    (answer) {
+                      final isSelected = answer == selected;
+
+                      return Card(
+                        color: isSelected
+                            ? colorScheme.secondary
+                            : colorScheme.surfaceContainer,
+                        clipBehavior: Clip.antiAlias,
+                        elevation: 2,
+                        margin: EdgeInsets.only(bottom: 16),
+                        child: RadioTheme(
+                          data: RadioThemeData(
+                            fillColor: WidgetStateProperty.resolveWith<Color>(
+                              (states) {
+                                if (states.contains(WidgetState.selected)) {
+                                  return colorScheme.onSecondary;
+                                }
+                                return colorScheme.primary;
+                              },
+                            ),
+                          ),
+                          child: RadioListTile<String>(
+                            title: Text(
+                              answer,
+                              style: TextStyle(
+                                color: isSelected
+                                    ? colorScheme.onSecondary
+                                    : colorScheme.primary,
+                                fontSize: 16,
+                              ),
+                            ),
+                            dense: true,
+                            groupValue: selected,
+                            value: answer,
+                            selected: isSelected,
+                            activeColor: colorScheme.onSecondary,
+                            selectedTileColor: colorScheme.primary,
+                            tileColor: colorScheme.surfaceContainer,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            visualDensity: VisualDensity.compact,
+                            onChanged: (String? value) {
+                              ref
+                                  .read(selectedAnswersProvider.notifier)
+                                  .update((state) {
+                                final newState = [...state];
+                                while (
+                                    newState.length <= widget.questionIndex) {
+                                  newState.add(null);
+                                }
+                                newState[widget.questionIndex] = value;
+                                return newState;
+                              });
+                            },
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
                         ),
-                        value: answer,
-                        groupValue: selected,
-                        selected: answer == selected,
-                        selectedTileColor: colorScheme.primary,
-                        activeColor: colorScheme.secondaryContainer,
-                        controlAffinity: ListTileControlAffinity.leading,
-                        dense: true,
-                        visualDensity: VisualDensity.compact,
-                        onChanged: (String? value) {
-                          ref
-                              .read(selectedAnswersProvider.notifier)
-                              .update((state) {
-                            final newState = [...state];
-                            while (newState.length <= widget.questionIndex) {
-                              newState.add(null);
-                            }
-                            newState[widget.questionIndex] = value;
-                            return newState;
-                          });
-                        },
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 10),
                 ],

@@ -25,7 +25,7 @@ class QuizTextField extends StatelessWidget {
         isDense: true,
         hintText: hintText,
         hintStyle: TextStyle(
-          color: colorScheme.primary.withValues(alpha: 0.5),
+          color: colorScheme.primary.withValues(alpha: 0.6),
         ),
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(
@@ -36,7 +36,7 @@ class QuizTextField extends StatelessWidget {
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(
             color: colorScheme.primary,
-            width: 0.75,
+            width: 1.0,
           ),
         ),
       ),
