@@ -19,7 +19,7 @@ Future<void> initializeHive() async {
     Hive.registerAdapter(QuizHistoryModelAdapter());
     Hive.registerAdapter(ThemeModelAdapter());
 
-    await Hive.openBox<ThemeMode>(AppStrings.themeBoxName);
+    await Hive.openBox<String>(AppStrings.themeBoxName);
     await Hive.openBox<QuizModel>(AppStrings.quizBoxName);
     await Hive.openBox<QuizHistoryModel>(AppStrings.quizHistoryBoxName);
   } catch (err, stk) {

@@ -2,39 +2,98 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:learn_and_quiz/core/config/strings.dart';
+import 'package:learn_and_quiz/core/config/theme/app_themes.dart';
 
-final themeProvider = StateNotifierProvider<ThemeNotifier, ThemeMode>((ref) {
-  return ThemeNotifier();
+final themeProvider = NotifierProvider<ThemeNotifier, ThemeData>(
+  () => ThemeNotifier(),
+);
+
+class ThemeNotifier extends Notifier<ThemeData> {
+  late AppTheme _currentTheme;
+
+  @override
+  ThemeData build() {
+    try {
+      final preferences = ref.read(appPreferencesProvider);
+      _currentTheme = preferences.getTheme();
+      return _currentTheme == AppTheme.dark ? _darkTheme : _lightTheme;
+    } catch (err) {
+      debugPrint('Error occurred while building Theme Notifier');
+      rethrow;
+    }
+  }
+
+  bool get isDark => _currentTheme == AppTheme.dark;
+
+  void toggleTheme(bool isDark) {
+    final newTheme = isDark ? AppTheme.dark : AppTheme.light;
+    _currentTheme = newTheme;
+    ref.read(appPreferencesProvider).setTheme(newTheme);
+    state = newTheme == AppTheme.dark ? _darkTheme : _lightTheme;
+  }
+
+  static final _lightTheme = AppThemes.lightTheme;
+
+  static final _darkTheme = AppThemes.darkTheme;
+}
+
+final appPreferencesProvider = Provider<AppPreferences>((ref) {
+  try {
+    final box = Hive.box<String>(AppStrings.themeBoxName);
+    return AppPreferences(box);
+  } catch (err, stk) {
+    debugPrint('[sufi] error: $err\nstack: $stk');
+    rethrow;
+  }
 });
 
-class ThemeNotifier extends StateNotifier<ThemeMode> {
-  static const String _themeModeKey = 'theme_mode';
-  late final Box<ThemeMode> _themeBox;
+class AppPreferences {
+  static const String _themeKey = 'selected_theme';
+  static const String _fontKey = 'default_font';
+  static const String _fontColorKey = 'default_font_color';
 
-  ThemeNotifier() : super(ThemeMode.system);
+  final Box<String> _box;
 
-  Future<void> initializeTheme() async {
-    try {
-      _themeBox = Hive.box<ThemeMode>(AppStrings.themeBoxName);
-      final savedTheme = _themeBox.get(_themeModeKey, defaultValue: ThemeMode.system);
-      state = savedTheme ?? ThemeMode.system;
-    } catch (err, stk) {
-      debugPrint("Error initializing theme: $err");
-      debugPrint("Stack: $stk");
-      state = ThemeMode.light;
-    }
+  AppPreferences(this._box);
+
+  // Theme methods
+  Future<void> setTheme(AppTheme theme) async {
+    await _box.put(_themeKey, theme.toString());
   }
 
-  Future<void> toggleTheme() async {
-    try {
-      final newTheme = state == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
-      await _themeBox.put(_themeModeKey, newTheme);
-      state = newTheme;
-    } catch (err, stk) {
-      debugPrint("Error toggling theme: $err");
-      debugPrint("Stack: $stk");
-    }
+  AppTheme getTheme() {
+    final theme = _box.get(_themeKey, defaultValue: AppTheme.light.toString());
+    return AppTheme.values.firstWhere(
+      (e) => e.toString() == theme,
+      orElse: () => AppTheme.light,
+    );
   }
 
-  ThemeMode get currentThemeMode => state;
+  AppTheme getThemeSync() {
+    final theme = _box.get(_themeKey, defaultValue: AppTheme.light.toString());
+    return AppTheme.values.firstWhere(
+      (e) => e.toString() == theme,
+      orElse: () => AppTheme.light,
+    );
+  }
+
+  // Font methods
+  Future<void> setDefaultFont(double font) async {
+    await _box.put(_fontKey, font.toString());
+  }
+
+  double getDefaultFont() {
+    final fontString = _box.get(_fontKey);
+    return fontString == null ? 20.0 : double.parse(_box.get(_fontKey)!);
+  }
+
+  // Font color methods
+  Future<void> setDefaultFontColor(String color) async {
+    await _box.put(_fontColorKey, color);
+  }
+
+  String? getDefaultFontColor() {
+    final color = _box.get(_fontColorKey);
+    return color;
+  }
 }
