@@ -4,10 +4,10 @@ import 'package:learn_and_quiz/core/ui/widgets/badge_item.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_history_detail.dart';
 
-class QuizHistoryItem extends StatelessWidget {
+class QuizHistoryListItem extends StatelessWidget {
   final QuizHistory quizHistory;
 
-  const QuizHistoryItem({super.key, required this.quizHistory});
+  const QuizHistoryListItem({super.key, required this.quizHistory});
 
   @override
   Widget build(BuildContext context) {
@@ -19,15 +19,15 @@ class QuizHistoryItem extends StatelessWidget {
     final formattedTime = DateFormat('hh:mm a').format(date);
 
     return Card(
-      color: Colors.white,
+      color: colorScheme.surfaceContainer,
       clipBehavior: Clip.antiAlias,
-      elevation: 1.5,
+      elevation: 2,
       child: InkWell(
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => QuizAttemptDetail(entry: quizHistory),
+              builder: (context) => QuizHistoryDetail(quizHistory: quizHistory),
             ),
           );
         },

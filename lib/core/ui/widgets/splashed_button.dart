@@ -26,7 +26,6 @@ class SplashedButton extends StatelessWidget {
         color: colorScheme.primary,
         child: InkWell(
           borderRadius: BorderRadius.circular(12.0),
-          splashColor: colorScheme.secondary,
           onTap: onTap,
           child: Container(
             padding: const EdgeInsets.symmetric(

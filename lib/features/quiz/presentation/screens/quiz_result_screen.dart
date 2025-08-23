@@ -1,24 +1,22 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:learn_and_quiz/core/config/theme/app_themes.dart';
 import 'package:learn_and_quiz/core/config/utils.dart';
-import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
+import 'package:learn_and_quiz/core/ui/widgets/custom_app_bar.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_history_detail.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_chart_item.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_history_question_item.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_outlined_button.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_time_widget.dart';
 
 class QuizResultScreen extends ConsumerStatefulWidget {
-  final Quiz quiz;
   final QuizHistory quizHistory;
 
   const QuizResultScreen({
     super.key,
-    required this.quiz,
     required this.quizHistory,
   });
 
@@ -27,31 +25,34 @@ class QuizResultScreen extends ConsumerStatefulWidget {
 }
 
 class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
-  final Color progressHigh = Color(0xFF004350);
-  final Color progressMedium = Color(0xFFA87700);
-  final Color progressLow = Color(0xFFAF0000);
-  final Color correctColor = const Color(0xFF009106);
+  late QuizHistory quizHistory;
+
+  @override
+  void initState() {
+    super.initState();
+    quizHistory = widget.quizHistory;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final quizHistory = widget.quizHistory;
-    final numOfTotalQuestions = widget.quiz.questions.length;
+    final numOfTotalQuestions = quizHistory.questions.length;
     int numOfCorrectAnswers = 0;
     final selectedAnswers = widget.quizHistory.selectedAnswers;
-    final questions = widget.quiz.questions;
+    final questions = quizHistory.questions;
 
     for (int idx = 0; idx < selectedAnswers.length; idx++) {
       if (questions[idx].correctAnswer == selectedAnswers[idx]) {
         numOfCorrectAnswers++;
       }
     }
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Quiz Result'),
-        titleSpacing: 0,
-        leading: AppBarBackButton(),
+      appBar: customAppBar(
+        context: context,
+        ref: ref,
+        title: 'Quiz Result',
+        hasBackButton: true,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -63,25 +64,28 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildScoreChart(numOfCorrectAnswers, numOfTotalQuestions),
+                    _buildScoreChart(
+                      numOfCorrectAnswers,
+                      numOfTotalQuestions,
+                    ),
                     const SizedBox(height: 12),
-                    _buildTimeChart(quizHistory: quizHistory),
+                    _buildTimeChart(
+                      quizHistory: quizHistory,
+                    ),
                     const SizedBox(height: 12),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         'Your Answers:',
                         style: TextStyle(
+                          color: colorScheme.primary,
                           fontSize: 20,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.5,
                         ),
                       ),
                     ),
-                    _buildQuestionSummaryList(
-                      questions,
-                      selectedAnswers,
-                      colorScheme,
-                    ),
+                    _buildQuestionSummaryList(),
                   ],
                 ),
               ),
@@ -93,23 +97,20 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
     );
   }
 
-  Widget _buildQuestionSummaryList(
-    List<Question> questions,
-    List<String?> selectedAnswers,
-    ColorScheme colorScheme,
-  ) {
+  Widget _buildQuestionSummaryList() {
     return ListView.builder(
       physics: NeverScrollableScrollPhysics(),
       shrinkWrap: true,
-      itemCount: questions.length + 1,
+      itemCount: quizHistory.questions.length + 1,
       itemBuilder: (context, index) {
+        final questions = quizHistory.questions;
         if (index == questions.length) {
           return SizedBox(height: 20);
         }
-        return QuizHistoryDetailItem(
+        return QuizHistoryQuestionItem(
           question: questions[index],
           questionIndex: index,
-          selectedAnswer: selectedAnswers[index],
+          selectedAnswer: quizHistory.selectedAnswers[index],
         );
       },
     );
@@ -117,6 +118,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
 
   /// Correct Answers Chart
   Widget _buildScoreChart(int correct, int total) {
+    final colorScheme = Theme.of(context).colorScheme;
     final correctAnswerPercentage = getCorrectAnswerPercentage(
       correctAnswers: correct,
       totalQuestions: total,
@@ -136,26 +138,26 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
           sectionsSpace: 2,
           sections: [
             PieChartSectionData(
-              color: progressLow,
+              color: colorScheme.error,
               value: (total - correct).toDouble(),
               title: '$wrongAnswerPercentage%',
               radius: 72,
-              titleStyle: const TextStyle(
+              titleStyle: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: colorScheme.onError,
               ),
               titlePositionPercentageOffset: titleOffset,
             ),
             PieChartSectionData(
-              color: correctColor,
+              color: colorScheme.tertiary,
               value: correct.toDouble(),
               title: '$correctAnswerPercentage%',
               radius: 72,
               titleStyle: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: colorScheme.onTertiary,
               ),
               titlePositionPercentageOffset: titleOffset,
             ),
@@ -164,16 +166,32 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
       ),
       infoWidget: [
         const SizedBox(height: 16),
-        _buildTag(Icons.list_alt, "Total", total, progressHigh),
+        _buildTag(
+          Icons.list_alt,
+          "Total",
+          total,
+          colorScheme.primary,
+        ),
         const SizedBox(height: 4),
-        _buildTag(Icons.check_circle_outline, "Correct", correct, correctColor),
+        _buildTag(
+          Icons.check_circle_outline,
+          "Correct",
+          correct,
+          colorScheme.tertiary,
+        ),
         const SizedBox(height: 4),
-        _buildTag(Icons.cancel_outlined, "Wrong", total - correct, progressLow),
+        _buildTag(
+          Icons.cancel_outlined,
+          "Wrong",
+          total - correct,
+          colorScheme.error,
+        ),
       ],
     );
   }
 
   Widget _buildTimeChart({required QuizHistory quizHistory}) {
+    final colorScheme = Theme.of(context).colorScheme;
     final elapsedTime = quizHistory.elapsedTimeSeconds;
     final remainingTime = quizHistory.totalDurationSeconds - elapsedTime;
 
@@ -186,10 +204,10 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
     double progress = elapsedTime / (quizHistory.totalDurationSeconds);
     double remainingProgress = 1 - progress;
     Color progressColor = remainingProgress <= 0.2
-        ? progressLow
+        ? colorScheme.error
         : remainingProgress <= 0.5
-            ? progressMedium
-            : progressHigh;
+            ? AppColors.warningOrange
+            : colorScheme.primary;
 
     return QuizChartItem(
       chartTitle: 'Time Stats',
@@ -202,7 +220,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
             child: CircularProgressIndicator(
               value: progress.clamp(0.0, 1.0),
               strokeWidth: 12,
-              backgroundColor: correctColor,
+              backgroundColor: colorScheme.tertiary,
               valueColor: AlwaysStoppedAnimation<Color>(progressColor),
             ),
           ),
@@ -213,7 +231,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
                 'Total Time',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey[600],
+                  color: colorScheme.primary,
                 ),
               ),
               Text(
@@ -221,7 +239,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: colorScheme.secondary,
                 ),
               ),
             ],
@@ -241,7 +259,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
           optionTitle: 'Remaining Time',
           optionValue:
               '$remainingMinutes:${remainingSeconds.toString().padLeft(2, '0')}',
-          optionColor: correctColor,
+          optionColor: colorScheme.tertiary,
         ),
       ],
     );
@@ -249,36 +267,42 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
 
   /// Action Buttons
   Widget _buildActionButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        QuizOutlinedButton(
-          text: 'Restart Quiz',
-          icon: Icons.restart_alt_outlined,
-          onTap: () {
-            // Update the remaining time here
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => QuizPlayScreen(quiz: widget.quiz),
-              ),
-            );
-          },
-          isRightAligned: false,
-        ),
-        const SizedBox(width: 16),
-        QuizOutlinedButton(
-          text: 'Go To Home',
-          icon: Icons.home_outlined,
-          onTap: () {
-            Navigator.popUntil(
-              context,
-              (route) => route.isFirst,
-            );
-          },
-          isRightAligned: false,
-        ),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularBorderedButton(
+            text: 'Restart Quiz',
+            icon: Icons.restart_alt_outlined,
+            onTap: () {
+              final quiz = ref
+                  .read(quizNotifierProvider.notifier)
+                  .getQuizById(quizHistory.quizId);
+              // Update the remaining time here
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => QuizPlayScreen(quiz: quiz!),
+                ),
+              );
+            },
+            isRightAligned: false,
+          ),
+          const SizedBox(width: 16),
+          CircularBorderedButton(
+            text: 'Go To Home',
+            icon: Icons.home_outlined,
+            onTap: () {
+              Navigator.popUntil(
+                context,
+                (route) => route.isFirst,
+              );
+            },
+            isRightAligned: false,
+          ),
+        ],
+      ),
     );
   }
 

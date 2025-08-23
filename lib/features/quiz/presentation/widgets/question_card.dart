@@ -21,44 +21,41 @@ class QuestionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: colorScheme.primary,
-          width: 0.75,
-        ),
-        color: colorScheme.secondary.withValues(alpha: 0.15),
-      ),
+    return Card(
+      color: colorScheme.surfaceContainer,
+      clipBehavior: Clip.antiAlias,
+      elevation: 2,
       key: globalKey,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
       margin: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Question ${questionIndex + 1}',
-                style: TextStyle(
-                  color: colorScheme.primary,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Question ${questionIndex + 1}',
+                  style: TextStyle(
+                    color: colorScheme.primary,
+                  ),
                 ),
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.delete,
-                  color: isDeleteButtonEnable
-                      ? Colors.red
-                      : colorScheme.primary.withValues(alpha: 0.3),
+                IconButton(
+                  icon: Icon(
+                    Icons.delete,
+                    color: isDeleteButtonEnable
+                        ? colorScheme.error
+                        : colorScheme.primary.withValues(alpha: 0.3),
+                  ),
+                  onPressed: onDeleteButtonPress,
                 ),
-                onPressed: onDeleteButtonPress,
-              ),
-            ],
-          ),
-          quizFormQuestionItem,
-        ],
+              ],
+            ),
+            quizFormQuestionItem,
+          ],
+        ),
       ),
     );
   }

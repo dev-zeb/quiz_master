@@ -1,10 +1,9 @@
 import 'package:blinking_timer/blinking_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/config/theme/theme.dart';
 import 'package:learn_and_quiz/core/config/utils.dart';
-import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
 import 'package:learn_and_quiz/core/ui/widgets/circular_border_progress_painter.dart';
+import 'package:learn_and_quiz/core/ui/widgets/clickable_text_widget.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
@@ -48,159 +47,233 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     final currentQuestion = _questions[_currentQuestionIndex];
     final isLastQuestion =
         _currentQuestionIndex == widget.quiz.questions.length - 1;
+    final currentQuestionNumber = _currentQuestionIndex + 1;
+    final totalNumberOfQuestions = widget.quiz.questions.length;
+    final progressRate = currentQuestionNumber / totalNumberOfQuestions;
+    final progressValue = (progressRate * 100).toStringAsFixed(2);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.quiz.title),
-        titleSpacing: 0,
-        leading: AppBarBackButton(),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 4,
-            decoration: BoxDecoration(
-              border: Border.all(color: colorScheme.primary, width: 0.5),
-            ),
-            child: LinearProgressIndicator(
-              value: (_currentQuestionIndex + 1) / widget.quiz.questions.length,
-              backgroundColor: colorScheme.surfaceContainerHighest,
-              valueColor: AlwaysStoppedAnimation<Color>(colorScheme.primary),
-            ),
-          ),
-          SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, res) async {
+        if (didPop) return;
+
+        await showConfirmationDialog(context);
+      },
+      child: Scaffold(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 60),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'Question ${_currentQuestionIndex + 1} of ${_questions.length}',
-                  style: TextStyle(fontSize: 16),
-                ),
-                BlinkingTimer(
-                  duration: Duration(seconds: _quizTimeSeconds),
-                  slowBlinkingThreshold: 0.5,
-                  fastBlinkingThreshold: 0.25,
-                  initialColor: AppColors.lightPink,
-                  customTimerUI: (text, color, progress, _, isBlinking) {
-                    final displayText = text == "Time Up!"
-                        ? "00:00"
-                        : convertToMinuteSecond(text);
+                SizedBox(width: 12),
+                Material(
+                  color: colorScheme.primary,
+                  borderRadius: BorderRadius.circular(12.0),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 6, top: 8, bottom: 8),
+                      child: Icon(
+                        Icons.arrow_back_ios,
+                        color: colorScheme.onPrimary,
+                        size: 20,
+                      ),
+                    ),
+                    onTap: () async {
+                      final result = await showConfirmationDialog(context);
 
-                    return Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SizedBox(
-                          width: 72,
-                          height: 28,
-                          child: CustomPaint(
-                            painter: CircularBorderProgressPainter(
-                              progress: progress,
-                              color: color,
-                              borderRadius: 16.0,
+                      if (result == true && context.mounted) {
+                        Navigator.pop(context);
+                      }
+                    },
+                  ),
+                ),
+                SizedBox(width: 16),
+                Flexible(
+                  child: Text(
+                    widget.quiz.title,
+                    style: TextStyle(
+                      color: colorScheme.primary,
+                      fontSize: 20,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
+                ),
+                SizedBox(width: 12),
+              ],
+            ),
+            SizedBox(height: 16),
+            Container(
+              height: 5,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: colorScheme.secondary,
+                  width: 0.5,
+                ),
+              ),
+              child: LinearProgressIndicator(
+                value: progressRate,
+                backgroundColor: colorScheme.onSecondary,
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(colorScheme.secondary),
+              ),
+            ),
+            SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Q: $currentQuestionNumber of $totalNumberOfQuestions',
+                    style: TextStyle(
+                      color: colorScheme.secondary,
+                      fontSize: 16,
+                    ),
+                  ),
+                  BlinkingTimer(
+                    duration: Duration(seconds: _quizTimeSeconds),
+                    slowBlinkingThreshold: 0.5,
+                    fastBlinkingThreshold: 0.25,
+                    initialColor: colorScheme.secondary,
+                    customTimerUI: (text, color, progress, _, isBlinking) {
+                      final displayText = text == "Time Up!"
+                          ? "00:00"
+                          : convertToMinuteSecond(text);
+
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SizedBox(
+                            width: 72,
+                            height: 28,
+                            child: CustomPaint(
+                              painter: CircularBorderProgressPainter(
+                                progress: progress,
+                                color: color,
+                                borderRadius: 16.0,
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          width: 72,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.timer_outlined,
-                                color: isBlinking
-                                    ? color.withValues(alpha: 0.7)
-                                    : color,
-                                size: 20,
-                              ),
-                              const SizedBox(width: 4),
-                              Expanded(
-                                // Add this to prevent text overflow
-                                child: Text(
-                                  displayText,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: isBlinking
-                                        ? color.withValues(alpha: 0.7)
-                                        : color,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
+                          SizedBox(
+                            width: 72,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.timer_outlined,
+                                  color: isBlinking
+                                      ? color.withValues(alpha: 0.7)
+                                      : color,
+                                  size: 20,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    displayText,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: isBlinking
+                                          ? color.withValues(alpha: 0.7)
+                                          : color,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                  onTimeUpThreshold: () async {
-                    await _navigateToResultScreen(
-                      title: "Time's Up!",
-                      iconColor: Colors.redAccent,
-                      delay: Duration(
-                        milliseconds: 700,
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: QuizQuestionCard(
-              questionText: currentQuestion.text,
-              questionIndex: _currentQuestionIndex,
-              answers: currentQuestion.answers,
-            ),
-          ),
-          Container(
-            color: Colors.transparent,
-            padding: EdgeInsets.symmetric(vertical: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (_currentQuestionIndex != 0) ...[
-                  QuizPlayButton(
-                    key: ValueKey('previous_$_currentQuestionIndex'),
-                    isIconFirst: true,
-                    text: 'Previous',
-                    iconWidget: Icon(Icons.arrow_circle_left),
-                    onTap: () => setState(() {
-                      _currentQuestionIndex--;
-                    }),
+                        ],
+                      );
+                    },
+                    onTimeUpThreshold: () async {
+                      await _navigateToResultScreen(
+                        colorScheme,
+                        title: "Time's Up!",
+                        iconColor: colorScheme.error,
+                        delay: Duration(milliseconds: 700),
+                      );
+                    },
                   ),
-                  const SizedBox(width: 12),
+                  Text(
+                    "$progressValue%",
+                    style: TextStyle(
+                      color: colorScheme.secondary,
+                      fontSize: 16,
+                    ),
+                  ),
                 ],
-                QuizPlayButton(
-                  key: ValueKey('next_$_currentQuestionIndex'),
-                  isIconFirst: false,
-                  text: isLastQuestion ? 'Submit' : 'Next',
-                  iconWidget: isLastQuestion
-                      ? Transform.rotate(
-                          angle: 4.7,
-                          child: Icon(Icons.arrow_circle_right),
-                        )
-                      : Icon(Icons.arrow_circle_right),
-                  onTap: _handleNextButtonClick,
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+            Expanded(
+              child: QuizQuestionCard(
+                questionText: currentQuestion.text,
+                questionIndex: _currentQuestionIndex,
+                answers: currentQuestion.answers,
+              ),
+            ),
+            Container(
+              color: Colors.transparent,
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (_currentQuestionIndex != 0) ...[
+                    QuizPlayButton(
+                      key: ValueKey('previous_$_currentQuestionIndex'),
+                      isIconFirst: true,
+                      text: 'Previous',
+                      iconWidget: Icon(
+                        Icons.arrow_circle_left,
+                        color: colorScheme.onPrimary,
+                      ),
+                      onTap: () => setState(() {
+                        _currentQuestionIndex--;
+                      }),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                  QuizPlayButton(
+                    key: ValueKey('next_$_currentQuestionIndex'),
+                    isIconFirst: false,
+                    text: isLastQuestion ? 'Submit' : 'Next',
+                    iconWidget: isLastQuestion
+                        ? Transform.rotate(
+                            angle: 4.7,
+                            child: Icon(
+                              Icons.arrow_circle_right,
+                              color: colorScheme.onPrimary,
+                            ),
+                          )
+                        : Icon(
+                            Icons.arrow_circle_right,
+                            color: colorScheme.onPrimary,
+                          ),
+                    onTap: () {
+                      _handleNextButtonClick(colorScheme);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Future<void> _handleNextButtonClick() async {
+  Future<void> _handleNextButtonClick(colorScheme) async {
     final isLastQuestion = _currentQuestionIndex == (_questions.length - 1);
     if (isLastQuestion) {
       await _navigateToResultScreen(
+        colorScheme,
         title: "Well Done!",
-        iconColor: Colors.green,
+        iconColor: colorScheme.tertiary,
         delay: Duration(
           milliseconds: 700,
         ),
@@ -212,7 +285,8 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     }
   }
 
-  Future<void> _navigateToResultScreen({
+  Future<void> _navigateToResultScreen(
+    colorScheme, {
     required String title,
     required Color iconColor,
     required Duration delay,
@@ -220,6 +294,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
+        backgroundColor: colorScheme.surfaceContainer,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -240,6 +315,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               Text(
                 title,
                 style: TextStyle(
+                  color: colorScheme.primary,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
@@ -248,7 +324,10 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               Text(
                 "You're now being redirected to the results screen.",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16),
+                style: TextStyle(
+                  color: colorScheme.primary.withValues(alpha: 0.75),
+                  fontSize: 16,
+                ),
               ),
             ],
           ),
@@ -288,12 +367,58 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => QuizResultScreen(
-            quiz: widget.quiz,
-            quizHistory: quizHistory,
-          ),
+          builder: (context) => QuizResultScreen(quizHistory: quizHistory),
         ),
       );
     }
+  }
+
+  Future<bool?> showConfirmationDialog(BuildContext context) async {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: colorScheme.surfaceContainer,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Text(
+          'Cancel Quiz?',
+          style: TextStyle(
+            fontSize: 20,
+            color: colorScheme.primary,
+          ),
+        ),
+        content: Text(
+          'Do you want to cancel the quiz?',
+          style: TextStyle(
+            fontSize: 16,
+            color: colorScheme.primary,
+          ),
+        ),
+        actions: [
+          ClickableTextWidget(
+            fontSize: 16,
+            text: 'No',
+            buttonColor: colorScheme.error,
+            textColor: colorScheme.onError,
+            onTap: () => Navigator.of(dialogContext).pop(false),
+          ),
+          SizedBox(width: 4),
+          ClickableTextWidget(
+            fontSize: 16,
+            text: 'Yes',
+            buttonColor: colorScheme.primary,
+            textColor: colorScheme.onPrimary,
+            onTap: () {
+              ref.invalidate(selectedAnswersProvider);
+              Navigator.of(dialogContext).pop(true);
+            },
+          ),
+        ],
+      ),
+    );
   }
 }

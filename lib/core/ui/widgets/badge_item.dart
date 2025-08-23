@@ -16,8 +16,8 @@ class BadgeItem extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: colorScheme.primary,
+        borderRadius: BorderRadius.circular(6),
+        color: colorScheme.primary.withValues(alpha: 0.35),
       ),
       padding: EdgeInsets.symmetric(
         horizontal: 6,
@@ -27,14 +27,14 @@ class BadgeItem extends StatelessWidget {
         children: [
           Icon(
             badgeIcon,
-            color: colorScheme.secondaryContainer,
+            color: colorScheme.onPrimary,
             size: 16,
           ),
           SizedBox(width: 6),
           Text(
             badgeTitle,
             style: TextStyle(
-              color: colorScheme.secondaryContainer,
+              color: colorScheme.onPrimary,
               fontSize: 12,
             ),
           ),

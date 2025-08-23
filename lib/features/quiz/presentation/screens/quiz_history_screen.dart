@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
+import 'package:learn_and_quiz/core/ui/widgets/custom_app_bar.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_history_item.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_history_list_item.dart';
 
 class QuizHistoryScreen extends ConsumerWidget {
-  const QuizHistoryScreen({
-    super.key,
-  });
+  const QuizHistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,30 +16,29 @@ class QuizHistoryScreen extends ConsumerWidget {
       ..sort((a, b) => b.playedAt.compareTo(a.playedAt));
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Quiz Play History'),
-        titleSpacing: 0,
-        leading: AppBarBackButton(),
+      appBar: customAppBar(
+        context: context,
+        ref: ref,
+        title: 'Quiz Play History',
+        hasBackButton: true,
       ),
       body: sortedHistory.isEmpty
           ? Center(
               child: Text('No History!'),
             )
           : Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-                vertical: 12,
+              padding: const EdgeInsets.only(
+                left: 16,
+                right: 16,
+                bottom: 20,
               ),
               child: ListView.builder(
-                itemCount: sortedHistory.length + 1,
+                itemCount: sortedHistory.length,
                 itemBuilder: (_, idx) {
-                  if (idx == sortedHistory.length) {
-                    return const SizedBox(height: 12);
-                  }
                   final quizHistory = sortedHistory[idx];
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12.0),
-                    child: QuizHistoryItem(quizHistory: quizHistory),
+                    child: QuizHistoryListItem(quizHistory: quizHistory),
                   );
                 },
               ),
