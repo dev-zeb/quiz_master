@@ -11,65 +11,65 @@ class StartScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-        ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Image.asset(
-                'assets/images/learn_with_quiz_icon.png',
-                color: colorScheme.primary,
-                width: 180,
-              ),
-              const SizedBox(height: 60),
-              QuizOutlinedButton(
-                text: 'Play Quiz',
-                icon: Icons.play_arrow,
-                isRightAligned: false,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const QuizListScreen(),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 12),
-              QuizOutlinedButton(
-                text: 'History ',
-                icon: Icons.history,
-                isRightAligned: false,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const QuizHistoryScreen(),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 12),
-              QuizOutlinedButton(
-                text: 'Settings ',
-                icon: Icons.settings,
-                isRightAligned: false,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SettingsScreen(),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
+        height: height,
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/images/learn_with_quiz_icon.png',
+              color: colorScheme.primary,
+              width: 180,
+            ),
+            const SizedBox(height: 60),
+            CircularBorderedButton(
+              text: 'Play Quiz',
+              icon: Icons.play_arrow,
+              isRightAligned: false,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const QuizListScreen(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            CircularBorderedButton(
+              text: 'History ',
+              icon: Icons.history,
+              isRightAligned: false,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const QuizHistoryScreen(),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            CircularBorderedButton(
+              text: 'Settings ',
+              icon: Icons.settings,
+              isRightAligned: false,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:learn_and_quiz/core/config/strings.dart';
-import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
+import 'package:learn_and_quiz/core/ui/widgets/custom_app_bar.dart';
 import 'package:learn_and_quiz/core/ui/widgets/scroll_to_button.dart';
 import 'package:learn_and_quiz/core/utils/dialog_utils.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
@@ -66,14 +66,13 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
     final isTimeError = minutes == 0 && seconds == 0;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          editingQuiz == null
-              ? AppStrings.addNewQuizPageTitle
-              : AppStrings.updateQuizPageTitle,
-        ),
-        titleSpacing: 0,
-        leading: AppBarBackButton(),
+      appBar: customAppBar(
+        context: context,
+        ref: ref,
+        title: editingQuiz == null
+            ? AppStrings.addNewQuizPageTitle
+            : AppStrings.updateQuizPageTitle,
+        hasBackButton: true,
       ),
       body: Stack(
         children: [
@@ -138,28 +137,19 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                                 ],
                               ),
                               Spacer(),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  QuizTimeInputField(
-                                    textEditingController: _minutesController,
-                                    onChanged: (_) {
-                                      setState(() {});
-                                    },
-                                  ),
-                                  Text('min'),
-                                ],
+                              QuizTimeInputField(
+                                label: 'min',
+                                textEditingController: _minutesController,
+                                onChanged: (_) {
+                                  setState(() {});
+                                },
                               ),
-                              Column(
-                                children: [
-                                  QuizTimeInputField(
-                                    textEditingController: _secondsController,
-                                    onChanged: (_) {
-                                      setState(() {});
-                                    },
-                                  ),
-                                  Text('sec'),
-                                ],
+                              QuizTimeInputField(
+                                label: 'sec',
+                                textEditingController: _secondsController,
+                                onChanged: (_) {
+                                  setState(() {});
+                                },
                               ),
                             ],
                           ),
@@ -190,13 +180,14 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    QuizOutlinedButton(
+                    CircularBorderedButton(
                       text: 'Add question',
                       icon: Icons.add,
                       isRightAligned: false,
+                      buttonWidthRatio: 0.36,
                       onTap: _addNewQuestion,
                     ),
-                    QuizOutlinedButton(
+                    CircularBorderedButton(
                       text: editingQuiz == null
                           ? AppStrings.saveQuiz
                           : AppStrings.updateQuiz,

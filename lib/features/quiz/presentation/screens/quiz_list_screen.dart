@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/ui/widgets/app_bar_back_button.dart';
+import 'package:learn_and_quiz/core/ui/widgets/custom_app_bar.dart';
 import 'package:learn_and_quiz/core/ui/widgets/splashed_button.dart';
 import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_editor_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_item.dart';
+import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_list_item.dart';
 import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_outlined_button.dart';
 
 class QuizListScreen extends ConsumerWidget {
@@ -17,16 +17,17 @@ class QuizListScreen extends ConsumerWidget {
     final quizzes = ref.watch(quizNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Quiz List'),
-        titleSpacing: 0,
-        leading: AppBarBackButton(),
+      appBar: customAppBar(
+        context: context,
+        ref: ref,
+        title: 'Quiz List',
+        hasBackButton: true,
       ),
       body: quizzes.isEmpty
           ? _buildEmptyState(context, colorScheme)
           : _buildQuizListWidget(context, colorScheme, ref, quizzes),
       floatingActionButton: quizzes.isNotEmpty
-          ? QuizOutlinedButton(
+          ? CircularBorderedButton(
               text: 'Add Quiz',
               icon: Icons.add,
               isRightAligned: true,
@@ -100,10 +101,7 @@ class QuizListScreen extends ConsumerWidget {
     List<Quiz> quizzes,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16.0,
-        vertical: 12
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
       child: ListView.builder(
         itemCount: quizzes.length + 1,
         itemBuilder: (_, idx) {
@@ -111,7 +109,10 @@ class QuizListScreen extends ConsumerWidget {
           final quiz = quizzes[idx];
           return Padding(
             padding: const EdgeInsets.only(bottom: 12.0),
-            child: QuizItem(quiz: quiz),
+            child: QuizListItem(
+              key: ValueKey('quiz_$idx'),
+              quiz: quiz,
+            ),
           );
         },
       ),
