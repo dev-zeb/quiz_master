@@ -23,7 +23,7 @@ class StartScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/learn_with_quiz_icon.png',
+              'assets/images/quiz_master_icon.png',
               color: colorScheme.primary,
               width: 180,
             ),
