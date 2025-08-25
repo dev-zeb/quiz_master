@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
-import 'package:learn_and_quiz/core/config/strings.dart';
-import 'package:learn_and_quiz/core/config/theme/app_themes.dart';
+import 'package:quiz_master/core/config/strings.dart';
+import 'package:quiz_master/core/config/theme/app_themes.dart';
 
 final themeProvider = NotifierProvider<ThemeNotifier, ThemeData>(
   () => ThemeNotifier(),

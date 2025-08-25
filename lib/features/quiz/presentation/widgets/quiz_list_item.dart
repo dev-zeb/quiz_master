@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/core/ui/widgets/badge_item.dart';
-import 'package:learn_and_quiz/core/ui/widgets/popup_menu.dart';
-import 'package:learn_and_quiz/core/ui/widgets/popup_option_item.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_editor_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
+import 'package:quiz_master/core/ui/widgets/badge_item.dart';
+import 'package:quiz_master/core/ui/widgets/popup_menu.dart';
+import 'package:quiz_master/core/ui/widgets/popup_option_item.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_play_screen.dart';
 
 class QuizListItem extends StatelessWidget {
   final Quiz quiz;

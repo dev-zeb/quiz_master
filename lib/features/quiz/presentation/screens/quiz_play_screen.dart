@@ -1,16 +1,16 @@
 import 'package:blinking_timer/blinking_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/config/utils.dart';
-import 'package:learn_and_quiz/core/ui/widgets/circular_border_progress_painter.dart';
-import 'package:learn_and_quiz/core/ui/widgets/clickable_text_widget.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_result_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_play_button.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_question_card.dart';
+import 'package:quiz_master/core/config/utils.dart';
+import 'package:quiz_master/core/ui/widgets/circular_border_progress_painter.dart';
+import 'package:quiz_master/core/ui/widgets/clickable_text_widget.dart';
+import 'package:quiz_master/features/quiz/domain/entities/question.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
+import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_result_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_play_button.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_question_card.dart';
 
 final selectedAnswersProvider = StateProvider<List<String?>>((ref) {
   return [];

@@ -1,6 +1,6 @@
 import 'package:hive/hive.dart';
-import 'package:learn_and_quiz/features/quiz/data/models/question_model.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
+import 'package:quiz_master/features/quiz/data/models/question_model.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
 
 part 'quiz_history_model.g.dart';
 

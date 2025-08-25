@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/features/quiz/data/datasources/local/quiz_local_data_source.dart';
-import 'package:learn_and_quiz/features/quiz/data/datasources/local/quiz_local_data_source_impl.dart';
-import 'package:learn_and_quiz/features/quiz/data/models/quiz_model.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
-import 'package:learn_and_quiz/features/quiz/domain/repositories/quiz_repository.dart';
+import 'package:quiz_master/features/quiz/data/datasources/local/quiz_local_data_source.dart';
+import 'package:quiz_master/features/quiz/data/datasources/local/quiz_local_data_source_impl.dart';
+import 'package:quiz_master/features/quiz/data/models/quiz_model.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
+import 'package:quiz_master/features/quiz/domain/repositories/quiz_repository.dart';
 
 import '../models/quiz_history_model.dart';
 

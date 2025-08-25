@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/config/strings.dart';
-import 'package:learn_and_quiz/core/ui/widgets/custom_app_bar.dart';
-import 'package:learn_and_quiz/core/ui/widgets/scroll_to_button.dart';
-import 'package:learn_and_quiz/core/utils/dialog_utils.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_text_field.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/question_card.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_outlined_button.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_form_question_item.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_time_input_field.dart';
+import 'package:quiz_master/core/config/strings.dart';
+import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
+import 'package:quiz_master/core/ui/widgets/scroll_to_button.dart';
+import 'package:quiz_master/core/utils/dialog_utils.dart';
+import 'package:quiz_master/features/quiz/domain/entities/question.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
+import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_text_field.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/question_card.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_outlined_button.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_form_question_item.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_time_input_field.dart';
 
 class QuizEditorScreen extends ConsumerStatefulWidget {
   final Quiz? quiz;
@@ -159,16 +159,28 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                             style: TextStyle(color: colorScheme.primary),
                           ),
                           const SizedBox(height: 10),
-                          ..._questions.asMap().entries.map((question) {
-                            final index = question.key;
+                          ListView.builder(
+                              itemCount: _questions.length,
+                              itemBuilder: (context, index) {
+                            final question = _questions[index];
                             return QuestionCard(
                               globalKey: _questionContainerKeys[index],
                               questionIndex: index,
                               isDeleteButtonEnable: _questions.length > 1,
-                              quizFormQuestionItem: question.value,
+                              quizFormQuestionItem: question,
                               onDeleteButtonPress: () => _removeQuestion(index),
                             );
                           }),
+                          // ..._questions.asMap().entries.map((question) {
+                          //   final index = question.key;
+                          //   return QuestionCard(
+                          //     globalKey: _questionContainerKeys[index],
+                          //     questionIndex: index,
+                          //     isDeleteButtonEnable: _questions.length > 1,
+                          //     quizFormQuestionItem: question.value,
+                          //     onDeleteButtonPress: () => _removeQuestion(index),
+                          //   );
+                          // }),
                         ],
                       ),
                     ),

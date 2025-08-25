@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/config/hive_init.dart';
-import 'package:learn_and_quiz/core/config/theme/app_themes.dart';
-import 'package:learn_and_quiz/core/config/theme/theme_provider.dart';
-import 'package:learn_and_quiz/core/ui/screens/start_screen.dart';
+import 'package:quiz_master/core/config/hive_init.dart';
+import 'package:quiz_master/core/config/theme/app_themes.dart';
+import 'package:quiz_master/core/config/theme/theme_provider.dart';
+import 'package:quiz_master/core/ui/screens/start_screen.dart';
 
 // TODO:
 // [-] Fix routing navigation.

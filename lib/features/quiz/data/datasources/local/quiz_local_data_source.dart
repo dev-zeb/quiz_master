@@ -1,5 +1,5 @@
-import 'package:learn_and_quiz/features/quiz/data/models/quiz_history_model.dart';
-import 'package:learn_and_quiz/features/quiz/data/models/quiz_model.dart';
+import 'package:quiz_master/features/quiz/data/models/quiz_history_model.dart';
+import 'package:quiz_master/features/quiz/data/models/quiz_model.dart';
 
 abstract class QuizLocalDataSource {
   QuizModel? getQuizById(String id);

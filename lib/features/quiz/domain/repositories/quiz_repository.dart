@@ -1,5 +1,5 @@
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
 
 abstract class QuizRepository {
   Future<void> addQuiz(Quiz quiz);

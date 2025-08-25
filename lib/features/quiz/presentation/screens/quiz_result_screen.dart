@@ -1,16 +1,16 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/core/config/theme/app_themes.dart';
-import 'package:learn_and_quiz/core/config/utils.dart';
-import 'package:learn_and_quiz/core/ui/widgets/custom_app_bar.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_chart_item.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_history_question_item.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_outlined_button.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_time_widget.dart';
+import 'package:quiz_master/core/config/theme/app_themes.dart';
+import 'package:quiz_master/core/config/utils.dart';
+import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
+import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_play_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_chart_item.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_history_question_item.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_outlined_button.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_time_widget.dart';
 
 class QuizResultScreen extends ConsumerStatefulWidget {
   final QuizHistory quizHistory;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/core/config/strings.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
+import 'package:quiz_master/core/config/strings.dart';
+import 'package:quiz_master/features/quiz/domain/entities/question.dart';
 
 import 'quiz_text_field.dart';
 

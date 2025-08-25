@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/config/theme/theme_provider.dart';
-import 'package:learn_and_quiz/core/ui/widgets/custom_app_bar.dart';
+import 'package:quiz_master/core/config/theme/theme_provider.dart';
+import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_play_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_play_screen.dart';
 
 class QuizQuestionCard extends ConsumerStatefulWidget {
   final String questionText;

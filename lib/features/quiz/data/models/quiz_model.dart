@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'question_model.dart';
 
 part 'quiz_model.g.dart';
@@ -31,7 +31,7 @@ class QuizModel {
       title: quiz.title,
       questions:
           quiz.questions.map((q) => QuestionModel.fromEntity(q)).toList(),
-      durationSeconds: quiz.durationSeconds ?? 120,
+      durationSeconds: quiz.durationSeconds,
     );
   }
 

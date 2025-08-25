@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_history_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_list_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_outlined_button.dart';
-import 'package:learn_and_quiz/features/settings/presentation/pages/settings_page.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_history_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_list_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_outlined_button.dart';
+import 'package:quiz_master/features/settings/presentation/pages/settings_page.dart';
 
 class StartScreen extends ConsumerWidget {
   const StartScreen({super.key});

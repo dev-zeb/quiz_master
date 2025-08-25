@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/core/config/theme/app_themes.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/question.dart';
+import 'package:quiz_master/core/config/theme/app_themes.dart';
+import 'package:quiz_master/features/quiz/domain/entities/question.dart';
 
 class QuizHistoryQuestionItem extends StatelessWidget {
   final Question question;

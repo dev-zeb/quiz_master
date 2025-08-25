@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/features/quiz/data/repositories/quiz_repository_impl.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz_history.dart';
-import 'package:learn_and_quiz/features/quiz/domain/repositories/quiz_repository.dart';
+import 'package:quiz_master/features/quiz/data/repositories/quiz_repository_impl.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
+import 'package:quiz_master/features/quiz/domain/repositories/quiz_repository.dart';
 
 final quizNotifierProvider =
     StateNotifierProvider<QuizNotifier, List<Quiz>>((ref) {

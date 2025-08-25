@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
-import 'package:learn_and_quiz/core/config/strings.dart';
-import 'package:learn_and_quiz/features/quiz/data/datasources/local/quiz_local_data_source.dart';
-import 'package:learn_and_quiz/features/quiz/data/models/quiz_history_model.dart';
-import 'package:learn_and_quiz/features/quiz/data/models/quiz_model.dart';
+import 'package:quiz_master/core/config/strings.dart';
+import 'package:quiz_master/features/quiz/data/datasources/local/quiz_local_data_source.dart';
+import 'package:quiz_master/features/quiz/data/models/quiz_history_model.dart';
+import 'package:quiz_master/features/quiz/data/models/quiz_model.dart';
 
 final hiveLocalDataSourceProvider = Provider<QuizLocalDataSource>((ref) {
   final quizBox = Hive.box<QuizModel>(AppStrings.quizBoxName);

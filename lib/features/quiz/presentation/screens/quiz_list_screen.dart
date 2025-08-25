@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:learn_and_quiz/core/ui/widgets/custom_app_bar.dart';
-import 'package:learn_and_quiz/core/ui/widgets/splashed_button.dart';
-import 'package:learn_and_quiz/features/quiz/domain/entities/quiz.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/screens/quiz_editor_screen.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_list_item.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_outlined_button.dart';
+import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
+import 'package:quiz_master/core/ui/widgets/splashed_button.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
+import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_list_item.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_outlined_button.dart';
 
 class QuizListScreen extends ConsumerWidget {
   const QuizListScreen({super.key});

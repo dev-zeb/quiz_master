@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:learn_and_quiz/features/quiz/presentation/widgets/quiz_form_question_item.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_form_question_item.dart';
 
 class QuestionCard extends StatelessWidget {
   final GlobalKey globalKey;
