@@ -159,28 +159,16 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                             style: TextStyle(color: colorScheme.primary),
                           ),
                           const SizedBox(height: 10),
-                          ListView.builder(
-                              itemCount: _questions.length,
-                              itemBuilder: (context, index) {
-                            final question = _questions[index];
+                          ..._questions.asMap().entries.map((question) {
+                            final index = question.key;
                             return QuestionCard(
                               globalKey: _questionContainerKeys[index],
                               questionIndex: index,
                               isDeleteButtonEnable: _questions.length > 1,
-                              quizFormQuestionItem: question,
+                              quizFormQuestionItem: question.value,
                               onDeleteButtonPress: () => _removeQuestion(index),
                             );
                           }),
-                          // ..._questions.asMap().entries.map((question) {
-                          //   final index = question.key;
-                          //   return QuestionCard(
-                          //     globalKey: _questionContainerKeys[index],
-                          //     questionIndex: index,
-                          //     isDeleteButtonEnable: _questions.length > 1,
-                          //     quizFormQuestionItem: question.value,
-                          //     onDeleteButtonPress: () => _removeQuestion(index),
-                          //   );
-                          // }),
                         ],
                       ),
                     ),

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
+import 'package:quiz_master/core/ui/widgets/empty_list_widget.dart';
 import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_list_screen.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_history_list_item.dart';
 
 class QuizHistoryScreen extends ConsumerWidget {
@@ -23,8 +25,21 @@ class QuizHistoryScreen extends ConsumerWidget {
         hasBackButton: true,
       ),
       body: sortedHistory.isEmpty
-          ? Center(
-              child: Text('No History!'),
+          ? EmptyListWidget(
+              iconData: Icons.history_toggle_off_rounded,
+              title: "No Quiz History Yet",
+              description:
+                  "Start playing quizzes and your history will appear here.",
+              buttonIcon: Icons.add,
+              buttonText: "Play a Quiz",
+              buttonTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const QuizListScreen(),
+                  ),
+                );
+              },
             )
           : Padding(
               padding: const EdgeInsets.only(
