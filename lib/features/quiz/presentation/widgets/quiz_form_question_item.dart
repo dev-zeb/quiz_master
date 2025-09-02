@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quiz_master/core/config/strings.dart';
+import 'package:quiz_master/core/utils/dialog_utils.dart';
 import 'package:quiz_master/features/quiz/domain/entities/question.dart';
 
 import 'quiz_text_field.dart';
@@ -166,12 +167,15 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
   }
 
   Question? getQuestion() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     final question = _questionController.text.trim();
     if (question.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(AppStrings.pleaseEnterQuestionAndOptions),
-        ),
+      showSnackBar(
+        context: context,
+        message: AppStrings.pleaseEnterQuestionAndOptions,
+        backgroundColor: colorScheme.error,
+        textColor: colorScheme.onError,
       );
       return null;
     }
@@ -184,20 +188,21 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
 
     // Check for duplicate options
     if (_hasDuplicateOptions()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(AppStrings.optionsMustBeUnique),
-          backgroundColor: Colors.red,
-        ),
+      showSnackBar(
+        context: context,
+        message: AppStrings.optionsMustBeUnique,
+        backgroundColor: colorScheme.error,
+        textColor: colorScheme.onError,
       );
       return null;
     }
 
     if (options.length < 2) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(AppStrings.pleaseEnterQuestionAndOptions),
-        ),
+      showSnackBar(
+        context: context,
+        message: AppStrings.pleaseEnterQuestionAndOptions,
+        backgroundColor: colorScheme.error,
+        textColor: colorScheme.onError,
       );
       return null;
     }

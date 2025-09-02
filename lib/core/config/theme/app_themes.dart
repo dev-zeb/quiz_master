@@ -20,7 +20,7 @@ class AppColors {
   static const Color onSurface = primary;
   static const Color primaryVariant = Color(0xFF00282E);
   static const Color secondaryVariant = Color(0xFF2FB8A7);
-  static const Color surfaceContainer = Color(0xFFDBE6E6);
+  static const Color surfaceContainer = Color(0xFFF5F8F8);
 
   /// Dark Theme Colors
   static const Color primaryDark = Color(0xFF7CB3AC);

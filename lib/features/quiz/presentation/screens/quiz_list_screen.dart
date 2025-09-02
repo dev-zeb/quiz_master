@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
-import 'package:quiz_master/core/ui/widgets/splashed_button.dart';
+import 'package:quiz_master/core/ui/widgets/empty_list_widget.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
@@ -24,7 +24,21 @@ class QuizListScreen extends ConsumerWidget {
         hasBackButton: true,
       ),
       body: quizzes.isEmpty
-          ? _buildEmptyState(context, colorScheme)
+          ? EmptyListWidget(
+              iconData: Icons.history_toggle_off_rounded,
+              title: "No quizzes available",
+              description: "You haven't created any quizzes yet.",
+              buttonIcon: Icons.add,
+              buttonText: "Create First Quiz",
+              buttonTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const QuizEditorScreen(),
+                  ),
+                );
+              },
+            )
           : _buildQuizListWidget(context, colorScheme, ref, quizzes),
       floatingActionButton: quizzes.isNotEmpty
           ? CircularBorderedButton(
@@ -41,56 +55,6 @@ class QuizListScreen extends ConsumerWidget {
               },
             )
           : null,
-    );
-  }
-
-  Widget _buildEmptyState(
-    BuildContext context,
-    ColorScheme colorScheme,
-  ) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.quiz_outlined, size: 100, color: colorScheme.primary),
-          const SizedBox(height: 8),
-          Text(
-            'No quizzes available',
-            style: TextStyle(
-              color: colorScheme.primary,
-              fontSize: 24,
-            ),
-          ),
-          const SizedBox(height: 20),
-          SplashedButton(
-            childWidget: Row(
-              children: [
-                Icon(
-                  Icons.add,
-                  color: colorScheme.onPrimary,
-                  size: 24,
-                ),
-                SizedBox(width: 4),
-                Text(
-                  'Create First Quiz',
-                  style: TextStyle(
-                    color: colorScheme.onPrimary,
-                    fontSize: 16,
-                  ),
-                ),
-              ],
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const QuizEditorScreen(),
-                ),
-              );
-            },
-          )
-        ],
-      ),
     );
   }
 

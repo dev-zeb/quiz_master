@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/core/ui/widgets/badge_item.dart';
 import 'package:quiz_master/core/ui/widgets/popup_menu.dart';
 import 'package:quiz_master/core/ui/widgets/popup_option_item.dart';
+import 'package:quiz_master/core/utils/dialog_utils.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
+import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
 import 'package:quiz_master/features/quiz/presentation/screens/quiz_play_screen.dart';
 
-class QuizListItem extends StatelessWidget {
+class QuizListItem extends ConsumerWidget {
   final Quiz quiz;
 
   const QuizListItem({super.key, required this.quiz});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
 
     final String minutes = (quiz.durationSeconds ~/ 60).toString();
@@ -132,7 +135,28 @@ class QuizListItem extends StatelessWidget {
                       );
                       break;
                     case 'delete':
-                      // TODO: Handle Delete Quiz
+                      final colorScheme = Theme.of(context).colorScheme;
+                      showConfirmationDialog(
+                        context,
+                        title: 'Delete Note?',
+                        content:
+                            'This will move the Note to the Trash. You can restore it later.',
+                        okButtonText: 'Delete',
+                        okButtonIcon: Icons.delete_forever_rounded,
+                        okButtonColor: colorScheme.error,
+                        okButtonTap: () async {
+                          await ref
+                              .read(quizNotifierProvider.notifier)
+                              .deleteQuiz(quiz.id);
+
+                          if (context.mounted) {
+                            showSnackBar(
+                              context: context,
+                              message: 'Quiz deleted successfully',
+                            );
+                          }
+                        },
+                      );
                       break;
                   }
                 },
