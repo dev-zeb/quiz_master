@@ -30,6 +30,9 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
   final _minutesController = TextEditingController();
   final _secondsController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormFieldState<String>> _titleFieldKey =
+      GlobalKey<FormFieldState<String>>();
+  final FocusNode _titleFocusNode = FocusNode();
   final List<GlobalKey<QuizFormQuestionItemState>> _questionKeys = [];
   final List<GlobalKey> _questionContainerKeys = [];
   final List<QuizFormQuestionItem> _questions = [];
@@ -52,6 +55,7 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
   @override
   void dispose() {
     _titleController.dispose();
+    _titleFocusNode.dispose();
     _scrollController
       ..removeListener(_checkLastQuestionVisibility)
       ..dispose();
@@ -97,6 +101,8 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           QuizTextField(
+                            fieldKey: _titleFieldKey,
+                            focusNode: _titleFocusNode,
                             hintText: AppStrings.quizTitle,
                             textEditingController: _titleController,
                             onChanged: (_) {
@@ -331,14 +337,8 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
       }
 
       if (!_formKey.currentState!.validate()) {
-        return;
-      }
-
-      if (_titleController.text.trim().isEmpty) {
-        showSnackBar(
-          context: context,
-          message: AppStrings.pleaseEnterQuizTitle,
-        );
+        _scrollToField(_titleFieldKey);
+        _titleFocusNode.requestFocus();
         return;
       }
 
@@ -353,7 +353,10 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
       final questions = <Question>[];
       for (var i = 0; i < _questions.length; i++) {
         final question = _questionKeys[i].currentState?.getQuestion();
-        if (question == null) return;
+        if (question == null) {
+          _scrollToQuestion(i);
+          return;
+        }
         questions.add(question);
       }
 
@@ -415,5 +418,21 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
         );
       }
     }
+  }
+
+  void _scrollToField(GlobalKey key) {
+    final context = key.currentContext;
+    if (context == null) return;
+    Scrollable.ensureVisible(
+      context,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+      alignment: 0.1,
+    );
+  }
+
+  void _scrollToQuestion(int index) {
+    if (index < 0 || index >= _questionContainerKeys.length) return;
+    _scrollToField(_questionContainerKeys[index]);
   }
 }
