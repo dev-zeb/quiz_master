@@ -29,14 +29,18 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
   int _currentQuestionIndex = 0;
   late int _quizTimeSeconds;
   List<Question> _questions = [];
+  late final List<List<String>> _shuffledAnswers;
   late int _startTime;
 
   @override
   void initState() {
     super.initState();
     _quizTimeSeconds = widget.quiz.durationSeconds;
-    _questions = widget.quiz.questions
-        .map((question) => question.copyWith(answers: question.shuffledAnswers))
+    _questions = List<Question>.from(widget.quiz.questions);
+    _shuffledAnswers = _questions
+        .map(
+          (question) => List<String>.from(question.answers)..shuffle(),
+        )
         .toList();
     _startTime = DateTime.now().millisecondsSinceEpoch;
   }
@@ -214,7 +218,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
               child: QuizQuestionCard(
                 questionText: currentQuestion.text,
                 questionIndex: _currentQuestionIndex,
-                answers: currentQuestion.answers,
+                answers: _shuffledAnswers[_currentQuestionIndex],
               ),
             ),
             Container(
