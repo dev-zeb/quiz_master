@@ -38,7 +38,7 @@ lib/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/dev-zeb/learn_with_quiz_flutter.git
+git clone https://github.com/dev-zeb/quiz_master.git
 ```
 
 2. Get dependencies:
