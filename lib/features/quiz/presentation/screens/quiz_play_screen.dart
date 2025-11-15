@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/core/config/utils.dart';
 import 'package:quiz_master/core/ui/widgets/circular_border_progress_painter.dart';
 import 'package:quiz_master/core/ui/widgets/clickable_text_widget.dart';
+import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:quiz_master/features/quiz/domain/entities/question.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
@@ -359,6 +360,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
       playedAt: DateTime.now(),
       elapsedTimeSeconds: elapsedTime,
       totalDurationSeconds: widget.quiz.durationSeconds,
+      userId: ref.read(currentUserProvider)?.id,
     );
 
     await ref.read(quizNotifierProvider.notifier).addQuizHistory(quizHistory);

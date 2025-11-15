@@ -12,6 +12,8 @@ abstract class QuizLocalDataSource {
 
   Future<void> updateQuiz(QuizModel quiz);
 
+  Future<void> upsertQuizzes(List<QuizModel> quizzes);
+
   Future<void> addQuizHistory(QuizHistoryModel quizHistory);
 
   List<QuizHistoryModel> getQuizHistoryList();

@@ -4,6 +4,7 @@ import 'package:quiz_master/core/config/strings.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/ui/widgets/scroll_to_button.dart';
 import 'package:quiz_master/core/utils/dialog_utils.dart';
+import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:quiz_master/features/quiz/domain/entities/question.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
@@ -326,6 +327,7 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
 
   Future<void> _submitQuiz() async {
     try {
+      final currentUser = ref.read(currentUserProvider);
       final minutes = int.tryParse(_minutesController.text) ?? 0;
       final seconds = int.tryParse(_secondsController.text) ?? 0;
       if (minutes == 0 && seconds == 0) {
@@ -362,12 +364,17 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
 
       int totalDurationInSeconds = (minutes * 60) + seconds;
 
+      final userId = currentUser?.id ?? editingQuiz?.userId;
+
       if (editingQuiz == null) {
         final newQuiz = Quiz(
           id: UniqueKey().toString(),
           title: _titleController.text.trim(),
           questions: questions,
           durationSeconds: totalDurationInSeconds,
+          userId: userId,
+          lastSyncedAt: DateTime.now(),
+          syncStatus: SyncStatus.pending,
         );
 
         await ref.read(quizNotifierProvider.notifier).addQuiz(newQuiz);
@@ -387,6 +394,9 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
           title: _titleController.text.trim(),
           questions: questions,
           durationSeconds: totalDurationInSeconds,
+          userId: userId,
+          lastSyncedAt: DateTime.now(),
+          syncStatus: SyncStatus.pending,
         );
         if (updatedQuiz == null) {
           showSnackBar(

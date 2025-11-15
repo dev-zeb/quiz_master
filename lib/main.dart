@@ -3,7 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/core/config/hive_init.dart';
 import 'package:quiz_master/core/config/theme/app_themes.dart';
 import 'package:quiz_master/core/config/theme/theme_provider.dart';
-import 'package:quiz_master/core/ui/screens/start_screen.dart';
+import 'package:quiz_master/core/firebase/firebase_initializer.dart';
+import 'package:quiz_master/features/auth/presentation/screens/auth_gate.dart';
 
 // TODO:
 // [-] Fix routing navigation.
@@ -13,14 +14,11 @@ import 'package:quiz_master/core/ui/screens/start_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeHive();
-
-  // Initialize theme before app starts
-  final container = ProviderContainer();
+  await initializeFirebase();
 
   runApp(
-    UncontrolledProviderScope(
-      container: container,
-      child: const QuizMaster(),
+    const ProviderScope(
+      child: QuizMaster(),
     ),
   );
 }
@@ -37,7 +35,7 @@ class QuizMaster extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       darkTheme: AppThemes.darkTheme,
       theme: themeData,
-      home: const StartScreen(),
+      home: const AuthGate(),
     );
   }
 }

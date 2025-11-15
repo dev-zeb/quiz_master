@@ -7,7 +7,8 @@ import 'package:quiz_master/features/quiz/data/models/quiz_model.dart';
 
 final hiveLocalDataSourceProvider = Provider<QuizLocalDataSource>((ref) {
   final quizBox = Hive.box<QuizModel>(AppStrings.quizBoxName);
-  final quizHistoryBox = Hive.box<QuizHistoryModel>(AppStrings.quizHistoryBoxName);
+  final quizHistoryBox =
+      Hive.box<QuizHistoryModel>(AppStrings.quizHistoryBoxName);
   return HiveLocalDataSource(quizBox, quizHistoryBox);
 });
 
@@ -40,6 +41,13 @@ class HiveLocalDataSource implements QuizLocalDataSource {
   @override
   Future<void> updateQuiz(QuizModel quiz) async {
     await quizBox.put(quiz.id, quiz);
+  }
+
+  @override
+  Future<void> upsertQuizzes(List<QuizModel> quizzes) async {
+    await quizBox.putAll({
+      for (final quiz in quizzes) quiz.id: quiz,
+    });
   }
 
   @override

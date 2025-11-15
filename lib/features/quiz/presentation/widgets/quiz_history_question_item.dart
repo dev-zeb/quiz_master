@@ -39,10 +39,10 @@ class QuizHistoryQuestionItem extends StatelessWidget {
             Text(
               'Q${questionIndex + 1}: ${question.text}',
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.primary,
-              ),
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.primary,
+                  ),
             ),
             const SizedBox(height: 12),
             ...question.answers.map((ans) {

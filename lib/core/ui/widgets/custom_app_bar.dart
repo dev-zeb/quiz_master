@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:quiz_master/features/auth/domain/entities/app_user.dart';
+import 'package:quiz_master/features/auth/presentation/screens/profile_screen.dart';
+import 'package:quiz_master/features/auth/presentation/widgets/user_profile_chip.dart';
 
 import 'app_bar_back_button.dart';
 
@@ -9,6 +12,7 @@ AppBar customAppBar({
   required String title,
   bool hasBackButton = false,
   bool hasSettingsButton = false,
+  AppUser? user,
   List<Widget>? actionButtons,
 }) {
   final colorScheme = Theme.of(context).colorScheme;
@@ -30,6 +34,19 @@ AppBar customAppBar({
     actions: [
       if (actionButtons != null) ...[
         ...actionButtons,
+        if (user != null)
+          Padding(
+            padding: const EdgeInsets.only(right: 10.0),
+            child: UserProfileChip(
+              user: user,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                );
+              },
+            ),
+          ),
         const SizedBox(width: 8),
       ],
     ],

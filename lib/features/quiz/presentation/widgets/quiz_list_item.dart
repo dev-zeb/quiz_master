@@ -81,6 +81,8 @@ class QuizListItem extends ConsumerWidget {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 6),
+                    _SyncStatusChip(status: quiz.syncStatus),
                   ],
                 ),
               ),
@@ -126,6 +128,7 @@ class QuizListItem extends ConsumerWidget {
                           ),
                         ),
                       );
+                      break;
                     case 'edit':
                       Navigator.push(
                         context,
@@ -164,6 +167,59 @@ class QuizListItem extends ConsumerWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SyncStatusChip extends StatelessWidget {
+  final SyncStatus status;
+
+  const _SyncStatusChip({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    Color bgColor;
+    String label;
+    IconData icon;
+
+    switch (status) {
+      case SyncStatus.synced:
+        bgColor = colorScheme.tertiary.withValues(alpha: 0.2);
+        label = 'Synced';
+        icon = Icons.cloud_done;
+        break;
+      case SyncStatus.failed:
+        bgColor = colorScheme.errorContainer;
+        label = 'Sync failed';
+        icon = Icons.cloud_off;
+        break;
+      case SyncStatus.pending:
+        bgColor = colorScheme.primary.withValues(alpha: 0.1);
+        label = 'Pending sync';
+        icon = Icons.sync;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: colorScheme.primary),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: colorScheme.primary,
+            ),
+          ),
+        ],
       ),
     );
   }

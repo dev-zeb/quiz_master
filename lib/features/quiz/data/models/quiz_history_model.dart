@@ -73,6 +73,7 @@ class QuizHistoryModel {
       playedAt: playedAt,
       elapsedTimeSeconds: elapsedTimeSeconds,
       totalDurationSeconds: totalDurationSeconds,
+      userId: userId,
     );
   }
 }

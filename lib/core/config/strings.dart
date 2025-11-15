@@ -21,7 +21,8 @@ class AppStrings {
 
   // Warning messages
   static const String pleaseEnterQuizTitle = 'Please enter a quiz title';
-  static const String pleaseEnterValidTimeDuration = 'Please enter a valid time duration.';
+  static const String pleaseEnterValidTimeDuration =
+      'Please enter a valid time duration.';
   static const String pleaseAddAtLeastOneQuestion =
       'Please add at least one question';
   static const String pleaseEnterQuestionAndOptions =
