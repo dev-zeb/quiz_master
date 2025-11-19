@@ -11,6 +11,15 @@ class Quiz {
   final DateTime? lastSyncedAt;
   final SyncStatus syncStatus;
 
+  final bool isPublic;
+  final String? createdByUserId;
+  final DateTime? createdAt;
+
+  final int playCount;
+  final double sumScorePercent;
+  final int sumCorrectAnswers;
+  final int sumTotalQuestions;
+
   const Quiz({
     required this.id,
     required this.title,
@@ -19,6 +28,13 @@ class Quiz {
     this.userId,
     this.lastSyncedAt,
     this.syncStatus = SyncStatus.pending,
+    this.isPublic = false,
+    this.createdByUserId,
+    this.createdAt,
+    this.playCount = 0,
+    this.sumScorePercent = 0.0,
+    this.sumCorrectAnswers = 0,
+    this.sumTotalQuestions = 0,
   });
 
   Quiz copyWith({
@@ -29,6 +45,13 @@ class Quiz {
     String? userId,
     DateTime? lastSyncedAt,
     SyncStatus? syncStatus,
+    bool? isPublic,
+    String? createdByUserId,
+    DateTime? createdAt,
+    int? playCount,
+    double? sumScorePercent,
+    int? sumCorrectAnswers,
+    int? sumTotalQuestions,
   }) {
     return Quiz(
       id: id ?? this.id,
@@ -38,6 +61,19 @@ class Quiz {
       userId: userId ?? this.userId,
       lastSyncedAt: lastSyncedAt ?? this.lastSyncedAt,
       syncStatus: syncStatus ?? this.syncStatus,
+      isPublic: isPublic ?? this.isPublic,
+      createdByUserId: createdByUserId ?? this.createdByUserId,
+      createdAt: createdAt ?? this.createdAt,
+      playCount: playCount ?? this.playCount,
+      sumScorePercent: sumScorePercent ?? this.sumScorePercent,
+      sumCorrectAnswers: sumCorrectAnswers ?? this.sumCorrectAnswers,
+      sumTotalQuestions: sumTotalQuestions ?? this.sumTotalQuestions,
     );
   }
+
+  double get averageScorePercent =>
+      playCount == 0 ? 0.0 : (sumScorePercent / playCount);
+
+  double get averageAccuracy =>
+      sumTotalQuestions == 0 ? 0.0 : sumCorrectAnswers / sumTotalQuestions;
 }
