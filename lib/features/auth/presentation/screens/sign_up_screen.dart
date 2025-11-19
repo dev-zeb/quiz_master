@@ -1,7 +1,7 @@
-// features/auth/presentation/screens/sign_up_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
+import 'package:quiz_master/core/utils/auth_error_mapper.dart';
 import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
@@ -58,8 +58,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   Icon(Icons.error_outline, color: cs.onErrorContainer),
                   const SizedBox(width: 8),
                   Expanded(
-                      child: Text(_error!,
-                          style: TextStyle(color: cs.onErrorContainer))),
+                    child: Text(
+                      _error!,
+                      style: TextStyle(color: cs.onErrorContainer),
+                    ),
+                  ),
                   IconButton(
                     icon: Icon(Icons.close, color: cs.onErrorContainer),
                     onPressed: () => setState(() => _error = null),
@@ -82,7 +85,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     Text(
                       'Create your account',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700, color: cs.primary),
+                            fontWeight: FontWeight.w700,
+                            color: cs.primary,
+                          ),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
@@ -120,9 +125,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           onPressed: () => setState(() => _obscure = !_obscure),
-                          icon: Icon(_obscure
-                              ? Icons.visibility
-                              : Icons.visibility_off),
+                          icon: Icon(
+                            _obscure ? Icons.visibility : Icons.visibility_off,
+                          ),
                         ),
                       ),
                       validator: (v) => (v ?? '').length < 6
@@ -138,10 +143,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         prefixIcon: const Icon(Icons.lock_person_outlined),
                         suffixIcon: IconButton(
                           onPressed: () => setState(
-                              () => _obscureConfirm = !_obscureConfirm),
-                          icon: Icon(_obscureConfirm
-                              ? Icons.visibility
-                              : Icons.visibility_off),
+                            () => _obscureConfirm = !_obscureConfirm,
+                          ),
+                          icon: Icon(
+                            _obscureConfirm
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
                         ),
                       ),
                       validator: (v) => (v ?? '') != _passwordController.text
@@ -192,9 +200,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e.toString());
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(_error!)));
+      final msg = mapAuthErrorToMessage(e, isSignIn: false);
+      setState(() => _error = msg);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }

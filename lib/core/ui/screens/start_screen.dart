@@ -18,7 +18,7 @@ class StartScreen extends ConsumerWidget {
     final user = ref.watch(currentUserProvider);
 
     final displayName = user == null
-        ? 'Guest User'
+        ? 'Guest'
         : (user.displayName?.trim().isEmpty == true
             ? user.email
             : (user.displayName ?? user.email));
@@ -27,7 +27,7 @@ class StartScreen extends ConsumerWidget {
         const AppUser(
           id: 'guest-local',
           email: '',
-          displayName: 'Guest User',
+          displayName: 'Guest',
           photoUrl: null,
         );
 
@@ -57,7 +57,8 @@ class StartScreen extends ConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const QuizListScreen()),
+                          builder: (_) => const QuizListScreen(),
+                        ),
                       );
                     },
                   ),
@@ -70,7 +71,8 @@ class StartScreen extends ConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const QuizHistoryScreen()),
+                          builder: (_) => const QuizHistoryScreen(),
+                        ),
                       );
                     },
                   ),
@@ -83,7 +85,8 @@ class StartScreen extends ConsumerWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const SettingsScreen()),
+                          builder: (_) => const SettingsScreen(),
+                        ),
                       );
                     },
                   ),
@@ -93,14 +96,16 @@ class StartScreen extends ConsumerWidget {
 
             // Top-right profile chip
             Positioned(
-              top: 8,
-              right: 12,
+              top: 32,
+              right: 20,
               child: UserProfileChip(
                 user: effectiveUser.copyWith(displayName: displayName),
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                    MaterialPageRoute(
+                      builder: (_) => const ProfileScreen(),
+                    ),
                   );
                 },
               ),

@@ -1,26 +1,30 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/features/quiz/data/datasources/local/quiz_local_data_source.dart';
-import 'package:quiz_master/features/quiz/data/datasources/local/quiz_local_data_source_impl.dart';
 import 'package:quiz_master/features/quiz/data/datasources/remote/quiz_remote_data_source.dart';
-import 'package:quiz_master/features/quiz/data/datasources/remote/quiz_remote_data_source_impl.dart';
 import 'package:quiz_master/features/quiz/data/models/quiz_model.dart';
+import 'package:quiz_master/features/quiz/data/models/quiz_history_model.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
 import 'package:quiz_master/features/quiz/domain/repositories/quiz_repository.dart';
 
-import '../models/quiz_history_model.dart';
-
 final quizRepositoryProvider = Provider<QuizRepository>((ref) {
   final quizLocalDataSource = ref.watch(hiveLocalDataSourceProvider);
   final quizRemoteDataSource = ref.watch(quizRemoteDataSourceProvider);
-  return QuizRepositoryImpl(quizLocalDataSource, quizRemoteDataSource);
+
+  return QuizRepositoryImpl(
+    quizLocalDataSource,
+    quizRemoteDataSource,
+  );
 });
 
 class QuizRepositoryImpl implements QuizRepository {
   final QuizLocalDataSource quizLocalDataSource;
   final QuizRemoteDataSource quizRemoteDataSource;
 
-  QuizRepositoryImpl(this.quizLocalDataSource, this.quizRemoteDataSource);
+  QuizRepositoryImpl(
+    this.quizLocalDataSource,
+    this.quizRemoteDataSource,
+  );
 
   @override
   Future<void> addQuiz(Quiz quiz) async {

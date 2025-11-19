@@ -200,7 +200,7 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                           : AppStrings.updateQuiz,
                       icon: Icons.save,
                       isRightAligned: false,
-                      onTap: _submitQuiz,
+                      onTap: () => _submitQuiz(colorScheme),
                     ),
                   ],
                 ),
@@ -325,7 +325,7 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
     });
   }
 
-  Future<void> _submitQuiz() async {
+  Future<void> _submitQuiz(colorScheme) async {
     try {
       final currentUser = ref.read(currentUserProvider);
       final minutes = int.tryParse(_minutesController.text) ?? 0;
@@ -334,6 +334,8 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
         showSnackBar(
           context: context,
           message: AppStrings.pleaseEnterValidTimeDuration,
+          backgroundColor: colorScheme.error,
+          textColor: colorScheme.onError,
         );
         return;
       }

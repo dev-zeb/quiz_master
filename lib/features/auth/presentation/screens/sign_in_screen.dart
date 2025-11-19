@@ -1,7 +1,7 @@
-// features/auth/presentation/screens/sign_in_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
+import 'package:quiz_master/core/utils/auth_error_mapper.dart';
 import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:quiz_master/features/auth/presentation/screens/sign_up_screen.dart';
 
@@ -58,8 +58,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   Icon(Icons.error_outline, color: cs.onErrorContainer),
                   const SizedBox(width: 8),
                   Expanded(
-                      child: Text(_error!,
-                          style: TextStyle(color: cs.onErrorContainer))),
+                    child: Text(
+                      _error!,
+                      style: TextStyle(color: cs.onErrorContainer),
+                    ),
+                  ),
                   IconButton(
                     icon: Icon(Icons.close, color: cs.onErrorContainer),
                     onPressed: () => setState(() => _error = null),
@@ -82,7 +85,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                     Text(
                       'Welcome back',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700, color: cs.primary),
+                            fontWeight: FontWeight.w700,
+                            color: cs.primary,
+                          ),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
@@ -117,9 +122,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           onPressed: () => setState(() => _obscure = !_obscure),
-                          icon: Icon(_obscure
-                              ? Icons.visibility
-                              : Icons.visibility_off),
+                          icon: Icon(
+                            _obscure ? Icons.visibility : Icons.visibility_off,
+                          ),
                         ),
                       ),
                       validator: (v) => (v ?? '').length < 6
@@ -135,7 +140,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                                'Implement password reset via sendPasswordResetEmail()',
+                                'Password reset is not implemented yet.',
                               ),
                             ),
                           );
@@ -195,7 +200,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                 ? null
                 : () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => const SignUpScreen(),
+                      ),
                     ),
             child: const Text.rich(
               TextSpan(
@@ -230,9 +237,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       await Navigator.of(context).maybePop();
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e.toString());
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(_error!)));
+      final msg = mapAuthErrorToMessage(e, isSignIn: true);
+      setState(() => _error = msg);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -249,9 +256,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       await Navigator.of(context).maybePop();
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e.toString());
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(_error!)));
+      final msg = mapAuthErrorToMessage(e, isSignIn: true);
+      setState(() => _error = msg);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
