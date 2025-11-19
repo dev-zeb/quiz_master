@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/core/config/utils.dart';
 import 'package:quiz_master/core/ui/widgets/circular_border_progress_painter.dart';
-import 'package:quiz_master/core/ui/widgets/clickable_text_widget.dart';
+import 'package:quiz_master/core/utils/dialog_utils.dart';
 import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:quiz_master/features/quiz/domain/entities/question.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
@@ -62,7 +62,19 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
       onPopInvokedWithResult: (didPop, res) async {
         if (didPop) return;
 
-        await showConfirmationDialog(context);
+        final result = await showConfirmationDialog(
+          context,
+          title: 'Cancel Quiz?',
+          content: 'The progress of this quiz session will be lost.',
+          okButtonText: 'Yes',
+          okButtonTap: () async {
+            ref.invalidate(selectedAnswersProvider);
+          },
+        );
+
+        if (result == true && context.mounted) {
+          Navigator.pop(context);
+        }
       },
       child: Scaffold(
         body: Column(
@@ -87,7 +99,16 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                       ),
                     ),
                     onTap: () async {
-                      final result = await showConfirmationDialog(context);
+                      final result = await showConfirmationDialog(
+                        context,
+                        title: 'Cancel Quiz?',
+                        content:
+                            'The progress of this quiz session will be lost.',
+                        okButtonText: 'Yes',
+                        okButtonTap: () async {
+                          ref.invalidate(selectedAnswersProvider);
+                        },
+                      );
 
                       if (result == true && context.mounted) {
                         Navigator.pop(context);
@@ -259,8 +280,8 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                             Icons.arrow_circle_right,
                             color: colorScheme.onPrimary,
                           ),
-                    onTap: () {
-                      _handleNextButtonClick(colorScheme);
+                    onTap: () async {
+                      await _handleNextButtonClick(colorScheme);
                     },
                   ),
                 ],
@@ -377,54 +398,5 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
         ),
       );
     }
-  }
-
-  Future<bool?> showConfirmationDialog(BuildContext context) async {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: colorScheme.surfaceContainer,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Text(
-          'Cancel Quiz?',
-          style: TextStyle(
-            fontSize: 20,
-            color: colorScheme.primary,
-          ),
-        ),
-        content: Text(
-          'Do you want to cancel the quiz?',
-          style: TextStyle(
-            fontSize: 16,
-            color: colorScheme.primary,
-          ),
-        ),
-        actions: [
-          ClickableTextWidget(
-            fontSize: 16,
-            text: 'No',
-            buttonColor: colorScheme.error,
-            textColor: colorScheme.onError,
-            onTap: () => Navigator.of(dialogContext).pop(false),
-          ),
-          SizedBox(width: 4),
-          ClickableTextWidget(
-            fontSize: 16,
-            text: 'Yes',
-            buttonColor: colorScheme.primary,
-            textColor: colorScheme.onPrimary,
-            onTap: () {
-              ref.invalidate(selectedAnswersProvider);
-              Navigator.of(dialogContext).pop(true);
-            },
-          ),
-        ],
-      ),
-    );
   }
 }

@@ -138,15 +138,12 @@ class QuizListItem extends ConsumerWidget {
                       );
                       break;
                     case 'delete':
-                      final colorScheme = Theme.of(context).colorScheme;
-                      showConfirmationDialog(
+                      await showConfirmationDialog(
                         context,
                         title: 'Delete Note?',
                         content:
                             'This will move the Note to the Trash. You can restore it later.',
                         okButtonText: 'Delete',
-                        okButtonIcon: Icons.delete_forever_rounded,
-                        okButtonColor: colorScheme.error,
                         okButtonTap: () async {
                           await ref
                               .read(quizNotifierProvider.notifier)
