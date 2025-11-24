@@ -7,6 +7,7 @@ class Quiz {
   final String title;
   final List<Question> questions;
   final int durationSeconds;
+
   final String? userId;
   final DateTime? lastSyncedAt;
   final SyncStatus syncStatus;
@@ -19,6 +20,8 @@ class Quiz {
   final double sumScorePercent;
   final int sumCorrectAnswers;
   final int sumTotalQuestions;
+
+  final bool isAiGenerated;
 
   const Quiz({
     required this.id,
@@ -35,6 +38,7 @@ class Quiz {
     this.sumScorePercent = 0.0,
     this.sumCorrectAnswers = 0,
     this.sumTotalQuestions = 0,
+    this.isAiGenerated = false,
   });
 
   Quiz copyWith({
@@ -52,6 +56,7 @@ class Quiz {
     double? sumScorePercent,
     int? sumCorrectAnswers,
     int? sumTotalQuestions,
+    bool? isAiGenerated,
   }) {
     return Quiz(
       id: id ?? this.id,
@@ -68,6 +73,7 @@ class Quiz {
       sumScorePercent: sumScorePercent ?? this.sumScorePercent,
       sumCorrectAnswers: sumCorrectAnswers ?? this.sumCorrectAnswers,
       sumTotalQuestions: sumTotalQuestions ?? this.sumTotalQuestions,
+      isAiGenerated: isAiGenerated ?? this.isAiGenerated,
     );
   }
 
