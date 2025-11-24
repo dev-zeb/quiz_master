@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/core/config/hive_init.dart';
 import 'package:quiz_master/core/config/theme/app_themes.dart';
@@ -10,13 +11,17 @@ import 'package:quiz_master/features/auth/presentation/controllers/auth_controll
 // TODO:
 // [-] Fix routing navigation.
 // [-] Modify the UIs of the quiz add and quiz play screens.
-// [-] Integrate Firebase and FireStore for auth and quiz storage
-// [] Integrate AI Quiz maker from text.
+// [-] Integrate Firebase and FireStore for auth and quiz storage.
+// [-] Integrate AI Quiz maker from text.
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await initializeHive();
   await initializeFirebase();
+
+  // Load .env file
+  await dotenv.load(fileName: '.env');
 
   runApp(
     const ProviderScope(

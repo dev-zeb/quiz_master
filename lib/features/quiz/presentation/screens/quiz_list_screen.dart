@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/ui/widgets/empty_list_widget.dart';
+import 'package:quiz_master/core/ui/widgets/gradient_quiz_button.dart';
 import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
 import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_generate_screen.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_list_item.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_outlined_button.dart';
 
@@ -28,23 +30,64 @@ class QuizListScreen extends ConsumerWidget {
       ),
       body: quizzes.when(
         data: (quizList) {
-          return quizList.isEmpty
-              ? EmptyListWidget(
-                  iconData: Icons.history_toggle_off_rounded,
-                  title: "No quizzes available",
-                  description: "You haven't created any quizzes yet.",
-                  buttonIcon: Icons.add,
-                  buttonText: "Create First Quiz",
-                  buttonTap: () {
+          return Stack(
+            children: [
+              quizList.isEmpty
+                  ? EmptyListWidget(
+                      iconData: Icons.history_toggle_off_rounded,
+                      title: "No quizzes available",
+                      description: "You haven't created any quizzes yet.",
+                      buttonIcon: Icons.add,
+                      buttonText: "Create First Quiz",
+                      buttonTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const QuizEditorScreen(),
+                          ),
+                        );
+                      },
+                    )
+                  : _buildQuizListWidget(
+                      context,
+                      colorScheme,
+                      ref,
+                      quizList,
+                    ),
+              Positioned(
+                bottom: 20,
+                left: 32,
+                child: GradientQuizButton(
+                  onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const QuizEditorScreen(),
+                        builder: (_) => const QuizGenerateScreen(),
                       ),
                     );
                   },
-                )
-              : _buildQuizListWidget(context, colorScheme, ref, quizList);
+                ),
+              ),
+              if (quizList.isNotEmpty)
+                Positioned(
+                  bottom: 24,
+                  right: 32,
+                  child: CircularBorderedButton(
+                    text: 'Add Quiz',
+                    icon: Icons.add,
+                    isRightAligned: true,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const QuizEditorScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
+          );
         },
         error: (err, stk) {
           return Center(
@@ -67,25 +110,6 @@ class QuizListScreen extends ConsumerWidget {
             child: CircularProgressIndicator(),
           );
         },
-      ),
-      floatingActionButton: quizzes.when(
-        data: (quizList) => quizList.isNotEmpty
-            ? CircularBorderedButton(
-                text: 'Add Quiz',
-                icon: Icons.add,
-                isRightAligned: true,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const QuizEditorScreen(),
-                    ),
-                  );
-                },
-              )
-            : SizedBox.shrink(),
-        error: (_, __) => SizedBox.shrink(),
-        loading: () => SizedBox.shrink(),
       ),
     );
   }

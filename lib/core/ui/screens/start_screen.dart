@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/core/ui/screens/settings_page.dart';
+import 'package:quiz_master/core/ui/widgets/gradient_quiz_button.dart';
 import 'package:quiz_master/features/auth/domain/entities/app_user.dart';
 import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:quiz_master/features/auth/presentation/screens/profile_screen.dart';
 import 'package:quiz_master/features/auth/presentation/widgets/user_profile_chip.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_generate_screen.dart';
 import 'package:quiz_master/features/quiz/presentation/screens/quiz_history_screen.dart';
 import 'package:quiz_master/features/quiz/presentation/screens/quiz_list_screen.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_outlined_button.dart';
@@ -20,8 +22,8 @@ class StartScreen extends ConsumerWidget {
     final displayName = user == null
         ? 'Guest'
         : (user.displayName?.trim().isEmpty == true
-            ? user.email
-            : (user.displayName ?? user.email));
+        ? user.email
+        : (user.displayName ?? user.email));
 
     final effectiveUser = user ??
         const AppUser(
@@ -108,6 +110,24 @@ class StartScreen extends ConsumerWidget {
                     ),
                   );
                 },
+              ),
+            ),
+
+            // Gradient button for Generate Quiz
+            Positioned(
+              bottom: 40,
+              right: 20,
+              child: Align(
+                child: GradientQuizButton(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const QuizGenerateScreen(),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ],
