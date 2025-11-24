@@ -31,6 +31,7 @@ class QuizModelAdapter extends TypeAdapter<QuizModel> {
       sumScorePercent: fields[11] as double,
       sumCorrectAnswers: fields[12] as int,
       sumTotalQuestions: fields[13] as int,
+      isAiGenerated: fields[14] as bool,
     );
   }
 
@@ -65,7 +66,9 @@ class QuizModelAdapter extends TypeAdapter<QuizModel> {
       ..writeByte(12)
       ..write(obj.sumCorrectAnswers)
       ..writeByte(13)
-      ..write(obj.sumTotalQuestions);
+      ..write(obj.sumTotalQuestions)
+      ..writeByte(14)
+      ..write(obj.isAiGenerated);
   }
 
   @override

@@ -50,6 +50,9 @@ class QuizModel {
   @HiveField(13)
   final int sumTotalQuestions;
 
+  @HiveField(14)
+  final bool isAiGenerated;
+
   QuizModel({
     required this.id,
     required this.title,
@@ -65,6 +68,7 @@ class QuizModel {
     this.sumScorePercent = 0.0,
     this.sumCorrectAnswers = 0,
     this.sumTotalQuestions = 0,
+    this.isAiGenerated = false,
   });
 
   QuizModel copyWith({
@@ -82,6 +86,7 @@ class QuizModel {
     double? sumScorePercent,
     int? sumCorrectAnswers,
     int? sumTotalQuestions,
+    bool? isAiGenerated,
   }) {
     return QuizModel(
       id: id ?? this.id,
@@ -98,6 +103,7 @@ class QuizModel {
       sumScorePercent: sumScorePercent ?? this.sumScorePercent,
       sumCorrectAnswers: sumCorrectAnswers ?? this.sumCorrectAnswers,
       sumTotalQuestions: sumTotalQuestions ?? this.sumTotalQuestions,
+      isAiGenerated: isAiGenerated ?? this.isAiGenerated,
     );
   }
 
@@ -119,6 +125,7 @@ class QuizModel {
       sumScorePercent: quiz.sumScorePercent,
       sumCorrectAnswers: quiz.sumCorrectAnswers,
       sumTotalQuestions: quiz.sumTotalQuestions,
+      isAiGenerated: quiz.isAiGenerated,
     );
   }
 
@@ -139,6 +146,7 @@ class QuizModel {
       sumScorePercent: sumScorePercent,
       sumCorrectAnswers: sumCorrectAnswers,
       sumTotalQuestions: sumTotalQuestions,
+      isAiGenerated: isAiGenerated,
     );
   }
 
@@ -158,6 +166,7 @@ class QuizModel {
       'sumScorePercent': sumScorePercent,
       'sumCorrectAnswers': sumCorrectAnswers,
       'sumTotalQuestions': sumTotalQuestions,
+      'isAiGenerated': isAiGenerated,
     };
   }
 
@@ -179,6 +188,7 @@ class QuizModel {
       sumScorePercent: (data['sumScorePercent'] as num? ?? 0.0).toDouble(),
       sumCorrectAnswers: (data['sumCorrectAnswers'] as num? ?? 0).toInt(),
       sumTotalQuestions: (data['sumTotalQuestions'] as num? ?? 0).toInt(),
+      isAiGenerated: (data['isAiGenerated']) as bool? ?? false,
     );
   }
 

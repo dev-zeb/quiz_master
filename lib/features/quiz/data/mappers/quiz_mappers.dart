@@ -1,5 +1,3 @@
-// features/quiz/data/mappers/quiz_mappers.dart
-
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/data/models/quiz_model.dart';
 import 'package:quiz_master/features/quiz/data/models/question_model.dart';
@@ -21,6 +19,7 @@ extension QuizToModel on Quiz {
       sumScorePercent: sumScorePercent,
       sumCorrectAnswers: sumCorrectAnswers,
       sumTotalQuestions: sumTotalQuestions,
+      isAiGenerated: isAiGenerated,
     );
   }
 }
@@ -42,6 +41,7 @@ extension QuizModelToEntity on QuizModel {
       sumScorePercent: sumScorePercent,
       sumCorrectAnswers: sumCorrectAnswers,
       sumTotalQuestions: sumTotalQuestions,
+      isAiGenerated: isAiGenerated,
     );
   }
 
