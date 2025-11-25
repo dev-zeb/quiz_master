@@ -17,4 +17,6 @@ abstract class QuizRepository {
   List<QuizHistory> getQuizHistoryList();
 
   QuizHistory? getQuizHistoryById(String id);
+
+  Future<void> syncQuizzes({required String userId});
 }

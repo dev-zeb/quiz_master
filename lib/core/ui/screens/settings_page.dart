@@ -42,8 +42,7 @@ class SettingsScreen extends ConsumerWidget {
                     ref.read(themeProvider.notifier).toggleTheme(value);
                   },
                   activeColor: colorScheme.primary,
-                  activeTrackColor:
-                      colorScheme.primary.withValues(alpha: 0.5),
+                  activeTrackColor: colorScheme.primary.withValues(alpha: 0.5),
                   inactiveThumbColor: colorScheme.primary,
                   inactiveTrackColor: colorScheme.onPrimary,
                 ),

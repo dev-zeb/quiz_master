@@ -21,13 +21,24 @@ class QuizModelAdapter extends TypeAdapter<QuizModel> {
       title: fields[1] as String,
       questions: (fields[2] as List).cast<QuestionModel>(),
       durationSeconds: fields[3] as int?,
+      userId: fields[4] as String?,
+      lastSyncedAt: fields[5] as DateTime?,
+      syncStatus: fields[6] as String,
+      isPublic: fields[7] as bool,
+      createdByUserId: fields[8] as String?,
+      createdAt: fields[9] as DateTime?,
+      playCount: fields[10] as int,
+      sumScorePercent: fields[11] as double,
+      sumCorrectAnswers: fields[12] as int,
+      sumTotalQuestions: fields[13] as int,
+      isAiGenerated: fields[14] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, QuizModel obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -35,7 +46,29 @@ class QuizModelAdapter extends TypeAdapter<QuizModel> {
       ..writeByte(2)
       ..write(obj.questions)
       ..writeByte(3)
-      ..write(obj.durationSeconds);
+      ..write(obj.durationSeconds)
+      ..writeByte(4)
+      ..write(obj.userId)
+      ..writeByte(5)
+      ..write(obj.lastSyncedAt)
+      ..writeByte(6)
+      ..write(obj.syncStatus)
+      ..writeByte(7)
+      ..write(obj.isPublic)
+      ..writeByte(8)
+      ..write(obj.createdByUserId)
+      ..writeByte(9)
+      ..write(obj.createdAt)
+      ..writeByte(10)
+      ..write(obj.playCount)
+      ..writeByte(11)
+      ..write(obj.sumScorePercent)
+      ..writeByte(12)
+      ..write(obj.sumCorrectAnswers)
+      ..writeByte(13)
+      ..write(obj.sumTotalQuestions)
+      ..writeByte(14)
+      ..write(obj.isAiGenerated);
   }
 
   @override

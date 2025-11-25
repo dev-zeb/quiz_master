@@ -4,6 +4,7 @@ import 'package:quiz_master/core/config/strings.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/ui/widgets/scroll_to_button.dart';
 import 'package:quiz_master/core/utils/dialog_utils.dart';
+import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:quiz_master/features/quiz/domain/entities/question.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
@@ -30,6 +31,9 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
   final _minutesController = TextEditingController();
   final _secondsController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormFieldState<String>> _titleFieldKey =
+      GlobalKey<FormFieldState<String>>();
+  final FocusNode _titleFocusNode = FocusNode();
   final List<GlobalKey<QuizFormQuestionItemState>> _questionKeys = [];
   final List<GlobalKey> _questionContainerKeys = [];
   final List<QuizFormQuestionItem> _questions = [];
@@ -52,6 +56,7 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
   @override
   void dispose() {
     _titleController.dispose();
+    _titleFocusNode.dispose();
     _scrollController
       ..removeListener(_checkLastQuestionVisibility)
       ..dispose();
@@ -97,6 +102,8 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           QuizTextField(
+                            fieldKey: _titleFieldKey,
+                            focusNode: _titleFocusNode,
                             hintText: AppStrings.quizTitle,
                             textEditingController: _titleController,
                             onChanged: (_) {
@@ -193,7 +200,7 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                           : AppStrings.updateQuiz,
                       icon: Icons.save,
                       isRightAligned: false,
-                      onTap: _submitQuiz,
+                      onTap: () => _submitQuiz(colorScheme),
                     ),
                   ],
                 ),
@@ -318,27 +325,24 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
     });
   }
 
-  Future<void> _submitQuiz() async {
+  Future<void> _submitQuiz(colorScheme) async {
     try {
+      final currentUser = ref.read(currentUserProvider);
       final minutes = int.tryParse(_minutesController.text) ?? 0;
       final seconds = int.tryParse(_secondsController.text) ?? 0;
       if (minutes == 0 && seconds == 0) {
         showSnackBar(
           context: context,
           message: AppStrings.pleaseEnterValidTimeDuration,
+          backgroundColor: colorScheme.error,
+          textColor: colorScheme.onError,
         );
         return;
       }
 
       if (!_formKey.currentState!.validate()) {
-        return;
-      }
-
-      if (_titleController.text.trim().isEmpty) {
-        showSnackBar(
-          context: context,
-          message: AppStrings.pleaseEnterQuizTitle,
-        );
+        _scrollToField(_titleFieldKey);
+        _titleFocusNode.requestFocus();
         return;
       }
 
@@ -353,11 +357,16 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
       final questions = <Question>[];
       for (var i = 0; i < _questions.length; i++) {
         final question = _questionKeys[i].currentState?.getQuestion();
-        if (question == null) return;
+        if (question == null) {
+          _scrollToQuestion(i);
+          return;
+        }
         questions.add(question);
       }
 
       int totalDurationInSeconds = (minutes * 60) + seconds;
+
+      final userId = currentUser?.id ?? editingQuiz?.userId;
 
       if (editingQuiz == null) {
         final newQuiz = Quiz(
@@ -365,6 +374,9 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
           title: _titleController.text.trim(),
           questions: questions,
           durationSeconds: totalDurationInSeconds,
+          userId: userId,
+          lastSyncedAt: DateTime.now(),
+          syncStatus: SyncStatus.pending,
         );
 
         await ref.read(quizNotifierProvider.notifier).addQuiz(newQuiz);
@@ -384,6 +396,9 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
           title: _titleController.text.trim(),
           questions: questions,
           durationSeconds: totalDurationInSeconds,
+          userId: userId,
+          lastSyncedAt: DateTime.now(),
+          syncStatus: SyncStatus.pending,
         );
         if (updatedQuiz == null) {
           showSnackBar(
@@ -415,5 +430,21 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
         );
       }
     }
+  }
+
+  void _scrollToField(GlobalKey key) {
+    final context = key.currentContext;
+    if (context == null) return;
+    Scrollable.ensureVisible(
+      context,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+      alignment: 0.1,
+    );
+  }
+
+  void _scrollToQuestion(int index) {
+    if (index < 0 || index >= _questionContainerKeys.length) return;
+    _scrollToField(_questionContainerKeys[index]);
   }
 }

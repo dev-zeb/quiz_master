@@ -37,4 +37,20 @@ class QuestionModel {
       answers: answers,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'text': text,
+      'answers': answers,
+    };
+  }
+
+  factory QuestionModel.fromMap(Map<String, dynamic> data) {
+    return QuestionModel(
+      id: data['id'] as String,
+      text: data['text'] as String,
+      answers: List<String>.from(data['answers'] as List<dynamic>),
+    );
+  }
 }

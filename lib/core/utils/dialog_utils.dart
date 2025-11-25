@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:quiz_master/core/ui/widgets/dialog_button_widget.dart';
+import 'package:quiz_master/core/ui/widgets/clickable_text_widget.dart';
 
 void showSnackBar({
   required BuildContext context,
@@ -35,65 +35,79 @@ void showSnackBar({
   );
 }
 
-void showConfirmationDialog(
+Future<bool> showConfirmationDialog(
   BuildContext context, {
   required String title,
   required String content,
-  required Color okButtonColor,
-  required IconData okButtonIcon,
-  required String okButtonText,
   required Future<void> Function() okButtonTap,
-}) {
+  String okButtonText = 'Yes',
+  String cancelButtonText = 'No',
+}) async {
   final colorScheme = Theme.of(context).colorScheme;
 
-  showDialog(
+  final res = await showDialog<bool>(
+    barrierDismissible: false,
     context: context,
     builder: (BuildContext dialogContext) {
       return AlertDialog(
+        backgroundColor: colorScheme.surfaceContainer,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
         title: Text(
           title,
           style: TextStyle(
+            fontSize: 20,
             color: colorScheme.primary,
           ),
         ),
         content: Text(
           content,
           style: TextStyle(
-            color: colorScheme.primary.withValues(alpha: 0.75),
+            fontSize: 16,
+            color: colorScheme.primary,
           ),
         ),
         actionsPadding: EdgeInsets.zero,
         buttonPadding: EdgeInsets.only(bottom: 8),
         clipBehavior: Clip.antiAlias,
         actions: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: DialogButtonWidget(
-                  buttonText: 'Cancel',
-                  buttonIcon: Icons.cancel_outlined,
-                  buttonColor: colorScheme.primary,
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                ),
-              ),
-              Expanded(
-                child: DialogButtonWidget(
-                  buttonText: okButtonText,
-                  buttonIcon: okButtonIcon,
-                  buttonColor: okButtonColor,
-                  onPressed: () async {
-                    await okButtonTap();
-                    if (dialogContext.mounted) {
-                      Navigator.of(dialogContext).pop();
-                    }
-                  },
-                ),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.only(
+              bottom: 12.0,
+              right: 8.0,
+            ),
+            child: ClickableTextWidget(
+              fontSize: 16,
+              text: cancelButtonText,
+              buttonColor: colorScheme.error,
+              textColor: colorScheme.onError,
+              onTap: () => Navigator.of(dialogContext).pop(false),
+            ),
+          ),
+          SizedBox(width: 4),
+          Padding(
+            padding: const EdgeInsets.only(
+              bottom: 12.0,
+              right: 12.0,
+            ),
+            child: ClickableTextWidget(
+              fontSize: 16,
+              text: okButtonText,
+              buttonColor: colorScheme.primary,
+              textColor: colorScheme.onPrimary,
+              onTap: () {
+                okButtonTap();
+                if (dialogContext.mounted) {
+                  return Navigator.of(dialogContext).pop(true);
+                }
+              },
+            ),
           ),
         ],
       );
     },
   );
+
+  return res ?? false;
 }

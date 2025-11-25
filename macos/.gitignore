@@ -1,7 +1,16 @@
-# Flutter-related
-**/Flutter/ephemeral/
-**/Pods/
+# Firebase client configs (keep local, especially for public repos)
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+macos/Runner/GoogleService-Info.plist
 
-# Xcode-related
-**/dgph
-**/xcuserdata/
+# Service account files (if you ever download any)
+**/serviceAccount*.json
+**/firebase-adminsdk-*.json
+
+# Keystores / signing keys (Android)
+**/*.keystore
+**/*.jks
+
+# iOS signing / p8 keys (if present)
+**/*.p8
+**/*.pem

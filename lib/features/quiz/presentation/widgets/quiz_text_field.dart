@@ -5,6 +5,8 @@ class QuizTextField extends StatelessWidget {
   final TextEditingController textEditingController;
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
+  final FocusNode? focusNode;
+  final GlobalKey<FormFieldState<String>>? fieldKey;
 
   const QuizTextField({
     super.key,
@@ -12,6 +14,8 @@ class QuizTextField extends StatelessWidget {
     required this.textEditingController,
     this.onChanged,
     this.validator,
+    this.focusNode,
+    this.fieldKey,
   });
 
   @override
@@ -19,6 +23,8 @@ class QuizTextField extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return TextFormField(
+      key: fieldKey,
+      focusNode: focusNode,
       controller: textEditingController,
       style: TextStyle(color: colorScheme.primary),
       decoration: InputDecoration(
