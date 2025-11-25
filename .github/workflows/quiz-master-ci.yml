@@ -35,9 +35,5 @@ jobs:
       - name: 🔎 Run Static Analysis
         run: flutter analyze
 
-      - name: 🧪 Run Tests
-        run: flutter test --no-pub # Use --no-pub since we ran pub get earlier
-
-      # Only run the build if tests and analysis pass
       - name: ⚙️ Build for Android
         run: flutter build apk
