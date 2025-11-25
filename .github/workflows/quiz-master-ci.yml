@@ -24,7 +24,14 @@ jobs:
 
       - name: Install dependencies
         run: flutter clean && flutter pub get
-
+      
+      - name: Create .env file with placeholder values
+        run: |
+          cat > .env << EOF
+          # Required environment variables for CI
+          BASE_URL=http://10.0.2.2:8000
+          EOF
+          
       - name: 🔎 Run Static Analysis
         run: flutter analyze
 
