@@ -36,4 +36,4 @@ jobs:
         run: flutter analyze
 
       - name: ⚙️ Build for Android
-        run: flutter build apk
+        run: flutter build apk  --debug
