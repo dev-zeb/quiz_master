@@ -1,30 +1,16 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:quiz_master/features/quiz/data/datasources/local/quiz_local_data_source.dart';
 import 'package:quiz_master/features/quiz/data/datasources/remote/quiz_remote_data_source.dart';
-import 'package:quiz_master/features/quiz/data/models/quiz_model.dart';
 import 'package:quiz_master/features/quiz/data/models/quiz_history_model.dart';
+import 'package:quiz_master/features/quiz/data/models/quiz_model.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
 import 'package:quiz_master/features/quiz/domain/repositories/quiz_repository.dart';
-
-final quizRepositoryProvider = Provider<QuizRepository>((ref) {
-  final quizLocalDataSource = ref.watch(hiveLocalDataSourceProvider);
-  final quizRemoteDataSource = ref.watch(quizRemoteDataSourceProvider);
-
-  return QuizRepositoryImpl(
-    quizLocalDataSource,
-    quizRemoteDataSource,
-  );
-});
 
 class QuizRepositoryImpl implements QuizRepository {
   final QuizLocalDataSource quizLocalDataSource;
   final QuizRemoteDataSource quizRemoteDataSource;
 
-  QuizRepositoryImpl(
-    this.quizLocalDataSource,
-    this.quizRemoteDataSource,
-  );
+  QuizRepositoryImpl(this.quizLocalDataSource, this.quizRemoteDataSource);
 
   @override
   Future<void> addQuiz(Quiz quiz) async {
@@ -78,16 +64,14 @@ class QuizRepositoryImpl implements QuizRepository {
 
   @override
   List<QuizHistory> getQuizHistoryList() {
-    final quizHistoryModelList = quizLocalDataSource.getQuizHistoryList();
-    return quizHistoryModelList
-        .map((quizHistoryModel) => quizHistoryModel.toEntity())
-        .toList();
+    final list = quizLocalDataSource.getQuizHistoryList();
+    return list.map((m) => m.toEntity()).toList();
   }
 
   @override
   QuizHistory? getQuizHistoryById(String id) {
-    final quizHistoryModel = quizLocalDataSource.getQuizHistoryById(id);
-    return quizHistoryModel?.toEntity();
+    final model = quizLocalDataSource.getQuizHistoryById(id);
+    return model?.toEntity();
   }
 
   @override
@@ -110,9 +94,7 @@ class QuizRepositoryImpl implements QuizRepository {
             userId: userId,
             lastSyncedAt: DateTime.now(),
           );
-          await quizLocalDataSource.updateQuiz(
-            QuizModel.fromEntity(localQuiz),
-          );
+          await quizLocalDataSource.updateQuiz(QuizModel.fromEntity(localQuiz));
         }
         await _syncQuizIfPossible(localQuiz);
       } else if (local == null && remote != null) {
@@ -132,9 +114,8 @@ class QuizRepositoryImpl implements QuizRepository {
               userId: userId,
               lastSyncedAt: DateTime.now(),
             );
-            await quizLocalDataSource.updateQuiz(
-              QuizModel.fromEntity(localQuiz),
-            );
+            await quizLocalDataSource
+                .updateQuiz(QuizModel.fromEntity(localQuiz));
           }
           await _syncQuizIfPossible(localQuiz);
         } else {

@@ -1,12 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quiz_master/features/auth/data/datasources/firebase_auth_data_source.dart';
-import 'package:quiz_master/features/auth/domain/entities/app_user.dart';
-import 'package:quiz_master/features/auth/domain/repositories/auth_repository.dart';
 
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  final dataSource = FirebaseAuthDataSource();
-  return AuthRepositoryImpl(dataSource);
-});
+import '../../domain/entities/app_user.dart';
+import '../../domain/repositories/auth_repository.dart';
+import '../datasources/firebase_auth_data_source.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuthDataSource _dataSource;
@@ -56,7 +51,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> signOut() => _dataSource.signOut();
 
-  AppUser? _mapFirebaseUser(user) {
+  AppUser? _mapFirebaseUser(dynamic user) {
     if (user == null) return null;
     return AppUser(
       id: user.uid,
