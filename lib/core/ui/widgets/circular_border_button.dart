@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CircularBorderedButton extends ConsumerWidget {
+class CircularBorderedButton extends StatelessWidget {
   final String text;
   final IconData icon;
   final bool isRightAligned;
@@ -18,7 +17,7 @@ class CircularBorderedButton extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final width = MediaQuery.of(context).size.width;
 
@@ -28,27 +27,29 @@ class CircularBorderedButton extends ConsumerWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        child: Container(
+        child: SizedBox(
           width: width * buttonWidthRatio,
-          padding: EdgeInsets.symmetric(vertical: 6),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                color: colorScheme.onPrimary,
-                size: 24,
-              ),
-              SizedBox(width: 8),
-              Text(
-                text,
-                style: TextStyle(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
                   color: colorScheme.onPrimary,
-                  fontSize: 16,
+                  size: 24,
                 ),
-              ),
-            ],
+                const SizedBox(width: 8),
+                Text(
+                  text,
+                  style: TextStyle(
+                    color: colorScheme.onPrimary,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
