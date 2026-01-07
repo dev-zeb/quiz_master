@@ -1,16 +1,21 @@
 import 'package:go_router/go_router.dart';
+import 'package:quiz_master/core/ui/screens/settings_page.dart';
+import 'package:quiz_master/core/ui/screens/start_screen.dart';
+import 'package:quiz_master/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:quiz_master/features/auth/presentation/bloc/auth_state.dart';
+import 'package:quiz_master/features/auth/presentation/screens/profile_screen.dart';
+import 'package:quiz_master/features/auth/presentation/screens/sign_in_screen.dart';
+import 'package:quiz_master/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
+import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_generate_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_history_detail.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_history_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_list_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_play_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/screens/quiz_result_screen.dart';
 
-import '../../features/auth/presentation/bloc/auth_bloc.dart';
-import '../../features/auth/presentation/bloc/auth_state.dart';
-import '../../features/auth/presentation/screens/profile_screen.dart';
-import '../../features/auth/presentation/screens/sign_in_screen.dart';
-import '../../features/auth/presentation/screens/sign_up_screen.dart';
-import '../../features/quiz/presentation/screens/quiz_editor_screen.dart';
-import '../../features/quiz/presentation/screens/quiz_generate_screen.dart';
-import '../../features/quiz/presentation/screens/quiz_history_screen.dart';
-import '../../features/quiz/presentation/screens/quiz_list_screen.dart';
-import '../ui/screens/settings_page.dart';
-import '../ui/screens/start_screen.dart';
 import 'go_router_refresh_stream.dart';
 
 GoRouter createAppRouter(AuthBloc authBloc) {
@@ -20,12 +25,10 @@ GoRouter createAppRouter(AuthBloc authBloc) {
     redirect: (context, state) {
       final authState = authBloc.state;
 
-      // You decide what "protected" means:
       final isSignedIn = authState is AuthAuthenticated;
       final isAuthRoute = state.matchedLocation == '/sign-in' ||
           state.matchedLocation == '/sign-up';
 
-      // Gate only routes that require login (example: you may want quiz sync/profile).
       final protected = <String>{
         '/profile',
       };
@@ -66,6 +69,13 @@ GoRouter createAppRouter(AuthBloc authBloc) {
             builder: (context, _) => const QuizHistoryScreen(),
           ),
           GoRoute(
+            path: 'history/detail',
+            builder: (context, state) {
+              final history = state.extra as QuizHistory;
+              return QuizHistoryDetail(quizHistory: history);
+            },
+          ),
+          GoRoute(
             path: 'generate',
             builder: (context, _) => const QuizGenerateScreen(),
           ),
@@ -74,6 +84,20 @@ GoRouter createAppRouter(AuthBloc authBloc) {
             builder: (context, state) {
               final quiz = state.extra; // Quiz?
               return QuizEditorScreen(quiz: quiz as dynamic);
+            },
+          ),
+          GoRoute(
+            path: 'play',
+            builder: (context, state) {
+              final quiz = state.extra as Quiz;
+              return QuizPlayScreen(quiz: quiz);
+            },
+          ),
+          GoRoute(
+            path: 'result',
+            builder: (context, state) {
+              final history = state.extra as QuizHistory;
+              return QuizResultScreen(quizHistory: history);
             },
           ),
         ],
