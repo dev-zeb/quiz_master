@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/utils/auth_error_mapper.dart';
-import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:quiz_master/features/auth/presentation/screens/sign_up_screen.dart';
 
-class SignInScreen extends ConsumerStatefulWidget {
+import 'package:quiz_master/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:quiz_master/features/auth/presentation/bloc/auth_event.dart';
+
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
   @override
-  ConsumerState<SignInScreen> createState() => _SignInScreenState();
+  State<SignInScreen> createState() => _SignInScreenState();
 }
 
-class _SignInScreenState extends ConsumerState<SignInScreen> {
+class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _emailFocus = FocusNode();
@@ -38,7 +41,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     return Scaffold(
       appBar: customAppBar(
         context: context,
-        ref: ref,
         title: 'Sign in',
         hasBackButton: true,
       ),
@@ -132,29 +134,9 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           : null,
                       onFieldSubmitted: (_) => _signInWithEmail(),
                     ),
-                    const SizedBox(height: 8),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Password reset is not implemented yet.',
-                              ),
-                            ),
-                          );
-                        },
-                        child: const Text('Forgot password?'),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 10),
                     FilledButton(
                       onPressed: _isSubmitting ? null : _signInWithEmail,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        textStyle: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
                       child: _isSubmitting
                           ? SizedBox(
                               height: 18,
@@ -167,27 +149,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                           : const Text('Sign in'),
                     ),
                     const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(child: Divider(color: cs.outlineVariant)),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 10),
-                          child: Text('or'),
-                        ),
-                        Expanded(child: Divider(color: cs.outlineVariant)),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
                     OutlinedButton.icon(
                       onPressed: _isSubmitting ? null : _signInWithGoogle,
                       icon: const Icon(Icons.g_translate_rounded),
                       label: const Text('Continue with Google'),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
                     ),
                   ],
                 ),
@@ -196,14 +161,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           ),
           const SizedBox(height: 12),
           TextButton(
-            onPressed: _isSubmitting
-                ? null
-                : () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SignUpScreen(),
-                      ),
-                    ),
+            onPressed: _isSubmitting ? null : () => context.push('/sign-up'),
             child: const Text.rich(
               TextSpan(
                 text: "Don't have an account? ",
@@ -224,17 +182,21 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
 
   Future<void> _signInWithEmail() async {
     if (!_formKey.currentState!.validate()) return;
+
     setState(() {
       _isSubmitting = true;
       _error = null;
     });
+
     try {
-      await ref.read(authControllerProvider.notifier).signInWithEmail(
-            _emailController.text.trim(),
-            _passwordController.text,
+      context.read<AuthBloc>().add(
+            AuthSignInWithEmailRequested(
+              email: _emailController.text.trim(),
+              password: _passwordController.text,
+            ),
           );
       if (!mounted) return;
-      await Navigator.of(context).maybePop();
+      context.pop(); // go back to previous screen
     } catch (e) {
       if (!mounted) return;
       final msg = mapAuthErrorToMessage(e, isSignIn: true);
@@ -250,10 +212,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
       _isSubmitting = true;
       _error = null;
     });
+
     try {
-      await ref.read(authControllerProvider.notifier).signInWithGoogle();
+      context.read<AuthBloc>().add(AuthSignInWithGoogleRequested());
       if (!mounted) return;
-      await Navigator.of(context).maybePop();
+      context.pop();
     } catch (e) {
       if (!mounted) return;
       final msg = mapAuthErrorToMessage(e, isSignIn: true);

@@ -1,33 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/ui/widgets/empty_list_widget.dart';
-import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_state.dart';
 import 'package:quiz_master/features/quiz/presentation/screens/quiz_list_screen.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_history_list_item.dart';
 
-class QuizHistoryScreen extends ConsumerWidget {
+import '../bloc/quiz_event.dart';
+
+class QuizHistoryScreen extends StatefulWidget {
   const QuizHistoryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final quizHistoryList =
-        ref.watch(quizNotifierProvider.notifier).getQuizHistoryList();
+  State<QuizHistoryScreen> createState() => _QuizHistoryScreenState();
+}
 
-    final sortedHistory = quizHistoryList
-      ..sort((a, b) => b.playedAt.compareTo(a.playedAt));
+class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
+  bool _bootstrapped = false;
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_bootstrapped) return;
+    _bootstrapped = true;
+    context.read<QuizBloc>().add(QuizBootstrapped());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: customAppBar(
         context: context,
-        ref: ref,
         title: 'Quiz Play History',
         hasBackButton: true,
-        user: ref.watch(currentUserProvider),
       ),
-      body: sortedHistory.isEmpty
-          ? EmptyListWidget(
+      body: BlocBuilder<QuizBloc, QuizState>(
+        builder: (context, state) {
+          final sortedHistory = List.of(state.histories)
+            ..sort((a, b) => b.playedAt.compareTo(a.playedAt));
+
+          if (state.isLoading && sortedHistory.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (sortedHistory.isEmpty) {
+            return EmptyListWidget(
               iconData: Icons.history_toggle_off_rounded,
               title: "No Quiz History Yet",
               description:
@@ -37,29 +55,27 @@ class QuizHistoryScreen extends ConsumerWidget {
               buttonTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const QuizListScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const QuizListScreen()),
                 );
               },
-            )
-          : Padding(
-              padding: const EdgeInsets.only(
-                left: 16,
-                right: 16,
-                bottom: 20,
-              ),
-              child: ListView.builder(
-                itemCount: sortedHistory.length,
-                itemBuilder: (_, idx) {
-                  final quizHistory = sortedHistory[idx];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: QuizHistoryListItem(quizHistory: quizHistory),
-                  );
-                },
-              ),
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
+            child: ListView.builder(
+              itemCount: sortedHistory.length,
+              itemBuilder: (_, idx) {
+                final quizHistory = sortedHistory[idx];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: QuizHistoryListItem(quizHistory: quizHistory),
+                );
+              },
             ),
+          );
+        },
+      ),
     );
   }
 }
