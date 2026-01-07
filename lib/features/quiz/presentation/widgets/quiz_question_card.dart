@@ -104,7 +104,8 @@ class _QuizQuestionCardState extends State<QuizQuestionCard> {
                             if (value == null) return;
                             widget.onAnswerSelected(value);
                             setState(
-                                () {}); // ensure visuals update if parent doesn't rebuild immediately
+                              () {},
+                            ); // ensure visuals update if parent doesn't rebuild immediately
                           },
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),

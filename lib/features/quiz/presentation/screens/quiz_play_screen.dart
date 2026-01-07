@@ -1,6 +1,7 @@
 import 'package:blinking_timer/blinking_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quiz_master/core/config/utils.dart';
 import 'package:quiz_master/core/di/injection.dart';
 import 'package:quiz_master/core/ui/widgets/circular_border_progress_painter.dart';
@@ -11,7 +12,6 @@ import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
 import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
 import 'package:quiz_master/features/quiz/presentation/bloc/quiz_event.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_result_screen.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_play_button.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_question_card.dart';
 
@@ -30,10 +30,8 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
 
   late final List<Question> _questions;
   late final List<List<String>> _shuffledAnswers;
-
   late final int _startTimeMillis;
 
-  // NEW: local state for answers
   late final List<String?> _selectedAnswers;
 
   @override
@@ -75,7 +73,7 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
         );
 
         if (result == true && context.mounted) {
-          Navigator.pop(context);
+          context.pop();
         }
       },
       child: Scaffold(
@@ -111,7 +109,7 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
                         okButtonTap: () async {},
                       );
                       if (result == true && context.mounted) {
-                        Navigator.pop(context);
+                        context.pop();
                       }
                     },
                   ),
@@ -262,18 +260,10 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
                     key: ValueKey('next_$_currentQuestionIndex'),
                     isIconFirst: false,
                     text: isLastQuestion ? 'Submit' : 'Next',
-                    iconWidget: isLastQuestion
-                        ? Transform.rotate(
-                            angle: 4.7,
-                            child: Icon(
-                              Icons.arrow_circle_right,
-                              color: colorScheme.onPrimary,
-                            ),
-                          )
-                        : Icon(
-                            Icons.arrow_circle_right,
-                            color: colorScheme.onPrimary,
-                          ),
+                    iconWidget: Icon(
+                      Icons.arrow_circle_right,
+                      color: colorScheme.onPrimary,
+                    ),
                     onTap: () async {
                       if (isLastQuestion) {
                         await _finishAndGoToResults(
@@ -357,14 +347,8 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
     context.read<QuizBloc>().add(QuizHistoryAdded(quizHistory));
     await Future.delayed(delay);
 
-    if (mounted) {
-      Navigator.pop(context);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => QuizResultScreen(quizHistory: quizHistory),
-        ),
-      );
-    }
+    if (!mounted) return;
+    context.pop(); // close dialog
+    context.go('/result', extra: quizHistory);
   }
 }

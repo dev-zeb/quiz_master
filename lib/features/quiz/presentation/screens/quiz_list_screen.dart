@@ -1,38 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:quiz_master/core/ui/widgets/circular_border_button.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/ui/widgets/empty_list_widget.dart';
 import 'package:quiz_master/core/ui/widgets/gradient_quiz_button.dart';
 import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_event.dart';
 import 'package:quiz_master/features/quiz/presentation/bloc/quiz_state.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_generate_screen.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_list_item.dart';
-import 'package:quiz_master/core/ui/widgets/circular_border_button.dart';
 
-import '../bloc/quiz_event.dart';
-
-class QuizListScreen extends StatefulWidget {
+class QuizListScreen extends StatelessWidget {
   const QuizListScreen({super.key});
 
   @override
-  State<QuizListScreen> createState() => _QuizListScreenState();
-}
-
-class _QuizListScreenState extends State<QuizListScreen> {
-  bool _bootstrapped = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_bootstrapped) return;
-    _bootstrapped = true;
-    context.read<QuizBloc>().add(QuizBootstrapped());
-  }
-
-  @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: customAppBar(
         context: context,
@@ -74,16 +56,7 @@ class _QuizListScreenState extends State<QuizListScreen> {
                       description: "You haven't created any quizzes yet.",
                       buttonIcon: Icons.add,
                       buttonText: "Create First Quiz",
-                      buttonTap: () {
-                        // You can switch to GoRouter:
-                        // context.push('/quiz/editor');
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const QuizEditorScreen(),
-                          ),
-                        );
-                      },
+                      buttonTap: () => context.push('/editor'),
                     )
                   : Padding(
                       padding: const EdgeInsets.symmetric(
@@ -111,14 +84,7 @@ class _QuizListScreenState extends State<QuizListScreen> {
                 bottom: 20,
                 left: 32,
                 child: GradientQuizButton(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const QuizGenerateScreen(),
-                      ),
-                    );
-                  },
+                  onTap: () => context.push('/generate'),
                 ),
               ),
               if (quizList.isNotEmpty)
@@ -129,14 +95,7 @@ class _QuizListScreenState extends State<QuizListScreen> {
                     text: 'Add Quiz',
                     icon: Icons.add,
                     isRightAligned: true,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const QuizEditorScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.push('/editor'),
                   ),
                 ),
             ],

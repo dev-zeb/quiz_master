@@ -1,12 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quiz_master/core/config/theme/app_themes.dart';
 import 'package:quiz_master/core/config/utils.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
 import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_play_screen.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_chart_item.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_history_question_item.dart';
 import 'package:quiz_master/core/ui/widgets/circular_border_button.dart';
@@ -249,11 +249,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
               final quiz =
                   context.read<QuizBloc>().getQuizById(quizHistory.quizId);
               if (quiz == null) return;
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => QuizPlayScreen(quiz: quiz)),
-              );
+              context.go('/play', extra: quiz);
             },
             isRightAligned: false,
           ),
@@ -261,7 +257,7 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
           CircularBorderedButton(
             text: 'Go To Home',
             icon: Icons.home_outlined,
-            onTap: () => Navigator.popUntil(context, (route) => route.isFirst),
+            onTap: () => context.go('/quizzes'),
             isRightAligned: false,
           ),
         ],

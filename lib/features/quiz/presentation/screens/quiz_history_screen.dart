@@ -1,31 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/ui/widgets/empty_list_widget.dart';
 import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
 import 'package:quiz_master/features/quiz/presentation/bloc/quiz_state.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_list_screen.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_history_list_item.dart';
 
-import '../bloc/quiz_event.dart';
-
-class QuizHistoryScreen extends StatefulWidget {
+class QuizHistoryScreen extends StatelessWidget {
   const QuizHistoryScreen({super.key});
-
-  @override
-  State<QuizHistoryScreen> createState() => _QuizHistoryScreenState();
-}
-
-class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
-  bool _bootstrapped = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_bootstrapped) return;
-    _bootstrapped = true;
-    context.read<QuizBloc>().add(QuizBootstrapped());
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,14 +33,9 @@ class _QuizHistoryScreenState extends State<QuizHistoryScreen> {
               title: "No Quiz History Yet",
               description:
                   "Start playing quizzes and your history will appear here.",
-              buttonIcon: Icons.add,
+              buttonIcon: Icons.play_arrow,
               buttonText: "Play a Quiz",
-              buttonTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const QuizListScreen()),
-                );
-              },
+              buttonTap: () => context.go('/quizzes'),
             );
           }
 

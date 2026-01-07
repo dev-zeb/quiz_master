@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quiz_master/core/ui/widgets/badge_item.dart';
 import 'package:quiz_master/core/ui/widgets/popup_menu.dart';
 import 'package:quiz_master/core/ui/widgets/popup_option_item.dart';
@@ -7,8 +8,6 @@ import 'package:quiz_master/core/utils/dialog_utils.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
 import 'package:quiz_master/features/quiz/presentation/bloc/quiz_event.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_play_screen.dart';
 
 class QuizListItem extends StatelessWidget {
   final Quiz quiz;
@@ -33,12 +32,7 @@ class QuizListItem extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       elevation: 2,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => QuizPlayScreen(quiz: quiz)),
-          );
-        },
+        onTap: () => context.push('/play', extra: quiz),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -112,19 +106,11 @@ class QuizListItem extends StatelessWidget {
                 onSelected: (selected) async {
                   switch (selected) {
                     case 'play':
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => QuizPlayScreen(quiz: quiz)),
-                      );
+                      context.push('/play', extra: quiz);
                       break;
 
                     case 'edit':
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => QuizEditorScreen(quiz: quiz)),
-                      );
+                      context.push('/editor', extra: quiz);
                       break;
 
                     case 'delete':

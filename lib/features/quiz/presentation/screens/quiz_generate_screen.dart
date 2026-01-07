@@ -1,14 +1,16 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:quiz_master/core/config/strings.dart';
 import 'package:quiz_master/core/di/injection.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/utils/dialog_utils.dart';
 import 'package:quiz_master/features/auth/domain/repositories/auth_repository.dart';
-import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
-import 'package:quiz_master/features/quiz/domain/repositories/ai_quiz_repository.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/ai_quiz_bloc.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/ai_quiz_event.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/ai_quiz_state.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_time_input_field.dart';
 
 class QuizGenerateScreen extends StatefulWidget {
@@ -29,9 +31,7 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
 
   final _scrollController = ScrollController();
 
-  bool _isLoading = false;
   int _selectedTabIndex = 0;
-
   PlatformFile? _selectedFile;
 
   @override
@@ -53,120 +53,163 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
     final seconds = int.tryParse(_secondsController.text) ?? 0;
     final isTimeError = minutes == 0 && seconds == 0;
 
-    return Scaffold(
-      appBar: customAppBar(
-        context: context,
-        title: 'Generate Quiz with AI',
-        hasBackButton: true,
-      ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Expanded(
-                child: Scrollbar(
-                  controller: _scrollController,
-                  interactive: true,
-                  scrollbarOrientation: ScrollbarOrientation.right,
-                  thickness: 6.0,
-                  thumbVisibility: true,
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildTabSection(colorScheme),
-                          const SizedBox(height: 8),
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            child: _selectedTabIndex == 0
-                                ? _buildTextInputSection(colorScheme)
-                                : _buildFileInputSection(colorScheme),
-                          ),
-                          const SizedBox(height: 8),
-                          _buildQuizConfigurationSection(
-                              colorScheme, isTimeError),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+    return BlocProvider<AiQuizBloc>(
+      create: (_) => getIt<AiQuizBloc>(),
+      child: BlocConsumer<AiQuizBloc, AiQuizState>(
+        listenWhen: (prev, cur) =>
+            prev.quiz != cur.quiz || prev.error != cur.error,
+        listener: (context, state) {
+          if (state.quiz != null) {
+            context.push('/editor', extra: state.quiz);
+            return;
+          }
+
+          if (state.error != null) {
+            final msg = _mapAiErrorToMessage(state.error!);
+            showSnackBar(
+              context: context,
+              message: msg,
+              backgroundColor: colorScheme.error,
+              textColor: colorScheme.onError,
+            );
+          }
+        },
+        builder: (context, aiState) {
+          return Scaffold(
+            appBar: customAppBar(
+              context: context,
+              title: 'Generate Quiz with AI',
+              hasBackButton: true,
+            ),
+            body: Stack(
+              children: [
+                Column(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                const Color(0xFF764BA2).withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(30),
-                        child: InkWell(
-                          onTap: _isLoading
-                              ? null
-                              : () => _generateQuiz(colorScheme),
-                          borderRadius: BorderRadius.circular(30),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 32, vertical: 16),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
+                    Expanded(
+                      child: Scrollbar(
+                        controller: _scrollController,
+                        interactive: true,
+                        scrollbarOrientation: ScrollbarOrientation.right,
+                        thickness: 6.0,
+                        thumbVisibility: true,
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 4),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                Icon(Icons.auto_awesome,
-                                    color: Colors.white, size: 20),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Generate quiz',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                _buildTabSection(colorScheme),
+                                const SizedBox(height: 8),
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 300),
+                                  child: _selectedTabIndex == 0
+                                      ? _buildTextInputSection(colorScheme)
+                                      : _buildFileInputSection(colorScheme),
                                 ),
+                                const SizedBox(height: 8),
+                                _buildQuizConfigurationSection(
+                                    colorScheme, isTimeError),
+                                const SizedBox(height: 16),
                               ],
                             ),
                           ),
                         ),
                       ),
                     ),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF764BA2)
+                                      .withValues(alpha: 0.3),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(30),
+                              child: InkWell(
+                                onTap: aiState.isLoading
+                                    ? null
+                                    : () => _generateQuiz(context, colorScheme),
+                                borderRadius: BorderRadius.circular(30),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 32, vertical: 16),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.auto_awesome,
+                                          color: Colors.white, size: 20),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Generate quiz',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                   ],
                 ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-          if (_isLoading)
-            Container(
-              color: Colors.black.withValues(alpha: 0.2),
-              child: const Center(child: CircularProgressIndicator()),
+                if (aiState.isLoading)
+                  Container(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+              ],
             ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  // --- UI sections (same as your version) ---
+  String _mapAiErrorToMessage(Object error) {
+    final s = error.toString();
+
+    if (s.contains('File too large')) return s;
+    if (s.contains('bytes were null')) {
+      return 'Could not read the file. Please re-pick it (or try a smaller PDF).';
+    }
+    if (s.toLowerCase().contains('timeout')) {
+      return 'AI generation is taking too long. Please try again or use a smaller file.';
+    }
+    if (s.contains('too large for the AI model')) {
+      return 'Document is too large. Try a smaller file or fewer pages.';
+    }
+
+    // During dev, this is helpful. In release, keep generic.
+    return 'Error generating quiz: $s';
+  }
+
+  // --- UI sections (unchanged from your version except where needed) ---
 
   Widget _buildTabSection(ColorScheme colorScheme) {
     return Card(
@@ -521,27 +564,34 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Quiz time limit",
-                        style: TextStyle(
-                            fontSize: 16, color: colorScheme.primary)),
+                    Text(
+                      "Quiz time limit",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: colorScheme.primary,
+                      ),
+                    ),
                     if (isTimeError)
                       Text(
                         AppStrings.pleaseEnterValidTimeDuration,
                         style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
-                            fontSize: 12),
+                          color: Theme.of(context).colorScheme.error,
+                          fontSize: 12,
+                        ),
                       ),
                   ],
                 ),
                 const Spacer(),
                 QuizTimeInputField(
-                    label: 'min',
-                    textEditingController: _minutesController,
-                    onChanged: (_) => setState(() {})),
+                  label: 'min',
+                  textEditingController: _minutesController,
+                  onChanged: (_) => setState(() {}),
+                ),
                 QuizTimeInputField(
-                    label: 'sec',
-                    textEditingController: _secondsController,
-                    onChanged: (_) => setState(() {})),
+                  label: 'sec',
+                  textEditingController: _secondsController,
+                  onChanged: (_) => setState(() {}),
+                ),
               ],
             ),
           ],
@@ -567,7 +617,8 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
     }
   }
 
-  Future<void> _generateQuiz(ColorScheme colorScheme) async {
+  Future<void> _generateQuiz(
+      BuildContext blocContext, ColorScheme colorScheme) async {
     final currentUser = getIt<AuthRepository>().currentUser;
 
     final minutes = int.tryParse(_minutesController.text) ?? 0;
@@ -584,28 +635,6 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
 
     if (!_formKey.currentState!.validate()) return;
 
-    if (_selectedTabIndex == 1) {
-      if (_selectedFile == null || _selectedFile!.bytes == null) {
-        showSnackBar(
-          context: context,
-          message: 'Please select a file.',
-          backgroundColor: colorScheme.error,
-          textColor: colorScheme.onError,
-        );
-        return;
-      }
-    } else {
-      if (_textController.text.trim().isEmpty) {
-        showSnackBar(
-          context: context,
-          message: 'Please enter some text.',
-          backgroundColor: colorScheme.error,
-          textColor: colorScheme.onError,
-        );
-        return;
-      }
-    }
-
     final numQuestions = int.tryParse(_numQuestionsController.text.trim()) ?? 0;
     if (numQuestions <= 0) {
       showSnackBar(
@@ -618,53 +647,50 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
     }
 
     final durationSeconds = (minutes * 60) + seconds;
-    final aiRepo = getIt<AiQuizRepository>();
 
-    setState(() => _isLoading = true);
-
-    try {
-      late final Quiz quiz;
-
-      if (_selectedTabIndex == 1) {
-        final file = _selectedFile!;
-        final bytes = file.bytes!;
-        quiz = await aiRepo.generateQuizFromFile(
-          bytes: bytes,
-          filename: file.name,
-          numQuestions: numQuestions,
-          userId: currentUser?.id,
-          durationSeconds: durationSeconds,
-          extraInstructions: _extraInfoController.text.trim().isEmpty
-              ? null
-              : _extraInfoController.text.trim(),
+    if (_selectedTabIndex == 1) {
+      final file = _selectedFile;
+      if (file == null) {
+        showSnackBar(
+          context: context,
+          message: 'Please select a file.',
+          backgroundColor: colorScheme.error,
+          textColor: colorScheme.onError,
         );
-      } else {
-        quiz = await aiRepo.generateQuizFromText(
-          text: _textController.text.trim(),
-          numQuestions: numQuestions,
-          userId: currentUser?.id,
-          durationSeconds: durationSeconds,
-        );
+        return;
       }
 
-      if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => QuizEditorScreen(quiz: quiz)),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      final msg = e.toString().contains('too large for the AI model')
-          ? 'Document is too large. Try a smaller file or fewer pages.'
-          : 'Error generating quiz. Please try again later.';
-      showSnackBar(
-        context: context,
-        message: msg,
-        backgroundColor: colorScheme.error,
-        textColor: colorScheme.onError,
-      );
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
+      blocContext.read<AiQuizBloc>().add(
+            AiQuizGenerateFromFileRequested(
+              file: file,
+              numQuestions: numQuestions,
+              userId: currentUser?.id,
+              durationSeconds: durationSeconds,
+              extraInstructions: _extraInfoController.text.trim().isEmpty
+                  ? null
+                  : _extraInfoController.text.trim(),
+            ),
+          );
+    } else {
+      final text = _textController.text.trim();
+      if (text.isEmpty) {
+        showSnackBar(
+          context: context,
+          message: 'Please enter some text.',
+          backgroundColor: colorScheme.error,
+          textColor: colorScheme.onError,
+        );
+        return;
+      }
+
+      blocContext.read<AiQuizBloc>().add(
+            AiQuizGenerateFromTextRequested(
+              text: text,
+              numQuestions: numQuestions,
+              userId: currentUser?.id,
+              durationSeconds: durationSeconds,
+            ),
+          );
     }
   }
 }
