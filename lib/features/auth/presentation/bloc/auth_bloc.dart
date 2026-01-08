@@ -39,11 +39,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final user = await _repo.signInWithGoogle();
-      if (user == null)
+      if (user == null) {
         emit(AuthUnauthenticated());
-      // stream will also update state, but we can be immediate:
-      else
+      } else {
         emit(AuthAuthenticated(user));
+      }
     } catch (e) {
       emit(AuthFailure(e));
       rethrow;
@@ -56,10 +56,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await _repo.signInWithEmail(
           email: event.email, password: event.password);
-      if (user == null)
+      if (user == null) {
         emit(AuthUnauthenticated());
-      else
+      } else {
         emit(AuthAuthenticated(user));
+      }
     } catch (e) {
       emit(AuthFailure(e));
       rethrow;
@@ -75,10 +76,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         password: event.password,
         displayName: event.displayName,
       );
-      if (user == null)
+      if (user == null) {
         emit(AuthUnauthenticated());
-      else
+      } else {
         emit(AuthAuthenticated(user));
+      }
     } catch (e) {
       emit(AuthFailure(e));
       rethrow;
