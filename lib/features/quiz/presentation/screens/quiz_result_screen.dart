@@ -1,30 +1,27 @@
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quiz_master/core/config/theme/app_themes.dart';
 import 'package:quiz_master/core/config/utils.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
-import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_play_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_chart_item.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_history_question_item.dart';
-import 'package:quiz_master/features/quiz/presentation/widgets/quiz_outlined_button.dart';
+import 'package:quiz_master/core/ui/widgets/circular_border_button.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_time_widget.dart';
 
-class QuizResultScreen extends ConsumerStatefulWidget {
+class QuizResultScreen extends StatefulWidget {
   final QuizHistory quizHistory;
 
-  const QuizResultScreen({
-    super.key,
-    required this.quizHistory,
-  });
+  const QuizResultScreen({super.key, required this.quizHistory});
 
   @override
-  ConsumerState<QuizResultScreen> createState() => _QuizResultScreenState();
+  State<QuizResultScreen> createState() => _QuizResultScreenState();
 }
 
-class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
+class _QuizResultScreenState extends State<QuizResultScreen> {
   late QuizHistory quizHistory;
 
   @override
@@ -37,7 +34,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
   Widget build(BuildContext context) {
     final numOfTotalQuestions = quizHistory.questions.length;
     int numOfCorrectAnswers = 0;
-    final selectedAnswers = widget.quizHistory.selectedAnswers;
+    final selectedAnswers = quizHistory.selectedAnswers;
     final questions = quizHistory.questions;
 
     for (int idx = 0; idx < selectedAnswers.length; idx++) {
@@ -45,12 +42,12 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
         numOfCorrectAnswers++;
       }
     }
+
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: customAppBar(
         context: context,
-        ref: ref,
         title: 'Quiz Result',
         hasBackButton: true,
       ),
@@ -58,20 +55,15 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           children: [
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildScoreChart(
-                      numOfCorrectAnswers,
-                      numOfTotalQuestions,
-                    ),
+                    _buildScoreChart(numOfCorrectAnswers, numOfTotalQuestions),
                     const SizedBox(height: 12),
-                    _buildTimeChart(
-                      quizHistory: quizHistory,
-                    ),
+                    _buildTimeChart(quizHistory: quizHistory),
                     const SizedBox(height: 12),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -99,14 +91,12 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
 
   Widget _buildQuestionSummaryList() {
     return ListView.builder(
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemCount: quizHistory.questions.length + 1,
       itemBuilder: (context, index) {
         final questions = quizHistory.questions;
-        if (index == questions.length) {
-          return SizedBox(height: 20);
-        }
+        if (index == questions.length) return const SizedBox(height: 20);
         return QuizHistoryQuestionItem(
           question: questions[index],
           questionIndex: index,
@@ -116,7 +106,6 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
     );
   }
 
-  /// Correct Answers Chart
   Widget _buildScoreChart(int correct, int total) {
     final colorScheme = Theme.of(context).colorScheme;
     final correctAnswerPercentage = getCorrectAnswerPercentage(
@@ -166,26 +155,13 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
       ),
       infoWidget: [
         const SizedBox(height: 16),
-        _buildTag(
-          Icons.list_alt,
-          "Total",
-          total,
-          colorScheme.primary,
-        ),
+        _buildTag(Icons.list_alt, "Total", total, colorScheme.primary),
+        const SizedBox(height: 4),
+        _buildTag(Icons.check_circle_outline, "Correct", correct,
+            colorScheme.tertiary),
         const SizedBox(height: 4),
         _buildTag(
-          Icons.check_circle_outline,
-          "Correct",
-          correct,
-          colorScheme.tertiary,
-        ),
-        const SizedBox(height: 4),
-        _buildTag(
-          Icons.cancel_outlined,
-          "Wrong",
-          total - correct,
-          colorScheme.error,
-        ),
+            Icons.cancel_outlined, "Wrong", total - correct, colorScheme.error),
       ],
     );
   }
@@ -201,9 +177,9 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
     final [totalMinutes, totalSeconds] =
         getMinutesAndSeconds(quizHistory.totalDurationSeconds);
 
-    double progress = elapsedTime / (quizHistory.totalDurationSeconds);
-    double remainingProgress = 1 - progress;
-    Color progressColor = remainingProgress <= 0.2
+    final progress = elapsedTime / quizHistory.totalDurationSeconds;
+    final remainingProgress = 1 - progress;
+    final progressColor = remainingProgress <= 0.2
         ? colorScheme.error
         : remainingProgress <= 0.5
             ? AppColors.warningOrange
@@ -227,13 +203,8 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'Total Time',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: colorScheme.primary,
-                ),
-              ),
+              Text('Total Time',
+                  style: TextStyle(fontSize: 14, color: colorScheme.primary)),
               Text(
                 '$totalMinutes:${totalSeconds.toString().padLeft(2, '0')}',
                 style: TextStyle(
@@ -265,7 +236,6 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
     );
   }
 
-  /// Action Buttons
   Widget _buildActionButtons() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -276,16 +246,10 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
             text: 'Restart Quiz',
             icon: Icons.restart_alt_outlined,
             onTap: () {
-              final quiz = ref
-                  .read(quizNotifierProvider.notifier)
-                  .getQuizById(quizHistory.quizId);
-              // Update the remaining time here
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => QuizPlayScreen(quiz: quiz!),
-                ),
-              );
+              final quiz =
+                  context.read<QuizBloc>().getQuizById(quizHistory.quizId);
+              if (quiz == null) return;
+              context.go('/play', extra: quiz);
             },
             isRightAligned: false,
           ),
@@ -293,12 +257,7 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
           CircularBorderedButton(
             text: 'Go To Home',
             icon: Icons.home_outlined,
-            onTap: () {
-              Navigator.popUntil(
-                context,
-                (route) => route.isFirst,
-              );
-            },
+            onTap: () => context.go('/quizzes'),
             isRightAligned: false,
           ),
         ],
@@ -306,7 +265,6 @@ class _QuizResultScreenState extends ConsumerState<QuizResultScreen> {
     );
   }
 
-  /// Reusable Tag Widget
   Widget _buildTag(IconData icon, String label, int count, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 2),

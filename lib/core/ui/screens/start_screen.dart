@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quiz_master/core/ui/screens/settings_page.dart';
-import 'package:quiz_master/core/ui/widgets/gradient_quiz_button.dart';
-import 'package:quiz_master/features/auth/domain/entities/app_user.dart';
-import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:quiz_master/features/auth/presentation/screens/profile_screen.dart';
-import 'package:quiz_master/features/auth/presentation/widgets/user_profile_chip.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_generate_screen.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_history_screen.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_list_screen.dart';
-import 'package:quiz_master/features/quiz/presentation/widgets/quiz_outlined_button.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-class StartScreen extends ConsumerWidget {
+import '../../../features/auth/domain/entities/app_user.dart';
+import '../../../features/auth/presentation/bloc/auth_bloc.dart';
+import '../../../features/auth/presentation/bloc/auth_state.dart';
+import '../../../features/auth/presentation/widgets/user_profile_chip.dart';
+import '../widgets/circular_border_button.dart';
+import '../widgets/gradient_quiz_button.dart';
+
+class StartScreen extends StatelessWidget {
   const StartScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final user = ref.watch(currentUserProvider);
+
+    final authState = context.watch<AuthBloc>().state;
+    final user = authState is AuthAuthenticated ? authState.user : null;
 
     final displayName = user == null
         ? 'Guest'
         : (user.displayName?.trim().isEmpty == true
-        ? user.email
-        : (user.displayName ?? user.email));
+            ? user.email
+            : (user.displayName ?? user.email));
 
     final effectiveUser = user ??
         const AppUser(
@@ -37,7 +37,6 @@ class StartScreen extends ConsumerWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            // Main centered content
             SizedBox(
               height: double.infinity,
               width: double.infinity,
@@ -55,78 +54,39 @@ class StartScreen extends ConsumerWidget {
                     text: 'Play Quiz',
                     icon: Icons.play_arrow,
                     isRightAligned: false,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const QuizListScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.push('/quizzes'),
                   ),
                   const SizedBox(height: 12),
                   CircularBorderedButton(
                     text: 'History',
                     icon: Icons.history,
                     isRightAligned: false,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const QuizHistoryScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.push('/history'),
                   ),
                   const SizedBox(height: 12),
                   CircularBorderedButton(
                     text: 'Settings',
                     icon: Icons.settings,
                     isRightAligned: false,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const SettingsScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.push('/settings'),
                   ),
                 ],
               ),
             ),
-
-            // Top-right profile chip
             Positioned(
               top: 32,
               right: 20,
               child: UserProfileChip(
                 user: effectiveUser.copyWith(displayName: displayName),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ProfileScreen(),
-                    ),
-                  );
-                },
+                onTap: () => context.push('/profile'),
               ),
             ),
-
-            // Gradient button for Generate Quiz
             Positioned(
-              bottom: 40,
-              right: 20,
+              bottom: 56,
+              left: 28,
               child: Align(
                 child: GradientQuizButton(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const QuizGenerateScreen(),
-                      ),
-                    );
-                  },
+                  onTap: () => context.push('/generate'),
                 ),
               ),
             ),

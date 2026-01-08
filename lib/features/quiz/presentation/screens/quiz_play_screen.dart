@@ -1,59 +1,61 @@
 import 'package:blinking_timer/blinking_timer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quiz_master/core/config/utils.dart';
+import 'package:quiz_master/core/di/injection.dart';
 import 'package:quiz_master/core/ui/widgets/circular_border_progress_painter.dart';
 import 'package:quiz_master/core/utils/dialog_utils.dart';
-import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:quiz_master/features/auth/domain/repositories/auth_repository.dart';
 import 'package:quiz_master/features/quiz/domain/entities/question.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
-import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_result_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_event.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_play_button.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_question_card.dart';
 
-final selectedAnswersProvider = StateProvider<List<String?>>((ref) {
-  return [];
-});
-
-class QuizPlayScreen extends ConsumerStatefulWidget {
+class QuizPlayScreen extends StatefulWidget {
   final Quiz quiz;
 
   const QuizPlayScreen({super.key, required this.quiz});
 
   @override
-  ConsumerState<QuizPlayScreen> createState() => _QuizPlayScreenState();
+  State<QuizPlayScreen> createState() => _QuizPlayScreenState();
 }
 
-class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
+class _QuizPlayScreenState extends State<QuizPlayScreen> {
   int _currentQuestionIndex = 0;
   late int _quizTimeSeconds;
-  List<Question> _questions = [];
+
+  late final List<Question> _questions;
   late final List<List<String>> _shuffledAnswers;
-  late int _startTime;
+  late final int _startTimeMillis;
+
+  late final List<String?> _selectedAnswers;
 
   @override
   void initState() {
     super.initState();
     _quizTimeSeconds = widget.quiz.durationSeconds;
     _questions = List<Question>.from(widget.quiz.questions);
-    _shuffledAnswers = _questions
-        .map(
-          (question) => List<String>.from(question.answers)..shuffle(),
-        )
-        .toList();
-    _startTime = DateTime.now().millisecondsSinceEpoch;
+
+    _shuffledAnswers =
+        _questions.map((q) => List<String>.from(q.answers)..shuffle()).toList();
+
+    _selectedAnswers = List<String?>.filled(_questions.length, null);
+    _startTimeMillis = DateTime.now().millisecondsSinceEpoch;
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
     final currentQuestion = _questions[_currentQuestionIndex];
-    final isLastQuestion =
-        _currentQuestionIndex == widget.quiz.questions.length - 1;
+    final isLastQuestion = _currentQuestionIndex == _questions.length - 1;
     final currentQuestionNumber = _currentQuestionIndex + 1;
-    final totalNumberOfQuestions = widget.quiz.questions.length;
+    final totalNumberOfQuestions = _questions.length;
+
     final progressRate = currentQuestionNumber / totalNumberOfQuestions;
     final progressValue = (progressRate * 100).toStringAsFixed(2);
 
@@ -67,31 +69,30 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
           title: 'Cancel Quiz?',
           content: 'The progress of this quiz session will be lost.',
           okButtonText: 'Yes',
-          okButtonTap: () async {
-            ref.invalidate(selectedAnswersProvider);
-          },
+          okButtonTap: () async {},
         );
 
         if (result == true && context.mounted) {
-          Navigator.pop(context);
+          context.pop();
         }
       },
       child: Scaffold(
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 60),
+            const SizedBox(height: 60),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Material(
                   color: colorScheme.primary,
                   borderRadius: BorderRadius.circular(12.0),
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
                     child: Padding(
-                      padding: EdgeInsets.only(left: 6, top: 8, bottom: 8),
+                      padding:
+                          const EdgeInsets.only(left: 6, top: 8, bottom: 8),
                       child: Icon(
                         Icons.arrow_back_ios,
                         color: colorScheme.onPrimary,
@@ -105,39 +106,30 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                         content:
                             'The progress of this quiz session will be lost.',
                         okButtonText: 'Yes',
-                        okButtonTap: () async {
-                          ref.invalidate(selectedAnswersProvider);
-                        },
+                        okButtonTap: () async {},
                       );
-
                       if (result == true && context.mounted) {
-                        Navigator.pop(context);
+                        context.pop();
                       }
                     },
                   ),
                 ),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Flexible(
                   child: Text(
                     widget.quiz.title,
-                    style: TextStyle(
-                      color: colorScheme.primary,
-                      fontSize: 20,
-                    ),
+                    style: TextStyle(color: colorScheme.primary, fontSize: 20),
                     textAlign: TextAlign.left,
                   ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Container(
               height: 5,
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: colorScheme.secondary,
-                  width: 0.5,
-                ),
+                border: Border.all(color: colorScheme.secondary, width: 0.5),
               ),
               child: LinearProgressIndicator(
                 value: progressRate,
@@ -146,7 +138,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                     AlwaysStoppedAnimation<Color>(colorScheme.secondary),
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Row(
@@ -155,10 +147,8 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                 children: [
                   Text(
                     'Q: $currentQuestionNumber of $totalNumberOfQuestions',
-                    style: TextStyle(
-                      color: colorScheme.secondary,
-                      fontSize: 16,
-                    ),
+                    style:
+                        TextStyle(color: colorScheme.secondary, fontSize: 16),
                   ),
                   BlinkingTimer(
                     duration: Duration(seconds: _quizTimeSeconds),
@@ -218,20 +208,18 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                       );
                     },
                     onTimeUpThreshold: () async {
-                      await _navigateToResultScreen(
+                      await _finishAndGoToResults(
                         colorScheme,
                         title: "Time's Up!",
                         iconColor: colorScheme.error,
-                        delay: Duration(milliseconds: 700),
+                        delay: const Duration(milliseconds: 700),
                       );
                     },
                   ),
                   Text(
                     "$progressValue%",
-                    style: TextStyle(
-                      color: colorScheme.secondary,
-                      fontSize: 16,
-                    ),
+                    style:
+                        TextStyle(color: colorScheme.secondary, fontSize: 16),
                   ),
                 ],
               ),
@@ -241,11 +229,17 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                 questionText: currentQuestion.text,
                 questionIndex: _currentQuestionIndex,
                 answers: _shuffledAnswers[_currentQuestionIndex],
+                selectedAnswer: _selectedAnswers[_currentQuestionIndex],
+                onAnswerSelected: (ans) {
+                  setState(() {
+                    _selectedAnswers[_currentQuestionIndex] = ans;
+                  });
+                },
               ),
             ),
             Container(
               color: Colors.transparent,
-              padding: EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -258,9 +252,7 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                         Icons.arrow_circle_left,
                         color: colorScheme.onPrimary,
                       ),
-                      onTap: () => setState(() {
-                        _currentQuestionIndex--;
-                      }),
+                      onTap: () => setState(() => _currentQuestionIndex--),
                     ),
                     const SizedBox(width: 12),
                   ],
@@ -268,20 +260,21 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
                     key: ValueKey('next_$_currentQuestionIndex'),
                     isIconFirst: false,
                     text: isLastQuestion ? 'Submit' : 'Next',
-                    iconWidget: isLastQuestion
-                        ? Transform.rotate(
-                            angle: 4.7,
-                            child: Icon(
-                              Icons.arrow_circle_right,
-                              color: colorScheme.onPrimary,
-                            ),
-                          )
-                        : Icon(
-                            Icons.arrow_circle_right,
-                            color: colorScheme.onPrimary,
-                          ),
+                    iconWidget: Icon(
+                      Icons.arrow_circle_right,
+                      color: colorScheme.onPrimary,
+                    ),
                     onTap: () async {
-                      await _handleNextButtonClick(colorScheme);
+                      if (isLastQuestion) {
+                        await _finishAndGoToResults(
+                          colorScheme,
+                          title: "Well Done!",
+                          iconColor: colorScheme.tertiary,
+                          delay: const Duration(milliseconds: 700),
+                        );
+                      } else {
+                        setState(() => _currentQuestionIndex++);
+                      }
                     },
                   ),
                 ],
@@ -293,26 +286,8 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
     );
   }
 
-  Future<void> _handleNextButtonClick(colorScheme) async {
-    final isLastQuestion = _currentQuestionIndex == (_questions.length - 1);
-    if (isLastQuestion) {
-      await _navigateToResultScreen(
-        colorScheme,
-        title: "Well Done!",
-        iconColor: colorScheme.tertiary,
-        delay: Duration(
-          milliseconds: 700,
-        ),
-      );
-    } else {
-      setState(() {
-        _currentQuestionIndex++;
-      });
-    }
-  }
-
-  Future<void> _navigateToResultScreen(
-    colorScheme, {
+  Future<void> _finishAndGoToResults(
+    ColorScheme colorScheme, {
     required String title,
     required Color iconColor,
     required Duration delay,
@@ -321,22 +296,13 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
       context: context,
       builder: (context) => Dialog(
         backgroundColor: colorScheme.surfaceContainer,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: 24.0,
-            horizontal: 20.0,
-          ),
+          padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 20.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Icons.alarm,
-                size: 48,
-                color: iconColor,
-              ),
+              Icon(Icons.alarm, size: 48, color: iconColor),
               const SizedBox(height: 16),
               Text(
                 title,
@@ -361,42 +327,28 @@ class _QuizPlayScreenState extends ConsumerState<QuizPlayScreen> {
       ),
     );
 
-    final totalQuestions = widget.quiz.questions.length;
-
-    final selectedAnswers = ref.read(selectedAnswersProvider);
-    while (selectedAnswers.length < totalQuestions) {
-      selectedAnswers.add('');
-    }
-    ref.read(selectedAnswersProvider.notifier).state = selectedAnswers;
-
     final elapsedTime =
-        (DateTime.now().millisecondsSinceEpoch - _startTime) ~/ 1000;
+        (DateTime.now().millisecondsSinceEpoch - _startTimeMillis) ~/ 1000;
+
+    final userId = getIt<AuthRepository>().currentUser?.id;
 
     final quizHistory = QuizHistory(
       id: UniqueKey().toString(),
       quizId: widget.quiz.id,
       quizTitle: widget.quiz.title,
-      selectedAnswers: ref.read(selectedAnswersProvider),
+      selectedAnswers: _selectedAnswers,
       questions: _questions,
       playedAt: DateTime.now(),
       elapsedTimeSeconds: elapsedTime,
       totalDurationSeconds: widget.quiz.durationSeconds,
-      userId: ref.read(currentUserProvider)?.id,
+      userId: userId,
     );
 
-    await ref.read(quizNotifierProvider.notifier).addQuizHistory(quizHistory);
+    context.read<QuizBloc>().add(QuizHistoryAdded(quizHistory));
     await Future.delayed(delay);
 
-    ref.invalidate(selectedAnswersProvider);
-
-    if (mounted) {
-      Navigator.pop(context);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => QuizResultScreen(quizHistory: quizHistory),
-        ),
-      );
-    }
+    if (!mounted) return;
+    context.pop(); // close dialog
+    context.go('/result', extra: quizHistory);
   }
 }

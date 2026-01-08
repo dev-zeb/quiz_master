@@ -1,58 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:quiz_master/core/ui/widgets/badge_item.dart';
 import 'package:quiz_master/core/ui/widgets/popup_menu.dart';
 import 'package:quiz_master/core/ui/widgets/popup_option_item.dart';
 import 'package:quiz_master/core/utils/dialog_utils.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
-import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_play_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_event.dart';
 
-class QuizListItem extends ConsumerWidget {
+class QuizListItem extends StatelessWidget {
   final Quiz quiz;
 
   const QuizListItem({super.key, required this.quiz});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    final String minutes = (quiz.durationSeconds ~/ 60).toString();
-    final String seconds = (quiz.durationSeconds % 60).toString();
+    final minutesInt = quiz.durationSeconds ~/ 60;
+    final secondsInt = quiz.durationSeconds % 60;
 
-    final timerText = minutes == ''
-        ? '$seconds sec'
-        : seconds == ''
-            ? '$minutes min'
-            : '${minutes}m ${seconds}s';
+    final timerText = minutesInt == 0
+        ? '${secondsInt}s'
+        : secondsInt == 0
+            ? '${minutesInt}m'
+            : '${minutesInt}m ${secondsInt}s';
 
     return Card(
       color: colorScheme.surfaceContainer,
       clipBehavior: Clip.antiAlias,
       elevation: 2,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => QuizPlayScreen(
-                quiz: quiz,
-              ),
-            ),
-          );
-        },
+        onTap: () => context.push('/play', extra: quiz),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                Icons.play_arrow_rounded,
-                color: colorScheme.primary,
-                size: 32,
-              ),
-              SizedBox(width: 12),
+              Icon(Icons.play_arrow_rounded,
+                  color: colorScheme.primary, size: 32),
+              const SizedBox(width: 12),
               Flexible(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,14 +55,14 @@ class QuizListItem extends ConsumerWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Row(
                       children: [
                         BadgeItem(
                           badgeIcon: Icons.quiz,
                           badgeTitle: '${quiz.questions.length} Ques.',
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         BadgeItem(
                           badgeIcon: Icons.timer_outlined,
                           badgeTitle: timerText,
@@ -90,65 +78,49 @@ class QuizListItem extends ConsumerWidget {
                 iconColor: colorScheme.primary,
                 iconSize: 28,
                 menuBuilder: () => [
-                  ...[
-                    PopupMenuItem(
-                      value: 'play',
-                      child: PopupOptionItem(
-                        color: colorScheme.onPrimary,
-                        title: 'Play',
-                        iconData: Icons.play_arrow,
-                      ),
+                  PopupMenuItem(
+                    value: 'play',
+                    child: PopupOptionItem(
+                      color: colorScheme.onPrimary,
+                      title: 'Play',
+                      iconData: Icons.play_arrow,
                     ),
-                    PopupMenuItem(
-                      value: 'edit',
-                      child: PopupOptionItem(
-                        color: colorScheme.onPrimary,
-                        title: 'Edit',
-                        iconData: Icons.edit,
-                      ),
+                  ),
+                  PopupMenuItem(
+                    value: 'edit',
+                    child: PopupOptionItem(
+                      color: colorScheme.onPrimary,
+                      title: 'Edit',
+                      iconData: Icons.edit,
                     ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: PopupOptionItem(
-                        color: colorScheme.onPrimary,
-                        title: 'Delete',
-                        iconData: Icons.delete,
-                      ),
+                  ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: PopupOptionItem(
+                      color: colorScheme.onPrimary,
+                      title: 'Delete',
+                      iconData: Icons.delete,
                     ),
-                  ],
+                  ),
                 ],
                 onSelected: (selected) async {
                   switch (selected) {
                     case 'play':
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => QuizPlayScreen(
-                            quiz: quiz,
-                          ),
-                        ),
-                      );
+                      context.push('/play', extra: quiz);
                       break;
+
                     case 'edit':
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => QuizEditorScreen(quiz: quiz),
-                        ),
-                      );
+                      context.push('/editor', extra: quiz);
                       break;
+
                     case 'delete':
                       await showConfirmationDialog(
                         context,
-                        title: 'Delete Note?',
-                        content:
-                            'This will move the Note to the Trash. You can restore it later.',
+                        title: 'Delete Quiz?',
+                        content: 'This will delete the quiz permanently.',
                         okButtonText: 'Delete',
                         okButtonTap: () async {
-                          await ref
-                              .read(quizNotifierProvider.notifier)
-                              .deleteQuiz(quiz.id);
-
+                          context.read<QuizBloc>().add(QuizDeleted(quiz.id));
                           if (context.mounted) {
                             showSnackBar(
                               context: context,
@@ -177,6 +149,7 @@ class _SyncStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
     Color bgColor;
     String label;
     IconData icon;
@@ -196,6 +169,7 @@ class _SyncStatusChip extends StatelessWidget {
         bgColor = colorScheme.primary.withValues(alpha: 0.1);
         label = 'Pending sync';
         icon = Icons.sync;
+        break;
     }
 
     return Container(
@@ -211,10 +185,7 @@ class _SyncStatusChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: TextStyle(
-              fontSize: 12,
-              color: colorScheme.primary,
-            ),
+            style: TextStyle(fontSize: 12, color: colorScheme.primary),
           ),
         ],
       ),

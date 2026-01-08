@@ -20,7 +20,9 @@ String getWrongAnswerPercentage({
   }
   final wrongAnswers = totalQuestions - correctAnswers;
   return getCorrectAnswerPercentage(
-      correctAnswers: wrongAnswers, totalQuestions: totalQuestions);
+    correctAnswers: wrongAnswers,
+    totalQuestions: totalQuestions,
+  );
 }
 
 List<String> getMinutesAndSeconds(int timeInSeconds) {

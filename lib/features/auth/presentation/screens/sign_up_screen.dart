@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/utils/auth_error_mapper.dart';
-import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
 
-class SignUpScreen extends ConsumerStatefulWidget {
+import 'package:quiz_master/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:quiz_master/features/auth/presentation/bloc/auth_event.dart';
+
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
   @override
-  ConsumerState<SignUpScreen> createState() => _SignUpScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends ConsumerState<SignUpScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -38,7 +42,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     return Scaffold(
       appBar: customAppBar(
         context: context,
-        ref: ref,
         title: 'Sign up',
         hasBackButton: true,
       ),
@@ -58,10 +61,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   Icon(Icons.error_outline, color: cs.onErrorContainer),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(
-                      _error!,
-                      style: TextStyle(color: cs.onErrorContainer),
-                    ),
+                    child: Text(_error!,
+                        style: TextStyle(color: cs.onErrorContainer)),
                   ),
                   IconButton(
                     icon: Icon(Icons.close, color: cs.onErrorContainer),
@@ -125,9 +126,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           onPressed: () => setState(() => _obscure = !_obscure),
-                          icon: Icon(
-                            _obscure ? Icons.visibility : Icons.visibility_off,
-                          ),
+                          icon: Icon(_obscure
+                              ? Icons.visibility
+                              : Icons.visibility_off),
                         ),
                       ),
                       validator: (v) => (v ?? '').length < 6
@@ -143,13 +144,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                         prefixIcon: const Icon(Icons.lock_person_outlined),
                         suffixIcon: IconButton(
                           onPressed: () => setState(
-                            () => _obscureConfirm = !_obscureConfirm,
-                          ),
-                          icon: Icon(
-                            _obscureConfirm
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
+                              () => _obscureConfirm = !_obscureConfirm),
+                          icon: Icon(_obscureConfirm
+                              ? Icons.visibility
+                              : Icons.visibility_off),
                         ),
                       ),
                       validator: (v) => (v ?? '') != _passwordController.text
@@ -160,17 +158,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                     const SizedBox(height: 10),
                     FilledButton(
                       onPressed: _isSubmitting ? null : _signUp,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
                       child: _isSubmitting
                           ? SizedBox(
                               height: 18,
                               width: 18,
                               child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: cs.onPrimary,
-                              ),
+                                  strokeWidth: 2, color: cs.onPrimary),
                             )
                           : const Text('Create account'),
                     ),
@@ -186,18 +179,24 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
+
     setState(() {
       _isSubmitting = true;
       _error = null;
     });
 
     try {
-      await ref.read(authControllerProvider.notifier).signUpWithEmail(
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-            displayName: _nameController.text.trim(),
+      context.read<AuthBloc>().add(
+            AuthSignUpWithEmailRequested(
+              email: _emailController.text.trim(),
+              password: _passwordController.text,
+              displayName: _nameController.text.trim().isEmpty
+                  ? null
+                  : _nameController.text.trim(),
+            ),
           );
-      if (mounted) Navigator.pop(context);
+      if (!mounted) return;
+      context.pop();
     } catch (e) {
       if (!mounted) return;
       final msg = mapAuthErrorToMessage(e, isSignIn: false);

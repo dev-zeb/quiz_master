@@ -1,35 +1,52 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:quiz_master/core/ui/widgets/circular_border_button.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/ui/widgets/empty_list_widget.dart';
 import 'package:quiz_master/core/ui/widgets/gradient_quiz_button.dart';
-import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
-import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_generate_screen.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_event.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_state.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_list_item.dart';
-import 'package:quiz_master/features/quiz/presentation/widgets/quiz_outlined_button.dart';
 
-class QuizListScreen extends ConsumerWidget {
+class QuizListScreen extends StatelessWidget {
   const QuizListScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final quizzes = ref.watch(quizNotifierProvider);
-    final user = ref.watch(currentUserProvider);
-
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: customAppBar(
         context: context,
-        ref: ref,
         title: 'Quiz List',
         hasBackButton: true,
-        user: user,
       ),
-      body: quizzes.when(
-        data: (quizList) {
+      body: BlocBuilder<QuizBloc, QuizState>(
+        builder: (context, state) {
+          if (state.isLoading && state.quizzes.isEmpty) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state.error != null && state.quizzes.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Something went wrong'),
+                  const SizedBox(height: 18),
+                  ElevatedButton(
+                    onPressed: () {
+                      context.read<QuizBloc>().add(QuizReloadRequested());
+                    },
+                    child: const Text('Refresh'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          final quizList = state.quizzes;
+
           return Stack(
             children: [
               quizList.isEmpty
@@ -39,33 +56,35 @@ class QuizListScreen extends ConsumerWidget {
                       description: "You haven't created any quizzes yet.",
                       buttonIcon: Icons.add,
                       buttonText: "Create First Quiz",
-                      buttonTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const QuizEditorScreen(),
-                          ),
-                        );
-                      },
+                      buttonTap: () => context.push('/editor'),
                     )
-                  : _buildQuizListWidget(
-                      context,
-                      colorScheme,
-                      ref,
-                      quizList,
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 12,
+                      ),
+                      child: ListView.builder(
+                        itemCount: quizList.length + 1,
+                        itemBuilder: (_, idx) {
+                          if (idx == quizList.length) {
+                            return const SizedBox(height: 60);
+                          }
+                          final quiz = quizList[idx];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: QuizListItem(
+                              key: ValueKey('quiz_$idx'),
+                              quiz: quiz,
+                            ),
+                          );
+                        },
+                      ),
                     ),
               Positioned(
                 bottom: 20,
                 left: 32,
                 child: GradientQuizButton(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const QuizGenerateScreen(),
-                      ),
-                    );
-                  },
+                  onTap: () => context.push('/generate'),
                 ),
               ),
               if (quizList.isNotEmpty)
@@ -76,63 +95,10 @@ class QuizListScreen extends ConsumerWidget {
                     text: 'Add Quiz',
                     icon: Icons.add,
                     isRightAligned: true,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const QuizEditorScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => context.push('/editor'),
                   ),
                 ),
             ],
-          );
-        },
-        error: (err, stk) {
-          return Center(
-            child: Column(
-              children: [
-                Text('Something went wrong'),
-                SizedBox(height: 18),
-                ElevatedButton(
-                  onPressed: () {
-                    ref.invalidate(quizNotifierProvider);
-                  },
-                  child: Text('Refresh'),
-                ),
-              ],
-            ),
-          );
-        },
-        loading: () {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildQuizListWidget(
-    BuildContext context,
-    ColorScheme colorScheme,
-    WidgetRef ref,
-    List<Quiz> quizzes,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-      child: ListView.builder(
-        itemCount: quizzes.length + 1,
-        itemBuilder: (_, idx) {
-          if (idx == quizzes.length) return const SizedBox(height: 60);
-          final quiz = quizzes[idx];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12.0),
-            child: QuizListItem(
-              key: ValueKey('quiz_$idx'),
-              quiz: quiz,
-            ),
           );
         },
       ),
