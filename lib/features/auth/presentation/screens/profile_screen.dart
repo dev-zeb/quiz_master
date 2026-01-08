@@ -1,35 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
+
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/utils/dialog_utils.dart';
+
 import 'package:quiz_master/features/auth/domain/entities/app_user.dart';
-import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
 import 'package:quiz_master/features/auth/presentation/data/quiz_stats.dart';
-import 'package:quiz_master/features/auth/presentation/screens/sign_in_screen.dart';
+
+import 'package:quiz_master/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:quiz_master/features/auth/presentation/bloc/auth_event.dart';
+import 'package:quiz_master/features/auth/presentation/bloc/auth_state.dart';
+
 import 'package:quiz_master/features/auth/presentation/widgets/insight_card.dart';
 import 'package:quiz_master/features/auth/presentation/widgets/profile_error_stat.dart';
 import 'package:quiz_master/features/auth/presentation/widgets/profile_header_card.dart';
 import 'package:quiz_master/features/auth/presentation/widgets/sign_in_banner.dart';
 import 'package:quiz_master/features/auth/presentation/widgets/sync_status_panel.dart';
-import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
 
-class ProfileScreen extends ConsumerWidget {
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_event.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_state.dart';
+
+class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(currentUserProvider);
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final quizzesAsync = ref.watch(quizNotifierProvider);
-    final quizNotifier = ref.read(quizNotifierProvider.notifier);
-    final historyList = quizNotifier.getQuizHistoryList();
+
+    final authState = context.watch<AuthBloc>().state;
+    final user = authState is AuthAuthenticated ? authState.user : null;
     final isGuest = user == null;
 
     return Scaffold(
       appBar: customAppBar(
         context: context,
-        ref: ref,
         title: 'Profile',
         hasBackButton: true,
         actionButtons: [
@@ -40,26 +47,26 @@ class ProfileScreen extends ConsumerWidget {
                 radius: 20,
                 backgroundColor: colorScheme.primary.withValues(alpha: 0.15),
                 child: IconButton(
-                  onPressed: () => isGuest
-                      ? Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SignInScreen(),
-                          ),
-                        )
-                      : _signOut(context, ref),
-                  icon: Icon(
-                    Icons.logout,
-                    color: colorScheme.primary,
-                  ),
+                  onPressed: () => _signOut(context),
+                  icon: Icon(Icons.logout, color: colorScheme.primary),
                 ),
               ),
             ),
         ],
       ),
-      body: quizzesAsync.when(
-        data: (quizzes) {
-          final stats = QuizStats.from(quizzes, historyList);
+      body: BlocBuilder<QuizBloc, QuizState>(
+        builder: (context, quizState) {
+          if (quizState.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (quizState.error != null) {
+            return ProfileErrorState(
+              onRetry: () =>
+                  context.read<QuizBloc>().add(QuizReloadRequested()),
+            );
+          }
+
+          final stats = QuizStats.from(quizState.quizzes, quizState.histories);
 
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
@@ -73,7 +80,7 @@ class ProfileScreen extends ConsumerWidget {
               if (!isGuest) ...[
                 SyncStatusPanel(
                   stats: stats,
-                  onSync: () => _syncQuizzes(context, ref, user),
+                  onSync: () => _syncQuizzes(context, user),
                 ),
                 const SizedBox(height: 16),
                 InsightsCard(
@@ -161,60 +168,39 @@ class ProfileScreen extends ConsumerWidget {
                 SignInBanner(
                   colorScheme: colorScheme,
                   isSignedIn: false,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SignInScreen(),
-                      ),
-                    );
-                  },
+                  onTap: () => context.push('/sign-in'),
                 ),
               ],
             ],
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => ProfileErrorState(
-          onRetry: () => ref.invalidate(quizNotifierProvider),
-        ),
       ),
     );
   }
 
-  Future<void> _syncQuizzes(
-    BuildContext context,
-    WidgetRef ref,
-    AppUser user,
-  ) async {
-    await ref.read(quizNotifierProvider.notifier).syncForUser(user.id);
-    if (context.mounted) {
-      showSnackBar(
-        context: context,
-        message: 'Quizzes synced successfully',
-      );
-    }
+  Future<void> _syncQuizzes(BuildContext context, AppUser user) async {
+    context.read<QuizBloc>().add(QuizSyncRequested(user.id));
+    showSnackBar(context: context, message: 'Sync started...');
   }
 
-  Future<void> _signOut(BuildContext context, WidgetRef ref) async {
+  Future<void> _signOut(BuildContext context) async {
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirm Sign Out?'),
-        content: Text("You'll no longer be able to sync your quizzes!"),
+        title: const Text('Confirm Sign Out?'),
+        content: const Text("You'll no longer be able to sync your quizzes!"),
         actions: [
           TextButton(
-            onPressed: () async {
-              await ref.read(authControllerProvider.notifier).signOut();
-              if (context.mounted) {
-                Navigator.popUntil(context, (route) => route.isFirst);
-              }
+            onPressed: () {
+              context.read<AuthBloc>().add(AuthSignOutRequested());
+              context.pop();
+              context.go('/');
             },
-            child: Text('Yes'),
+            child: const Text('Yes'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('No'),
+            onPressed: () => context.pop(),
+            child: const Text('No'),
           ),
         ],
       ),

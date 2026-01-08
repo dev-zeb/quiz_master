@@ -1,24 +1,26 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:quiz_master/core/config/strings.dart';
+import 'package:quiz_master/core/di/injection.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/utils/dialog_utils.dart';
-import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
-import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_editor_screen.dart';
+import 'package:quiz_master/features/auth/domain/repositories/auth_repository.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/ai_quiz_bloc.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/ai_quiz_event.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/ai_quiz_state.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_time_input_field.dart';
-import 'package:quiz_master/features/quiz/data/repositories/ai_quiz_repository_impl.dart';
 
-class QuizGenerateScreen extends ConsumerStatefulWidget {
+class QuizGenerateScreen extends StatefulWidget {
   const QuizGenerateScreen({super.key});
 
   @override
-  ConsumerState<QuizGenerateScreen> createState() => _GenerateQuizScreenState();
+  State<QuizGenerateScreen> createState() => _GenerateQuizScreenState();
 }
 
-class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
+class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
   final _formKey = GlobalKey<FormState>();
 
   final _textController = TextEditingController();
@@ -29,9 +31,7 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
 
   final _scrollController = ScrollController();
 
-  bool _isLoading = false;
   int _selectedTabIndex = 0;
-
   PlatformFile? _selectedFile;
 
   @override
@@ -48,139 +48,168 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
     final minutes = int.tryParse(_minutesController.text) ?? 0;
     final seconds = int.tryParse(_secondsController.text) ?? 0;
     final isTimeError = minutes == 0 && seconds == 0;
 
-    return Scaffold(
-      appBar: customAppBar(
-        context: context,
-        ref: ref,
-        title: 'Generate Quiz with AI',
-        hasBackButton: true,
-      ),
-      body: Stack(
-        children: [
-          Column(
-            children: [
-              Expanded(
-                child: Scrollbar(
-                  controller: _scrollController,
-                  interactive: true,
-                  scrollbarOrientation: ScrollbarOrientation.right,
-                  thickness: 6.0,
-                  thumbVisibility: true,
-                  child: SingleChildScrollView(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 4,
-                    ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildTabSection(colorScheme),
-                          const SizedBox(height: 8),
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 300),
-                            child: _selectedTabIndex == 0
-                                ? _buildTextInputSection(colorScheme)
-                                : _buildFileInputSection(colorScheme),
-                          ),
-                          const SizedBox(height: 8),
-                          _buildQuizConfigurationSection(
-                            colorScheme,
-                            isTimeError,
-                          ),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+    return BlocProvider<AiQuizBloc>(
+      create: (_) => getIt<AiQuizBloc>(),
+      child: BlocConsumer<AiQuizBloc, AiQuizState>(
+        listenWhen: (prev, cur) =>
+            prev.quiz != cur.quiz || prev.error != cur.error,
+        listener: (context, state) {
+          if (state.quiz != null) {
+            context.push('/editor', extra: state.quiz);
+            return;
+          }
+
+          if (state.error != null) {
+            final msg = _mapAiErrorToMessage(state.error!);
+            showSnackBar(
+              context: context,
+              message: msg,
+              backgroundColor: colorScheme.error,
+              textColor: colorScheme.onError,
+            );
+          }
+        },
+        builder: (context, aiState) {
+          return Scaffold(
+            appBar: customAppBar(
+              context: context,
+              title: 'Generate Quiz with AI',
+              hasBackButton: true,
+            ),
+            body: Stack(
+              children: [
+                Column(
                   children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFF667EEA),
-                            Color(0xFF764BA2),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(30),
-                        boxShadow: [
-                          BoxShadow(
-                            color:
-                                const Color(0xFF764BA2).withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Material(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(30),
-                        child: InkWell(
-                          onTap: _isLoading
-                              ? null
-                              : () => _generateQuiz(colorScheme),
-                          borderRadius: BorderRadius.circular(30),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 16,
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
+                    Expanded(
+                      child: Scrollbar(
+                        controller: _scrollController,
+                        interactive: true,
+                        scrollbarOrientation: ScrollbarOrientation.right,
+                        thickness: 6.0,
+                        thumbVisibility: true,
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 4),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                const Icon(
-                                  Icons.auto_awesome,
-                                  color: Colors.white,
-                                  size: 20,
+                                _buildTabSection(colorScheme),
+                                const SizedBox(height: 8),
+                                AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 300),
+                                  child: _selectedTabIndex == 0
+                                      ? _buildTextInputSection(colorScheme)
+                                      : _buildFileInputSection(colorScheme),
                                 ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'Generate quiz',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                const SizedBox(height: 8),
+                                _buildQuizConfigurationSection(
+                                    colorScheme, isTimeError),
+                                const SizedBox(height: 16),
                               ],
                             ),
                           ),
                         ),
                       ),
                     ),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF764BA2)
+                                      .withValues(alpha: 0.3),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(30),
+                              child: InkWell(
+                                onTap: aiState.isLoading
+                                    ? null
+                                    : () => _generateQuiz(context, colorScheme),
+                                borderRadius: BorderRadius.circular(30),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 32, vertical: 16),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.auto_awesome,
+                                          color: Colors.white, size: 20),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Generate quiz',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
                   ],
                 ),
-              ),
-              const SizedBox(height: 8),
-            ],
-          ),
-          if (_isLoading)
-            Container(
-              color: Colors.black.withValues(alpha: 0.2),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
+                if (aiState.isLoading)
+                  Container(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+              ],
             ),
-        ],
+          );
+        },
       ),
     );
   }
 
-  // --- UI pieces (unchanged from your version) ---
+  String _mapAiErrorToMessage(Object error) {
+    final s = error.toString();
+
+    if (s.contains('File too large')) return s;
+    if (s.contains('bytes were null')) {
+      return 'Could not read the file. Please re-pick it (or try a smaller PDF).';
+    }
+    if (s.toLowerCase().contains('timeout')) {
+      return 'AI generation is taking too long. Please try again or use a smaller file.';
+    }
+    if (s.contains('too large for the AI model')) {
+      return 'Document is too large. Try a smaller file or fewer pages.';
+    }
+
+    // During dev, this is helpful. In release, keep generic.
+    return 'Error generating quiz: $s';
+  }
+
+  // --- UI sections (unchanged from your version except where needed) ---
 
   Widget _buildTabSection(ColorScheme colorScheme) {
     return Card(
@@ -202,9 +231,7 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
           ),
           Container(
             margin: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-            ),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
             child: Row(
               children: [
                 Expanded(
@@ -212,11 +239,7 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
                     icon: Icons.text_fields_rounded,
                     label: 'Text',
                     isSelected: _selectedTabIndex == 0,
-                    onTap: () {
-                      setState(() {
-                        _selectedTabIndex = 0;
-                      });
-                    },
+                    onTap: () => setState(() => _selectedTabIndex = 0),
                     colorScheme: colorScheme,
                   ),
                 ),
@@ -225,11 +248,7 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
                     icon: Icons.attach_file_rounded,
                     label: 'File',
                     isSelected: _selectedTabIndex == 1,
-                    onTap: () {
-                      setState(() {
-                        _selectedTabIndex = 1;
-                      });
-                    },
+                    onTap: () => setState(() => _selectedTabIndex = 1),
                     colorScheme: colorScheme,
                   ),
                 ),
@@ -253,10 +272,7 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
         borderRadius: BorderRadius.circular(6),
         gradient: LinearGradient(
           colors: isSelected
-              ? const [
-                  Color(0xFF667EEA),
-                  Color(0xFF764BA2),
-                ]
+              ? const [Color(0xFF667EEA), Color(0xFF764BA2)]
               : [
                   colorScheme.primary.withValues(alpha: 0.25),
                   colorScheme.primary.withValues(alpha: 0.25),
@@ -270,18 +286,6 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
         borderRadius: BorderRadius.circular(6),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: colorScheme.primary.withValues(alpha: 0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 1),
-                    ),
-                  ]
-                : null,
-          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -301,7 +305,6 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
                   color: isSelected
                       ? colorScheme.onPrimaryContainer
                       : colorScheme.onSurfaceVariant,
-                  letterSpacing: -0.1,
                 ),
               ),
             ],
@@ -344,7 +347,6 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
                 ),
                 contentPadding: const EdgeInsets.all(16),
               ),
-              style: TextStyle(color: colorScheme.onSurface),
               validator: (value) {
                 if (_selectedTabIndex == 0) {
                   if (value == null || value.trim().isEmpty) {
@@ -451,11 +453,9 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
                 hintText:
                     'E.g. "Focus on React basics", "Make questions easy", etc.',
                 hintStyle: TextStyle(
-                  color: colorScheme.primary.withValues(alpha: 0.6),
-                ),
+                    color: colorScheme.primary.withValues(alpha: 0.6)),
                 contentPadding: const EdgeInsets.all(16),
               ),
-              style: TextStyle(color: colorScheme.onSurface),
             ),
           ],
         ),
@@ -467,21 +467,11 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [
-            Color(0xFF667EEA),
-            Color(0xFF764BA2),
-          ],
+          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF764BA2).withValues(alpha: 0.3),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -490,18 +480,11 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
           onTap: _pickFile,
           borderRadius: BorderRadius.circular(30),
           child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 8,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(
-                  Icons.attach_file,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                const Icon(Icons.attach_file, color: Colors.white, size: 20),
                 const SizedBox(width: 8),
                 Text(
                   _selectedFile != null ? 'Change File' : 'Choose File',
@@ -520,9 +503,7 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
   }
 
   Widget _buildQuizConfigurationSection(
-    ColorScheme colorScheme,
-    bool isTimeError,
-  ) {
+      ColorScheme colorScheme, bool isTimeError) {
     return Card(
       color: colorScheme.surfaceContainer,
       elevation: 3,
@@ -541,21 +522,11 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
             ),
             const SizedBox(height: 16),
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.quiz,
-                  color: colorScheme.primary,
-                  size: 20,
-                ),
+                Icon(Icons.quiz, color: colorScheme.primary, size: 20),
                 const SizedBox(width: 8),
-                Text(
-                  'Number of questions',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: colorScheme.primary,
-                  ),
-                ),
+                Text('Number of questions',
+                    style: TextStyle(fontSize: 16, color: colorScheme.primary)),
                 const Spacer(),
                 SizedBox(
                   width: 50,
@@ -565,29 +536,20 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: colorScheme.primary,
-                          width: 0.5,
-                        ),
+                        borderSide:
+                            BorderSide(color: colorScheme.primary, width: 0.5),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: colorScheme.primary,
-                          width: 1.0,
-                        ),
+                        borderSide:
+                            BorderSide(color: colorScheme.primary, width: 1.0),
                       ),
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(
-                        vertical: 4,
-                        horizontal: 4,
-                      ),
+                          vertical: 4, horizontal: 4),
                     ),
-                    style: TextStyle(color: colorScheme.primary),
                     validator: (value) {
                       final n = int.tryParse(value ?? '') ?? 0;
-                      if (n <= 0) {
-                        return 'Enter a number';
-                      }
+                      if (n <= 0) return 'Enter a number';
                       return null;
                     },
                   ),
@@ -596,13 +558,8 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
             ),
             const SizedBox(height: 20),
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.timer,
-                  color: colorScheme.primary,
-                  size: 20,
-                ),
+                Icon(Icons.timer, color: colorScheme.primary, size: 20),
                 const SizedBox(width: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -628,16 +585,12 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
                 QuizTimeInputField(
                   label: 'min',
                   textEditingController: _minutesController,
-                  onChanged: (_) {
-                    setState(() {});
-                  },
+                  onChanged: (_) => setState(() {}),
                 ),
                 QuizTimeInputField(
                   label: 'sec',
                   textEditingController: _secondsController,
-                  onChanged: (_) {
-                    setState(() {});
-                  },
+                  onChanged: (_) => setState(() {}),
                 ),
               ],
             ),
@@ -646,8 +599,6 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
       ),
     );
   }
-
-  // --- Actions ---
 
   Future<void> _pickFile() async {
     try {
@@ -658,23 +609,17 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
         allowedExtensions: ['pdf', 'doc', 'docx', 'txt'],
       );
       if (result != null && result.files.isNotEmpty) {
-        setState(() {
-          _selectedFile = result.files.first;
-        });
+        setState(() => _selectedFile = result.files.first);
       }
     } catch (e) {
-      debugPrint('File pick error: $e');
-      if (mounted) {
-        showSnackBar(
-          context: context,
-          message: 'Failed to pick file: $e',
-        );
-      }
+      if (!mounted) return;
+      showSnackBar(context: context, message: 'Failed to pick file: $e');
     }
   }
 
-  Future<void> _generateQuiz(ColorScheme colorScheme) async {
-    final currentUser = ref.read(currentUserProvider);
+  Future<void> _generateQuiz(
+      BuildContext blocContext, ColorScheme colorScheme) async {
+    final currentUser = getIt<AuthRepository>().currentUser;
 
     final minutes = int.tryParse(_minutesController.text) ?? 0;
     final seconds = int.tryParse(_secondsController.text) ?? 0;
@@ -688,31 +633,7 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
       return;
     }
 
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    if (_selectedTabIndex == 1) {
-      if (_selectedFile == null || _selectedFile!.bytes == null) {
-        showSnackBar(
-          context: context,
-          message: 'Please select a file.',
-          backgroundColor: colorScheme.error,
-          textColor: colorScheme.onError,
-        );
-        return;
-      }
-    } else {
-      if (_textController.text.trim().isEmpty) {
-        showSnackBar(
-          context: context,
-          message: 'Please enter some text.',
-          backgroundColor: colorScheme.error,
-          textColor: colorScheme.onError,
-        );
-        return;
-      }
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     final numQuestions = int.tryParse(_numQuestionsController.text.trim()) ?? 0;
     if (numQuestions <= 0) {
@@ -726,69 +647,50 @@ class _GenerateQuizScreenState extends ConsumerState<QuizGenerateScreen> {
     }
 
     final durationSeconds = (minutes * 60) + seconds;
-    final aiRepo = ref.read(aiQuizRepositoryProvider);
 
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      late final Quiz quiz;
-
-      if (_selectedTabIndex == 1) {
-        final file = _selectedFile!;
-        final bytes = file.bytes;
-        if (bytes == null) {
-          throw Exception('Selected file has no data.');
-        }
-
-        quiz = await aiRepo.generateQuizFromFile(
-          bytes: bytes,
-          filename: file.name,
-          numQuestions: numQuestions,
-          userId: currentUser?.id,
-          durationSeconds: durationSeconds,
-          extraInstructions: _extraInfoController.text.trim().isEmpty
-              ? null
-              : _extraInfoController.text.trim(),
-        );
-      } else {
-        quiz = await aiRepo.generateQuizFromText(
-          text: _textController.text.trim(),
-          numQuestions: numQuestions,
-          userId: currentUser?.id,
-          durationSeconds: durationSeconds,
-        );
-      }
-
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => QuizEditorScreen(quiz: quiz),
-          ),
-        );
-      }
-    } catch (e, stk) {
-      debugPrint('Generate quiz error: $e');
-      debugPrint('Stack: $stk');
-      if (mounted) {
-        final msg = e.toString().contains('too large for the AI model')
-            ? 'Document is too large. Try a smaller file or fewer pages.'
-            : 'Error generating quiz. Please try again later.';
+    if (_selectedTabIndex == 1) {
+      final file = _selectedFile;
+      if (file == null) {
         showSnackBar(
           context: context,
-          message: msg,
+          message: 'Please select a file.',
           backgroundColor: colorScheme.error,
           textColor: colorScheme.onError,
         );
+        return;
       }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
+
+      blocContext.read<AiQuizBloc>().add(
+            AiQuizGenerateFromFileRequested(
+              file: file,
+              numQuestions: numQuestions,
+              userId: currentUser?.id,
+              durationSeconds: durationSeconds,
+              extraInstructions: _extraInfoController.text.trim().isEmpty
+                  ? null
+                  : _extraInfoController.text.trim(),
+            ),
+          );
+    } else {
+      final text = _textController.text.trim();
+      if (text.isEmpty) {
+        showSnackBar(
+          context: context,
+          message: 'Please enter some text.',
+          backgroundColor: colorScheme.error,
+          textColor: colorScheme.onError,
+        );
+        return;
       }
+
+      blocContext.read<AiQuizBloc>().add(
+            AiQuizGenerateFromTextRequested(
+              text: text,
+              numQuestions: numQuestions,
+              userId: currentUser?.id,
+              durationSeconds: durationSeconds,
+            ),
+          );
     }
   }
 }

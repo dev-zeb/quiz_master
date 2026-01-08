@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:quiz_master/core/ui/widgets/badge_item.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz_history.dart';
-import 'package:quiz_master/features/quiz/presentation/screens/quiz_history_detail.dart';
 
 class QuizHistoryListItem extends StatelessWidget {
   final QuizHistory quizHistory;
@@ -24,11 +24,9 @@ class QuizHistoryListItem extends StatelessWidget {
       elevation: 2,
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => QuizHistoryDetail(quizHistory: quizHistory),
-            ),
+          context.push(
+            '/history/detail',
+            extra: quizHistory,
           );
         },
         child: Padding(

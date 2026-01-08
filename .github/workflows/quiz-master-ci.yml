@@ -1,0 +1,39 @@
+name: Quiz-Master CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.27.3
+
+      - name: Install dependencies
+        run: flutter clean && flutter pub get
+      
+      - name: Create .env file with placeholder values
+        run: |
+          cat > .env << EOF
+          # Required environment variables for CI
+          BASE_URL=http://10.0.2.2:8000
+          EOF
+          
+      - name: 🔎 Run Static Analysis
+        run: flutter analyze
+
+      - name: ⚙️ Build for Android
+        run: flutter build apk  --debug

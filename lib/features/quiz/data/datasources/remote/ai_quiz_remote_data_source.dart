@@ -1,18 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
-
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:quiz_master/core/config/backend_config.dart';
-
-final httpClientProvider = Provider<http.Client>((ref) {
-  return http.Client();
-});
-
-final aiQuizRemoteDataSourceProvider = Provider<AiQuizRemoteDataSource>((ref) {
-  final client = ref.watch(httpClientProvider);
-  return AiQuizRemoteDataSource(client);
-});
 
 class AiQuizRemoteDataSource {
   final http.Client _client;
@@ -32,9 +21,7 @@ class AiQuizRemoteDataSource {
 
     final resp = await _client.post(
       uri,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: {'Content-Type': 'application/json'},
       body: jsonEncode(body),
     );
 
@@ -61,11 +48,7 @@ class AiQuizRemoteDataSource {
     }
 
     request.files.add(
-      http.MultipartFile.fromBytes(
-        'file',
-        bytes,
-        filename: filename,
-      ),
+      http.MultipartFile.fromBytes('file', bytes, filename: filename),
     );
 
     final streamed = await _client.send(request);

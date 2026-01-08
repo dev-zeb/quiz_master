@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quiz_master/features/auth/domain/entities/app_user.dart';
-import 'package:quiz_master/features/auth/presentation/screens/profile_screen.dart';
-import 'package:quiz_master/features/auth/presentation/widgets/user_profile_chip.dart';
 
+import '../../../features/auth/domain/entities/app_user.dart';
+import '../../../features/auth/presentation/screens/profile_screen.dart';
+import '../../../features/auth/presentation/widgets/user_profile_chip.dart';
 import 'app_bar_back_button.dart';
 
 AppBar customAppBar({
   required BuildContext context,
-  required WidgetRef? ref,
   required String title,
   bool hasBackButton = false,
   bool hasSettingsButton = false,

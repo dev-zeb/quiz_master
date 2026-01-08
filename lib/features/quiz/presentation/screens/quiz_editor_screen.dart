@@ -1,32 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:quiz_master/core/config/strings.dart';
+import 'package:quiz_master/core/di/injection.dart';
 import 'package:quiz_master/core/ui/widgets/custom_app_bar.dart';
 import 'package:quiz_master/core/ui/widgets/scroll_to_button.dart';
 import 'package:quiz_master/core/utils/dialog_utils.dart';
-import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:quiz_master/features/auth/domain/repositories/auth_repository.dart';
 import 'package:quiz_master/features/quiz/domain/entities/question.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
-import 'package:quiz_master/features/quiz/presentation/providers/quiz_provider.dart';
-import 'package:quiz_master/features/quiz/presentation/widgets/quiz_text_field.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_bloc.dart';
+import 'package:quiz_master/features/quiz/presentation/bloc/quiz_event.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/question_card.dart';
-import 'package:quiz_master/features/quiz/presentation/widgets/quiz_outlined_button.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_form_question_item.dart';
+import 'package:quiz_master/core/ui/widgets/circular_border_button.dart';
+import 'package:quiz_master/features/quiz/presentation/widgets/quiz_text_field.dart';
 import 'package:quiz_master/features/quiz/presentation/widgets/quiz_time_input_field.dart';
 
-class QuizEditorScreen extends ConsumerStatefulWidget {
+class QuizEditorScreen extends StatefulWidget {
   final Quiz? quiz;
 
-  const QuizEditorScreen({
-    super.key,
-    this.quiz,
-  });
+  const QuizEditorScreen({super.key, this.quiz});
 
   @override
-  ConsumerState<QuizEditorScreen> createState() => _QuizEditorScreenState();
+  State<QuizEditorScreen> createState() => _QuizEditorScreenState();
 }
 
-class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
+class _QuizEditorScreenState extends State<QuizEditorScreen> {
   final _titleController = TextEditingController();
   final _minutesController = TextEditingController();
   final _secondsController = TextEditingController();
@@ -34,18 +33,23 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
   final GlobalKey<FormFieldState<String>> _titleFieldKey =
       GlobalKey<FormFieldState<String>>();
   final FocusNode _titleFocusNode = FocusNode();
+
   final List<GlobalKey<QuizFormQuestionItemState>> _questionKeys = [];
   final List<GlobalKey> _questionContainerKeys = [];
   final List<QuizFormQuestionItem> _questions = [];
+
   final _scrollController = ScrollController();
+
   bool _showScrollDownButton = false;
+  bool _showScrollUpButton = false;
 
   Quiz? editingQuiz;
 
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_checkLastQuestionVisibility);
+    _scrollController.addListener(_checkScrollButtons);
+
     if (widget.quiz == null) {
       _initializeNewQuizValues();
     } else {
@@ -56,9 +60,11 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
   @override
   void dispose() {
     _titleController.dispose();
+    _minutesController.dispose();
+    _secondsController.dispose();
     _titleFocusNode.dispose();
     _scrollController
-      ..removeListener(_checkLastQuestionVisibility)
+      ..removeListener(_checkScrollButtons)
       ..dispose();
     super.dispose();
   }
@@ -66,6 +72,7 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+
     final minutes = int.tryParse(_minutesController.text) ?? 0;
     final seconds = int.tryParse(_secondsController.text) ?? 0;
     final isTimeError = minutes == 0 && seconds == 0;
@@ -73,7 +80,6 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
     return Scaffold(
       appBar: customAppBar(
         context: context,
-        ref: ref,
         title: editingQuiz == null
             ? AppStrings.addNewQuizPageTitle
             : AppStrings.updateQuizPageTitle,
@@ -92,10 +98,8 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                   thumbVisibility: true,
                   child: SingleChildScrollView(
                     controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 4,
-                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -106,11 +110,7 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                             focusNode: _titleFocusNode,
                             hintText: AppStrings.quizTitle,
                             textEditingController: _titleController,
-                            onChanged: (_) {
-                              if (_formKey.currentState != null) {
-                                _formKey.currentState!.validate();
-                              }
-                            },
+                            onChanged: (_) => _formKey.currentState?.validate(),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
                                 return AppStrings.pleaseEnterQuizTitle;
@@ -118,7 +118,7 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                               return null;
                             },
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -136,27 +136,22 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                                     Text(
                                       AppStrings.pleaseEnterValidTimeDuration,
                                       style: TextStyle(
-                                        color:
-                                            Theme.of(context).colorScheme.error,
+                                        color: colorScheme.error,
                                         fontSize: 12,
                                       ),
                                     ),
                                 ],
                               ),
-                              Spacer(),
+                              const Spacer(),
                               QuizTimeInputField(
                                 label: 'min',
                                 textEditingController: _minutesController,
-                                onChanged: (_) {
-                                  setState(() {});
-                                },
+                                onChanged: (_) => setState(() {}),
                               ),
                               QuizTimeInputField(
                                 label: 'sec',
                                 textEditingController: _secondsController,
-                                onChanged: (_) {
-                                  setState(() {});
-                                },
+                                onChanged: (_) => setState(() {}),
                               ),
                             ],
                           ),
@@ -166,13 +161,13 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
                             style: TextStyle(color: colorScheme.primary),
                           ),
                           const SizedBox(height: 10),
-                          ..._questions.asMap().entries.map((question) {
-                            final index = question.key;
+                          ..._questions.asMap().entries.map((entry) {
+                            final index = entry.key;
                             return QuestionCard(
                               globalKey: _questionContainerKeys[index],
                               questionIndex: index,
                               isDeleteButtonEnable: _questions.length > 1,
-                              quizFormQuestionItem: question.value,
+                              quizFormQuestionItem: entry.value,
                               onDeleteButtonPress: () => _removeQuestion(index),
                             );
                           }),
@@ -213,85 +208,64 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
             isVisible: _showScrollUpButton,
             iconData: Icons.arrow_upward,
             bottomPosition: _showScrollDownButton ? 140 : 80,
-            onTap: () {
-              _scrollController.animateTo(
-                0,
-                duration: const Duration(milliseconds: 750),
-                curve: Curves.easeOut,
-              );
-            },
+            onTap: () => _scrollController.animateTo(
+              0,
+              duration: const Duration(milliseconds: 750),
+              curve: Curves.easeOut,
+            ),
           ),
           ScrollToButton(
             scrollController: _scrollController,
             isVisible: _showScrollDownButton,
             iconData: Icons.arrow_downward,
             bottomPosition: 80,
-            onTap: () {
-              _scrollController.animateTo(
-                _scrollController.position.maxScrollExtent,
-                duration: const Duration(milliseconds: 750),
-                curve: Curves.easeOut,
-              );
-            },
+            onTap: () => _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 750),
+              curve: Curves.easeOut,
+            ),
           ),
         ],
       ),
     );
   }
 
-  _initializeNewQuizValues() {
+  void _initializeNewQuizValues() {
     _minutesController.text = '02';
     _secondsController.text = '00';
-
     _addNewQuestion();
   }
 
-  _initializeExistingQuizValues() {
+  void _initializeExistingQuizValues() {
     editingQuiz = widget.quiz;
-
     if (editingQuiz == null) return;
 
     _titleController.text = editingQuiz!.title;
 
-    int minutes = editingQuiz!.durationSeconds ~/ 60;
-    int seconds = editingQuiz!.durationSeconds % 60;
+    final minutes = editingQuiz!.durationSeconds ~/ 60;
+    final seconds = editingQuiz!.durationSeconds % 60;
 
     _minutesController.text = minutes.toString();
     _secondsController.text = seconds.toString();
 
-    for (var question in editingQuiz!.questions) {
-      final questionKey = GlobalKey<QuizFormQuestionItemState>();
-
-      _questionKeys.add(questionKey);
+    for (final q in editingQuiz!.questions) {
+      final key = GlobalKey<QuizFormQuestionItemState>();
+      _questionKeys.add(key);
       _questionContainerKeys.add(GlobalKey());
-      _questions.add(
-        QuizFormQuestionItem(
-          key: questionKey,
-          question: question,
-        ),
-      );
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 750),
-          curve: Curves.easeOut,
-        );
-      });
+      _questions.add(QuizFormQuestionItem(key: key, question: q));
     }
   }
 
   void _addNewQuestion() {
     setState(() {
-      _questionKeys.add(GlobalKey<QuizFormQuestionItemState>());
+      final key = GlobalKey<QuizFormQuestionItemState>();
+      _questionKeys.add(key);
       _questionContainerKeys.add(GlobalKey());
-      _questions.add(
-        QuizFormQuestionItem(
-          key: _questionKeys.last,
-        ),
-      );
+      _questions.add(QuizFormQuestionItem(key: key));
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
         duration: const Duration(milliseconds: 750),
@@ -302,20 +276,16 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
 
   void _removeQuestion(int index) {
     if (_questions.length <= 1) return;
-
     setState(() {
       _questions.removeAt(index);
       _questionKeys.removeAt(index);
       _questionContainerKeys.removeAt(index);
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkLastQuestionVisibility();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _checkScrollButtons());
   }
 
-  bool _showScrollUpButton = false;
-
-  void _checkLastQuestionVisibility() {
+  void _checkScrollButtons() {
+    if (!_scrollController.hasClients) return;
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
 
@@ -325,126 +295,98 @@ class _QuizEditorScreenState extends ConsumerState<QuizEditorScreen> {
     });
   }
 
-  Future<void> _submitQuiz(colorScheme) async {
-    try {
-      final currentUser = ref.read(currentUserProvider);
-      final minutes = int.tryParse(_minutesController.text) ?? 0;
-      final seconds = int.tryParse(_secondsController.text) ?? 0;
-      if (minutes == 0 && seconds == 0) {
-        showSnackBar(
-          context: context,
-          message: AppStrings.pleaseEnterValidTimeDuration,
-          backgroundColor: colorScheme.error,
-          textColor: colorScheme.onError,
-        );
+  Future<void> _submitQuiz(ColorScheme colorScheme) async {
+    final currentUser = getIt<AuthRepository>().currentUser;
+
+    final minutes = int.tryParse(_minutesController.text) ?? 0;
+    final seconds = int.tryParse(_secondsController.text) ?? 0;
+    if (minutes == 0 && seconds == 0) {
+      showSnackBar(
+        context: context,
+        message: AppStrings.pleaseEnterValidTimeDuration,
+        backgroundColor: colorScheme.error,
+        textColor: colorScheme.onError,
+      );
+      return;
+    }
+
+    if (!_formKey.currentState!.validate()) {
+      _scrollToKey(_titleFieldKey);
+      _titleFocusNode.requestFocus();
+      return;
+    }
+
+    if (_questionKeys.isEmpty) {
+      showSnackBar(
+        context: context,
+        message: AppStrings.pleaseAddAtLeastOneQuestion,
+      );
+      return;
+    }
+
+    final questions = <Question>[];
+    for (int i = 0; i < _questionKeys.length; i++) {
+      final question = _questionKeys[i].currentState?.getQuestion();
+      if (question == null) {
+        _scrollToKey(_questionContainerKeys[i]);
         return;
       }
+      questions.add(question);
+    }
 
-      if (!_formKey.currentState!.validate()) {
-        _scrollToField(_titleFieldKey);
-        _titleFocusNode.requestFocus();
-        return;
-      }
+    final totalDurationInSeconds = (minutes * 60) + seconds;
+    final userId = currentUser?.id ?? editingQuiz?.userId;
 
-      if (_questions.isEmpty) {
-        showSnackBar(
-          context: context,
-          message: AppStrings.pleaseAddAtLeastOneQuestion,
-        );
-        return;
-      }
+    if (editingQuiz == null) {
+      final newQuiz = Quiz(
+        id: UniqueKey().toString(),
+        title: _titleController.text.trim(),
+        questions: questions,
+        durationSeconds: totalDurationInSeconds,
+        userId: userId,
+        lastSyncedAt: DateTime.now(),
+        syncStatus: SyncStatus.pending,
+      );
 
-      final questions = <Question>[];
-      for (var i = 0; i < _questions.length; i++) {
-        final question = _questionKeys[i].currentState?.getQuestion();
-        if (question == null) {
-          _scrollToQuestion(i);
-          return;
-        }
-        questions.add(question);
-      }
+      context.read<QuizBloc>().add(QuizAdded(newQuiz));
+      setState(() => editingQuiz = newQuiz);
 
-      int totalDurationInSeconds = (minutes * 60) + seconds;
-
-      final userId = currentUser?.id ?? editingQuiz?.userId;
-
-      if (editingQuiz == null) {
-        final newQuiz = Quiz(
-          id: UniqueKey().toString(),
-          title: _titleController.text.trim(),
-          questions: questions,
-          durationSeconds: totalDurationInSeconds,
-          userId: userId,
-          lastSyncedAt: DateTime.now(),
-          syncStatus: SyncStatus.pending,
-        );
-
-        await ref.read(quizNotifierProvider.notifier).addQuiz(newQuiz);
-
-        setState(() {
-          editingQuiz = newQuiz;
-        });
-
-        if (mounted) {
-          showSnackBar(
-            context: context,
-            message: AppStrings.successfullySavedQuiz,
-          );
-        }
-      } else {
-        final updatedQuiz = editingQuiz?.copyWith(
-          title: _titleController.text.trim(),
-          questions: questions,
-          durationSeconds: totalDurationInSeconds,
-          userId: userId,
-          lastSyncedAt: DateTime.now(),
-          syncStatus: SyncStatus.pending,
-        );
-        if (updatedQuiz == null) {
-          showSnackBar(
-            context: context,
-            message: AppStrings.quizCouldNotBeUpdated,
-          );
-          return;
-        }
-        await ref.read(quizNotifierProvider.notifier).updateQuiz(updatedQuiz);
-
-        setState(() {
-          editingQuiz = updatedQuiz;
-        });
-
-        if (mounted) {
-          showSnackBar(
-            context: context,
-            message: AppStrings.successfullyUpdatedQuiz,
-          );
-        }
-      }
-    } catch (err, stk) {
-      debugPrint("Error: $err");
-      debugPrint("Stack: $stk");
       if (mounted) {
         showSnackBar(
           context: context,
-          message: 'Error: ${err.toString()}',
+          message: AppStrings.successfullySavedQuiz,
+        );
+      }
+    } else {
+      final updatedQuiz = editingQuiz!.copyWith(
+        title: _titleController.text.trim(),
+        questions: questions,
+        durationSeconds: totalDurationInSeconds,
+        userId: userId,
+        lastSyncedAt: DateTime.now(),
+        syncStatus: SyncStatus.pending,
+      );
+
+      context.read<QuizBloc>().add(QuizUpdated(updatedQuiz));
+      setState(() => editingQuiz = updatedQuiz);
+
+      if (mounted) {
+        showSnackBar(
+          context: context,
+          message: AppStrings.successfullyUpdatedQuiz,
         );
       }
     }
   }
 
-  void _scrollToField(GlobalKey key) {
-    final context = key.currentContext;
-    if (context == null) return;
+  void _scrollToKey(GlobalKey key) {
+    final ctx = key.currentContext;
+    if (ctx == null) return;
     Scrollable.ensureVisible(
-      context,
+      ctx,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
       alignment: 0.1,
     );
-  }
-
-  void _scrollToQuestion(int index) {
-    if (index < 0 || index >= _questionContainerKeys.length) return;
-    _scrollToField(_questionContainerKeys[index]);
   }
 }

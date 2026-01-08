@@ -14,21 +14,20 @@ class QuizHistoryDetail extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final formattedDate = DateFormat('MMM d, y').format(quizHistory.playedAt);
     final formattedTime = DateFormat('hh:mm a').format(quizHistory.playedAt);
-    int index = 0;
+
     return Scaffold(
       appBar: customAppBar(
         context: context,
-        ref: null,
         title: 'Quiz Play Details',
         hasBackButton: true,
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               RichText(
                 text: TextSpan(
                   children: [
@@ -51,7 +50,7 @@ class QuizHistoryDetail extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Row(
                 children: [
                   Text(
@@ -62,7 +61,7 @@ class QuizHistoryDetail extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
                     '$formattedDate at $formattedTime',
                     style: TextStyle(
@@ -73,7 +72,7 @@ class QuizHistoryDetail extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 12),
+              const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: Text(
@@ -90,19 +89,20 @@ class QuizHistoryDetail extends StatelessWidget {
                 height: 1,
                 width: double.infinity,
               ),
-              SizedBox(height: 16),
-              ...quizHistory.questions.map((question) {
+              const SizedBox(height: 16),
+              ...List.generate(quizHistory.questions.length, (index) {
+                final question = quizHistory.questions[index];
                 final selectedAnswer = quizHistory.selectedAnswers[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12.0),
                   child: QuizHistoryQuestionItem(
                     question: question,
-                    questionIndex: index++,
+                    questionIndex: index,
                     selectedAnswer: selectedAnswer,
                   ),
                 );
               }),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
             ],
           ),
         ),

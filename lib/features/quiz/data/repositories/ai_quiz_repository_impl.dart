@@ -1,13 +1,8 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:typed_data';
 import 'package:quiz_master/features/quiz/data/datasources/remote/ai_quiz_remote_data_source.dart';
 import 'package:quiz_master/features/quiz/domain/entities/question.dart';
 import 'package:quiz_master/features/quiz/domain/entities/quiz.dart';
 import 'package:quiz_master/features/quiz/domain/repositories/ai_quiz_repository.dart';
-
-final aiQuizRepositoryProvider = Provider<AiQuizRepository>((ref) {
-  final remote = ref.watch(aiQuizRemoteDataSourceProvider);
-  return AiQuizRepositoryImpl(remote);
-});
 
 class AiQuizRepositoryImpl implements AiQuizRepository {
   final AiQuizRemoteDataSource _remote;
@@ -25,6 +20,7 @@ class AiQuizRepositoryImpl implements AiQuizRepository {
       text: text,
       numQuestions: numQuestions,
     );
+
     return _mapApiResponseToQuiz(
       quizJson: json,
       userId: userId,
@@ -42,11 +38,12 @@ class AiQuizRepositoryImpl implements AiQuizRepository {
     String? extraInstructions,
   }) async {
     final json = await _remote.generateFromFile(
-      bytes: bytes as dynamic, // List<int> is Uint8List-compatible
+      bytes: Uint8List.fromList(bytes),
       filename: filename,
       numQuestions: numQuestions,
       extraInstructions: extraInstructions,
     );
+
     return _mapApiResponseToQuiz(
       quizJson: json,
       userId: userId,

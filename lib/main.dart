@@ -1,69 +1,85 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:quiz_master/core/config/hive_init.dart';
-import 'package:quiz_master/core/config/theme/app_themes.dart';
-import 'package:quiz_master/core/config/theme/theme_provider.dart';
-import 'package:quiz_master/core/firebase/firebase_initializer.dart';
-import 'package:quiz_master/core/ui/screens/start_screen.dart';
-import 'package:quiz_master/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:go_router/go_router.dart';
 
-// TODO:
-// [-] Fix routing navigation.
-// [-] Modify the UIs of the quiz add and quiz play screens.
-// [-] Integrate Firebase and FireStore for auth and quiz storage.
-// [-] Integrate AI Quiz maker from text.
+import 'core/config/hive_init.dart';
+import 'core/config/theme/app_themes.dart';
+import 'core/config/theme/bloc/theme_bloc.dart';
+import 'core/config/theme/bloc/theme_event.dart';
+import 'core/config/theme/bloc/theme_state.dart';
+import 'core/di/injection.dart';
+import 'core/firebase/firebase_initializer.dart';
+import 'core/router/app_router.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/quiz/presentation/bloc/quiz_bloc.dart';
+import 'features/quiz/presentation/bloc/quiz_event.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await initializeHive();
   await initializeFirebase();
 
-  // Load .env file
   await dotenv.load(fileName: '.env');
+  await configureDependencies();
 
-  runApp(
-    const ProviderScope(
-      child: QuizMaster(),
-    ),
-  );
+  runApp(const QuizMasterApp());
 }
 
-class QuizMaster extends ConsumerWidget {
-  const QuizMaster({super.key});
+class QuizMasterApp extends StatefulWidget {
+  const QuizMasterApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final themeData = ref.watch(themeProvider);
+  State<QuizMasterApp> createState() => _QuizMasterAppState();
+}
 
-    return MaterialApp(
-      title: 'Quiz Master',
-      debugShowCheckedModeBanner: false,
-      darkTheme: AppThemes.darkTheme,
-      theme: themeData,
-      home: const AuthGate(),
-    );
+class _QuizMasterAppState extends State<QuizMasterApp> {
+  late final AuthBloc _authBloc;
+  late final ThemeBloc _themeBloc;
+  late final QuizBloc _quizBloc;
+  late final GoRouter _router;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Create blocs once (important so router & UI don’t end up with different instances)
+    _authBloc = getIt<AuthBloc>();
+    _themeBloc = getIt<ThemeBloc>()..add(ThemeBootstrapped());
+    _quizBloc = getIt<QuizBloc>()..add(QuizBootstrapped());
+
+    // Create router once (critical: DO NOT recreate GoRouter on theme rebuilds)
+    _router = createAppRouter(_authBloc);
   }
-}
-
-class AuthGate extends ConsumerWidget {
-  const AuthGate({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authControllerProvider);
+  void dispose() {
+    _authBloc.close();
+    _themeBloc.close();
+    _quizBloc.close();
+    super.dispose();
+  }
 
-    return authState.when(
-      data: (_) => const StartScreen(),
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthBloc>.value(value: _authBloc),
+        BlocProvider<ThemeBloc>.value(value: _themeBloc),
+        BlocProvider<QuizBloc>.value(value: _quizBloc),
+      ],
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, themeState) {
+          return MaterialApp.router(
+            title: 'Quiz Master',
+            debugShowCheckedModeBanner: false,
+            theme: themeState.themeData,
+            darkTheme: AppThemes.darkTheme,
+            routerConfig: _router,
+          );
+        },
       ),
-      error: (error, stackTrace) {
-        debugPrint('Authentication error: $error');
-        debugPrintStack(stackTrace: stackTrace);
-        return const StartScreen();
-      },
     );
   }
 }
