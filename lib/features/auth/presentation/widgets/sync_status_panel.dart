@@ -83,7 +83,10 @@ class SyncStatusPanel extends StatelessWidget {
                   message: 'Sync now',
                   child: IconButton(
                     onPressed: onSync,
-                    icon: Icon(Icons.sync, size: 28,),
+                    icon: Icon(
+                      Icons.sync,
+                      size: 28,
+                    ),
                   ),
                 ),
               ],
