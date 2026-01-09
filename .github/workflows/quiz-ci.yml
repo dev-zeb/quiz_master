@@ -1,4 +1,4 @@
-name: Quiz-Master CI (Flutter)
+name: Quiz-Master CI (Run tests & Build debug APK)
 
 on:
   push:

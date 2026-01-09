@@ -1,4 +1,4 @@
-name: CD (Flutter Android Release)
+name: Quiz-Master CD (Test and Build Android Release)
 
 on:
   push:
@@ -78,7 +78,7 @@ jobs:
           storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
           keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
-          storeFile=app/quiz_master.jks
+          storeFile=quiz_master.jks
           EOF
 
       - name: Install dependencies
