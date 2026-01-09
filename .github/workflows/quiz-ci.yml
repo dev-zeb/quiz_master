@@ -1,4 +1,4 @@
-name: CI (Flutter)
+name: Quiz-Master CI (Run tests & Build debug APK)
 
 on:
   push:
@@ -101,6 +101,11 @@ jobs:
           cat > .env << EOF
           BASE_URL=http://localhost
           EOF
+
+      - name: Restore google-services.json
+        run: |
+          mkdir -p android/app
+          echo "${{ secrets.ANDROID_GOOGLE_SERVICES_JSON_B64 }}" | base64 --decode > android/app/google-services.json
 
       - name: Install dependencies
         run: flutter pub get
