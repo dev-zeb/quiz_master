@@ -29,10 +29,7 @@ class ClickableTextWidget extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12.0,
-            vertical: 4,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
           child: Text(
             text,
             style: TextStyle(

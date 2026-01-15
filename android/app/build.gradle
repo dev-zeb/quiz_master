@@ -1,6 +1,6 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
+    id "org.jetbrains.kotlin.android"
     id "com.google.gms.google-services"
     id "dev.flutter.flutter-gradle-plugin"
 }
@@ -12,34 +12,37 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.dev_zeb_tech.quiz_master"
-    compileSdk = 35
+    namespace "com.dev_zeb_tech.quiz_master"
 
-    ndkVersion = flutter.ndkVersion
+    // Keep 35 if you want; bump to 36 only if Play/plugins require it
+    compileSdkVersion 35
 
+    ndkVersion flutter.ndkVersion
+
+    // ✅ Use Java 17 (recommended for modern Flutter/AGP toolchains)
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     defaultConfig {
         applicationId "com.dev_zeb_tech.quiz_master"
-        minSdk = 24
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        minSdkVersion 24
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
     }
 
     signingConfigs {
         release {
-            keyAlias = keystoreProperties["keyAlias"]
-            keyPassword = keystoreProperties["keyPassword"]
-            storeFile = keystoreProperties["storeFile"] ? file(keystoreProperties["storeFile"]) : null
-            storePassword = keystoreProperties["storePassword"]
+            keyAlias keystoreProperties["keyAlias"]
+            keyPassword keystoreProperties["keyPassword"]
+            storeFile keystoreProperties["storeFile"] ? file(keystoreProperties["storeFile"]) : null
+            storePassword keystoreProperties["storePassword"]
         }
     }
 
@@ -48,8 +51,7 @@ android {
             minifyEnabled true
             shrinkResources true
 
-            proguardFiles getDefaultProguardFile(
-                    'proguard-android-optimize.txt'),
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
                     'proguard-rules.pro'
 
             signingConfig signingConfigs.release
@@ -60,12 +62,11 @@ android {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "com.google.android.material:material:1.12.0"
     implementation platform('com.google.firebase:firebase-bom:34.5.0')
     implementation 'com.google.firebase:firebase-auth'
 }
 
 flutter {
-    source = "../.."
+    source "../.."
 }

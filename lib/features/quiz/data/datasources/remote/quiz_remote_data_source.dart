@@ -4,10 +4,7 @@ import 'package:quiz_master/features/quiz/data/models/quiz_model.dart';
 abstract class QuizRemoteDataSource {
   Future<void> upsertQuiz(QuizModel quiz);
 
-  Future<void> deleteQuiz({
-    required String userId,
-    required String quizId,
-  });
+  Future<void> deleteQuiz({required String userId, required String quizId});
 
   Future<List<QuizModel>> fetchQuizzes(String userId);
 }
@@ -27,9 +24,9 @@ class FirestoreQuizRemoteDataSource implements QuizRemoteDataSource {
     if (userId == null) return;
 
     final data = quiz.toFirestore();
-    await _quizCollection(userId)
-        .doc(quiz.id)
-        .set(data, SetOptions(merge: true));
+    await _quizCollection(
+      userId,
+    ).doc(quiz.id).set(data, SetOptions(merge: true));
   }
 
   @override

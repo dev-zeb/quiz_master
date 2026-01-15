@@ -51,10 +51,7 @@ class _QuizQuestionCardState extends State<QuizQuestionCard> {
               const SizedBox(height: 20),
               Text(
                 widget.questionText,
-                style: TextStyle(
-                  color: colorScheme.primary,
-                  fontSize: 22,
-                ),
+                style: TextStyle(color: colorScheme.primary, fontSize: 22),
               ),
               const SizedBox(height: 16),
               Column(
@@ -70,45 +67,47 @@ class _QuizQuestionCardState extends State<QuizQuestionCard> {
                       clipBehavior: Clip.antiAlias,
                       elevation: 2,
                       margin: const EdgeInsets.only(bottom: 16),
-                      child: RadioTheme(
-                        data: RadioThemeData(
-                          fillColor: WidgetStateProperty.resolveWith<Color>(
-                            (states) {
+                      child: RadioGroup(
+                        groupValue: selected,
+                        onChanged: (String? value) {
+                          if (value == null) return;
+                          widget.onAnswerSelected(value);
+                          setState(
+                            () {},
+                          ); // ensure visuals update if parent doesn't rebuild immediately
+                        },
+                        child: RadioTheme(
+                          data: RadioThemeData(
+                            fillColor: WidgetStateProperty.resolveWith<Color>((
+                              states,
+                            ) {
                               if (states.contains(WidgetState.selected)) {
                                 return colorScheme.onSecondary;
                               }
                               return colorScheme.primary;
-                            },
+                            }),
                           ),
-                        ),
-                        child: RadioListTile<String>(
-                          title: Text(
-                            answer,
-                            style: TextStyle(
-                              color: isSelected
-                                  ? colorScheme.onSecondary
-                                  : colorScheme.primary,
-                              fontSize: 16,
+                          child: RadioListTile<String>(
+                            title: Text(
+                              answer,
+                              style: TextStyle(
+                                color: isSelected
+                                    ? colorScheme.onSecondary
+                                    : colorScheme.primary,
+                                fontSize: 16,
+                              ),
                             ),
-                          ),
-                          dense: true,
-                          groupValue: selected,
-                          value: answer,
-                          selected: isSelected,
-                          activeColor: colorScheme.onSecondary,
-                          selectedTileColor: colorScheme.primary,
-                          tileColor: colorScheme.surfaceContainer,
-                          controlAffinity: ListTileControlAffinity.leading,
-                          visualDensity: VisualDensity.compact,
-                          onChanged: (String? value) {
-                            if (value == null) return;
-                            widget.onAnswerSelected(value);
-                            setState(
-                              () {},
-                            ); // ensure visuals update if parent doesn't rebuild immediately
-                          },
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            dense: true,
+                            value: answer,
+                            selected: isSelected,
+                            activeColor: colorScheme.onSecondary,
+                            selectedTileColor: colorScheme.primary,
+                            tileColor: colorScheme.surfaceContainer,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            visualDensity: VisualDensity.compact,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                         ),
                       ),

@@ -30,20 +30,12 @@ class QuizTextField extends StatelessWidget {
       decoration: InputDecoration(
         isDense: true,
         hintText: hintText,
-        hintStyle: TextStyle(
-          color: colorScheme.primary.withValues(alpha: 0.6),
-        ),
+        hintStyle: TextStyle(color: colorScheme.primary.withValues(alpha: 0.6)),
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: colorScheme.primary,
-            width: 0.25,
-          ),
+          borderSide: BorderSide(color: colorScheme.primary, width: 0.25),
         ),
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(
-            color: colorScheme.primary,
-            width: 1.0,
-          ),
+          borderSide: BorderSide(color: colorScheme.primary, width: 1.0),
         ),
       ),
       onChanged: (value) {

@@ -3,17 +3,9 @@ class Question {
   final String text;
   final List<String> answers;
 
-  const Question({
-    required this.id,
-    required this.text,
-    required this.answers,
-  });
+  const Question({required this.id, required this.text, required this.answers});
 
-  Question copyWith({
-    String? id,
-    String? text,
-    List<String>? answers,
-  }) {
+  Question copyWith({String? id, String? text, List<String>? answers}) {
     return Question(
       id: id ?? this.id,
       text: text ?? this.text,

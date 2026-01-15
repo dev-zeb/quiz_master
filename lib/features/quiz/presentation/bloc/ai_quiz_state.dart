@@ -12,17 +12,10 @@ class AiQuizState extends Equatable {
     required this.error,
   });
 
-  factory AiQuizState.initial() => const AiQuizState(
-        isLoading: false,
-        quiz: null,
-        error: null,
-      );
+  factory AiQuizState.initial() =>
+      const AiQuizState(isLoading: false, quiz: null, error: null);
 
-  AiQuizState copyWith({
-    bool? isLoading,
-    Quiz? quiz,
-    Object? error,
-  }) {
+  AiQuizState copyWith({bool? isLoading, Quiz? quiz, Object? error}) {
     return AiQuizState(
       isLoading: isLoading ?? this.isLoading,
       quiz: quiz ?? this.quiz,

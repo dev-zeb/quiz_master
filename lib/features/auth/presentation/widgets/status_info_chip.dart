@@ -20,9 +20,7 @@ class StatusInfoChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Expanded(
         child: Column(
@@ -33,21 +31,15 @@ class StatusInfoChip extends StatelessWidget {
               children: [
                 Icon(icon, size: 20, color: color),
                 SizedBox(width: 4),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 14,
-                  ),
-                ),
+                Text(label, style: TextStyle(color: color, fontSize: 14)),
               ],
             ),
             Text(
               value.toString(),
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.bold,
-                  ),
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),

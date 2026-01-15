@@ -14,11 +14,7 @@ class QuestionModel {
   @HiveField(2)
   final List<String> answers;
 
-  QuestionModel({
-    required this.id,
-    required this.text,
-    required this.answers,
-  });
+  QuestionModel({required this.id, required this.text, required this.answers});
 
   // Convert from domain entity to data model
   factory QuestionModel.fromEntity(Question question) {
@@ -31,19 +27,11 @@ class QuestionModel {
 
   // Convert from data model to domain entity
   Question toEntity() {
-    return Question(
-      id: id,
-      text: text,
-      answers: answers,
-    );
+    return Question(id: id, text: text, answers: answers);
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'text': text,
-      'answers': answers,
-    };
+    return {'id': id, 'text': text, 'answers': answers};
   }
 
   factory QuestionModel.fromMap(Map<String, dynamic> data) {

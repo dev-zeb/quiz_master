@@ -112,8 +112,9 @@ class QuizModel {
     return QuizModel(
       id: quiz.id,
       title: quiz.title,
-      questions:
-          quiz.questions.map((q) => QuestionModel.fromEntity(q)).toList(),
+      questions: quiz.questions
+          .map((q) => QuestionModel.fromEntity(q))
+          .toList(),
       durationSeconds: quiz.durationSeconds,
       userId: quiz.userId,
       lastSyncedAt: quiz.lastSyncedAt,

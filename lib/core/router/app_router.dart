@@ -26,12 +26,11 @@ GoRouter createAppRouter(AuthBloc authBloc) {
       final authState = authBloc.state;
 
       final isSignedIn = authState is AuthAuthenticated;
-      final isAuthRoute = state.matchedLocation == '/sign-in' ||
+      final isAuthRoute =
+          state.matchedLocation == '/sign-in' ||
           state.matchedLocation == '/sign-up';
 
-      final protected = <String>{
-        '/profile',
-      };
+      final protected = <String>{'/profile'};
 
       final isProtected = protected.contains(state.matchedLocation);
 

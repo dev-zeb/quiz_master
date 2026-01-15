@@ -25,12 +25,15 @@ class QuizStats {
   final DateTime? lastSyncedAt;
 
   factory QuizStats.from(List<Quiz> quizzes, List<QuizHistory> histories) {
-    final synced =
-        quizzes.where((quiz) => quiz.syncStatus == SyncStatus.synced).length;
-    final pending =
-        quizzes.where((quiz) => quiz.syncStatus == SyncStatus.pending).length;
-    final failed =
-        quizzes.where((quiz) => quiz.syncStatus == SyncStatus.failed).length;
+    final synced = quizzes
+        .where((quiz) => quiz.syncStatus == SyncStatus.synced)
+        .length;
+    final pending = quizzes
+        .where((quiz) => quiz.syncStatus == SyncStatus.pending)
+        .length;
+    final failed = quizzes
+        .where((quiz) => quiz.syncStatus == SyncStatus.failed)
+        .length;
     final localOnly = quizzes.where((quiz) => quiz.userId == null).length;
 
     DateTime? lastSyncedAt;
@@ -50,8 +53,9 @@ class QuizStats {
       }
       scoreAccumulator += history.scorePercent;
     }
-    final averageScore =
-        histories.isEmpty ? null : scoreAccumulator / histories.length;
+    final averageScore = histories.isEmpty
+        ? null
+        : scoreAccumulator / histories.length;
 
     return QuizStats(
       totalQuizzes: quizzes.length,

@@ -22,20 +22,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
 
     await _sub?.cancel();
-    _sub = _repo.authStateChanges().listen(
-      (user) {
-        if (user == null) {
-          add(_AuthInternalUnauthed());
-        } else {
-          add(_AuthInternalAuthed(user));
-        }
-      },
-      onError: (e) => add(_AuthInternalError(e)),
-    );
+    _sub = _repo.authStateChanges().listen((user) {
+      if (user == null) {
+        add(_AuthInternalUnauthed());
+      } else {
+        add(_AuthInternalAuthed(user));
+      }
+    }, onError: (e) => add(_AuthInternalError(e)));
   }
 
   Future<void> _onGoogle(
-      AuthSignInWithGoogleRequested event, Emitter<AuthState> emit) async {
+    AuthSignInWithGoogleRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
     try {
       final user = await _repo.signInWithGoogle();
@@ -51,11 +50,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onEmail(
-      AuthSignInWithEmailRequested event, Emitter<AuthState> emit) async {
+    AuthSignInWithEmailRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
     try {
       final user = await _repo.signInWithEmail(
-          email: event.email, password: event.password);
+        email: event.email,
+        password: event.password,
+      );
       if (user == null) {
         emit(AuthUnauthenticated());
       } else {
@@ -68,7 +71,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onSignUp(
-      AuthSignUpWithEmailRequested event, Emitter<AuthState> emit) async {
+    AuthSignUpWithEmailRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
     try {
       final user = await _repo.signUpWithEmail(
@@ -88,7 +93,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onSignOut(
-      AuthSignOutRequested event, Emitter<AuthState> emit) async {
+    AuthSignOutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
     emit(AuthLoading());
     try {
       await _repo.signOut();

@@ -31,22 +31,13 @@ class QuizTimeInputField extends StatelessWidget {
             textAlign: TextAlign.center,
             decoration: InputDecoration(
               enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: colorScheme.primary,
-                  width: 0.5,
-                ),
+                borderSide: BorderSide(color: colorScheme.primary, width: 0.5),
               ),
               focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: colorScheme.primary,
-                  width: 1.0,
-                ),
+                borderSide: BorderSide(color: colorScheme.primary, width: 1.0),
               ),
               isDense: true,
-              contentPadding: EdgeInsets.symmetric(
-                vertical: 4,
-                horizontal: 4,
-              ),
+              contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
             ),
             style: TextStyle(color: colorScheme.primary),
             onChanged: onChanged,
@@ -62,12 +53,7 @@ class QuizTimeInputField extends StatelessWidget {
             ],
           ),
         ),
-        Text(
-          label,
-          style: TextStyle(
-            color: colorScheme.primary,
-          ),
-        ),
+        Text(label, style: TextStyle(color: colorScheme.primary)),
       ],
     );
   }

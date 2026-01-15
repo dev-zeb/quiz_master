@@ -19,24 +19,14 @@ class BadgeItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         color: colorScheme.primary.withValues(alpha: 0.25),
       ),
-      padding: EdgeInsets.symmetric(
-        horizontal: 6,
-        vertical: 4,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       child: Row(
         children: [
-          Icon(
-            badgeIcon,
-            color: colorScheme.primary,
-            size: 16,
-          ),
+          Icon(badgeIcon, color: colorScheme.primary, size: 16),
           SizedBox(width: 6),
           Text(
             badgeTitle,
-            style: TextStyle(
-              color: colorScheme.primary,
-              fontSize: 12,
-            ),
+            style: TextStyle(color: colorScheme.primary, fontSize: 12),
           ),
         ],
       ),

@@ -29,20 +29,10 @@ class QuizPlayButton extends StatelessWidget {
             children: [
               isIconFirst
                   ? iconWidget
-                  : Text(
-                      text,
-                      style: TextStyle(
-                        color: colorScheme.onPrimary,
-                      ),
-                    ),
+                  : Text(text, style: TextStyle(color: colorScheme.onPrimary)),
               SizedBox(width: 8),
               isIconFirst
-                  ? Text(
-                      text,
-                      style: TextStyle(
-                        color: colorScheme.onPrimary,
-                      ),
-                    )
+                  ? Text(text, style: TextStyle(color: colorScheme.onPrimary))
                   : iconWidget,
             ],
           ),

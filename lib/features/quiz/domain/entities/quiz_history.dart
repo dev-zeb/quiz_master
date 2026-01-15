@@ -40,10 +40,10 @@ class QuizHistory {
   int get totalQuestions => questions.length;
 
   int get correctAnswers => List.generate(questions.length, (i) {
-        final selected = selectedAnswers[i];
-        final correct = questions[i].correctAnswer;
-        return selected != null && selected == correct ? 1 : 0;
-      }).fold(0, (a, b) => a + b);
+    final selected = selectedAnswers[i];
+    final correct = questions[i].correctAnswer;
+    return selected != null && selected == correct ? 1 : 0;
+  }).fold(0, (a, b) => a + b);
 
   double get scorePercent =>
       totalQuestions == 0 ? 0.0 : (correctAnswers / totalQuestions) * 100;
@@ -55,9 +55,5 @@ class UserProfile {
   final String name;
   final String email;
 
-  UserProfile({
-    required this.userId,
-    required this.name,
-    required this.email,
-  });
+  UserProfile({required this.userId, required this.name, required this.email});
 }

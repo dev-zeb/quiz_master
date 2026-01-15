@@ -7,10 +7,7 @@ import '../theme_prefs.dart';
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
   ThemeBloc(this._prefs)
-      : super(ThemeState(
-          themeData: AppThemes.lightTheme,
-          isDark: false,
-        )) {
+    : super(ThemeState(themeData: AppThemes.lightTheme, isDark: false)) {
     on<ThemeBootstrapped>(_onBootstrapped);
     on<ThemeToggled>(_onToggled);
   }
@@ -31,10 +28,7 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     );
   }
 
-  Future<void> _onToggled(
-    ThemeToggled event,
-    Emitter<ThemeState> emit,
-  ) async {
+  Future<void> _onToggled(ThemeToggled event, Emitter<ThemeState> emit) async {
     final theme = event.isDark ? AppTheme.dark : AppTheme.light;
     await _prefs.setTheme(theme);
     emit(

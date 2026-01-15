@@ -18,9 +18,7 @@ class QuizChartItem extends StatelessWidget {
 
     return Card(
       color: colorScheme.surfaceContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       elevation: 2.0,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -43,11 +41,7 @@ class QuizChartItem extends StatelessWidget {
                 ...infoWidget,
               ],
             ),
-            SizedBox(
-              height: 140,
-              width: 160,
-              child: chartWidget,
-            ),
+            SizedBox(height: 140, width: 160, child: chartWidget),
           ],
         ),
       ),

@@ -33,7 +33,8 @@ Future<void> configureDependencies() async {
 
   // ---------- Auth ----------
   getIt.registerLazySingleton<FirebaseAuthDataSource>(
-      () => FirebaseAuthDataSource());
+    () => FirebaseAuthDataSource(),
+  );
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(getIt<FirebaseAuthDataSource>()),
   );
@@ -47,21 +48,20 @@ Future<void> configureDependencies() async {
 
   // Firestore
   getIt.registerLazySingleton<FirebaseFirestore>(
-      () => FirebaseFirestore.instance);
+    () => FirebaseFirestore.instance,
+  );
   getIt.registerLazySingleton<QuizRemoteDataSource>(
     () => FirestoreQuizRemoteDataSource(getIt<FirebaseFirestore>()),
   );
 
   // Hive local datasource
   final quizBox = Hive.box<QuizModel>(AppStrings.quizBoxName);
-  final quizHistoryBox =
-      Hive.box<QuizHistoryModel>(AppStrings.quizHistoryBoxName);
+  final quizHistoryBox = Hive.box<QuizHistoryModel>(
+    AppStrings.quizHistoryBoxName,
+  );
 
   getIt.registerLazySingleton<QuizLocalDataSource>(
-    () => HiveLocalDataSource(
-      quizBox: quizBox,
-      quizHistoryBox: quizHistoryBox,
-    ),
+    () => HiveLocalDataSource(quizBox: quizBox, quizHistoryBox: quizHistoryBox),
   );
 
   // Repositories
@@ -84,6 +84,7 @@ Future<void> configureDependencies() async {
   );
 
   // AI quiz generation bloc
-  getIt
-      .registerFactory<AiQuizBloc>(() => AiQuizBloc(getIt<AiQuizRepository>()));
+  getIt.registerFactory<AiQuizBloc>(
+    () => AiQuizBloc(getIt<AiQuizRepository>()),
+  );
 }

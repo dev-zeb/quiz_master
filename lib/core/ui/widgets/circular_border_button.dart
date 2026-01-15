@@ -35,18 +35,11 @@ class CircularBorderedButton extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  icon,
-                  color: colorScheme.onPrimary,
-                  size: 24,
-                ),
+                Icon(icon, color: colorScheme.onPrimary, size: 24),
                 const SizedBox(width: 8),
                 Text(
                   text,
-                  style: TextStyle(
-                    color: colorScheme.onPrimary,
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: colorScheme.onPrimary, fontSize: 16),
                 ),
               ],
             ),

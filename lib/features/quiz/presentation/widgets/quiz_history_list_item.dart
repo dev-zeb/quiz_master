@@ -24,21 +24,14 @@ class QuizHistoryListItem extends StatelessWidget {
       elevation: 2,
       child: InkWell(
         onTap: () {
-          context.push(
-            '/history/detail',
-            extra: quizHistory,
-          );
+          context.push('/history/detail', extra: quizHistory);
         },
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
-                Icons.history,
-                color: colorScheme.primary,
-                size: 28,
-              ),
+              Icon(Icons.history, color: colorScheme.primary, size: 28),
               SizedBox(width: 12),
               Flexible(
                 child: Column(

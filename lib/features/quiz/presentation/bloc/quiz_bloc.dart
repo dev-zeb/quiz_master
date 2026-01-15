@@ -10,9 +10,9 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
   QuizBloc({
     required QuizRepository quizRepository,
     required AuthRepository authRepository,
-  })  : _repo = quizRepository,
-        _authRepo = authRepository,
-        super(QuizState.initial()) {
+  }) : _repo = quizRepository,
+       _authRepo = authRepository,
+       super(QuizState.initial()) {
     on<QuizBootstrapped>(_onBootstrapped);
     on<QuizReloadRequested>(_onReload);
     on<QuizAdded>(_onAdd);
@@ -26,7 +26,9 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
   final AuthRepository _authRepo;
 
   Future<void> _onBootstrapped(
-      QuizBootstrapped event, Emitter<QuizState> emit) async {
+    QuizBootstrapped event,
+    Emitter<QuizState> emit,
+  ) async {
     await _loadLocal(emit);
 
     final user = _authRepo.currentUser;
@@ -36,7 +38,9 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
   }
 
   Future<void> _onReload(
-      QuizReloadRequested event, Emitter<QuizState> emit) async {
+    QuizReloadRequested event,
+    Emitter<QuizState> emit,
+  ) async {
     await _loadLocal(emit);
   }
 
@@ -71,7 +75,9 @@ class QuizBloc extends Bloc<QuizEvent, QuizState> {
   }
 
   Future<void> _onHistoryAdded(
-      QuizHistoryAdded event, Emitter<QuizState> emit) async {
+    QuizHistoryAdded event,
+    Emitter<QuizState> emit,
+  ) async {
     try {
       await _repo.addQuizHistory(event.history);
       final histories = _repo.getQuizHistoryList();

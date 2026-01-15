@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:quiz_master/features/auth/domain/entities/app_user.dart';
 
 class UserProfileChip extends StatelessWidget {
-  const UserProfileChip({
-    super.key,
-    required this.user,
-    required this.onTap,
-  });
+  const UserProfileChip({super.key, required this.user, required this.onTap});
 
   final AppUser user;
   final VoidCallback onTap;
@@ -34,11 +30,7 @@ class UserProfileChip extends StatelessWidget {
               ? NetworkImage(user.photoUrl!)
               : null,
           child: _isGuest
-              ? Icon(
-                  Icons.person,
-                  size: 28,
-                  color: colorScheme.onPrimary,
-                )
+              ? Icon(Icons.person, size: 28, color: colorScheme.onPrimary)
               : Text(nameLetters!),
         ),
       ),

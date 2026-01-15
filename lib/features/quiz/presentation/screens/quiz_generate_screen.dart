@@ -95,7 +95,9 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
                         child: SingleChildScrollView(
                           controller: _scrollController,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 4),
+                            horizontal: 20,
+                            vertical: 4,
+                          ),
                           child: Form(
                             key: _formKey,
                             child: Column(
@@ -111,7 +113,9 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 _buildQuizConfigurationSection(
-                                    colorScheme, isTimeError),
+                                  colorScheme,
+                                  isTimeError,
+                                ),
                                 const SizedBox(height: 16),
                               ],
                             ),
@@ -134,8 +138,9 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
                               borderRadius: BorderRadius.circular(30),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF764BA2)
-                                      .withValues(alpha: 0.3),
+                                  color: const Color(
+                                    0xFF764BA2,
+                                  ).withValues(alpha: 0.3),
                                   blurRadius: 10,
                                   offset: const Offset(0, 4),
                                 ),
@@ -151,12 +156,17 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
                                 borderRadius: BorderRadius.circular(30),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 32, vertical: 16),
+                                    horizontal: 32,
+                                    vertical: 16,
+                                  ),
                                   child: const Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Icon(Icons.auto_awesome,
-                                          color: Colors.white, size: 20),
+                                      Icon(
+                                        Icons.auto_awesome,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
                                       SizedBox(width: 8),
                                       Text(
                                         'Generate quiz',
@@ -453,7 +463,8 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
                 hintText:
                     'E.g. "Focus on React basics", "Make questions easy", etc.',
                 hintStyle: TextStyle(
-                    color: colorScheme.primary.withValues(alpha: 0.6)),
+                  color: colorScheme.primary.withValues(alpha: 0.6),
+                ),
                 contentPadding: const EdgeInsets.all(16),
               ),
             ),
@@ -503,7 +514,9 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
   }
 
   Widget _buildQuizConfigurationSection(
-      ColorScheme colorScheme, bool isTimeError) {
+    ColorScheme colorScheme,
+    bool isTimeError,
+  ) {
     return Card(
       color: colorScheme.surfaceContainer,
       elevation: 3,
@@ -525,8 +538,10 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
               children: [
                 Icon(Icons.quiz, color: colorScheme.primary, size: 20),
                 const SizedBox(width: 8),
-                Text('Number of questions',
-                    style: TextStyle(fontSize: 16, color: colorScheme.primary)),
+                Text(
+                  'Number of questions',
+                  style: TextStyle(fontSize: 16, color: colorScheme.primary),
+                ),
                 const Spacer(),
                 SizedBox(
                   width: 50,
@@ -536,16 +551,22 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(
                       enabledBorder: UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: colorScheme.primary, width: 0.5),
+                        borderSide: BorderSide(
+                          color: colorScheme.primary,
+                          width: 0.5,
+                        ),
                       ),
                       focusedBorder: UnderlineInputBorder(
-                        borderSide:
-                            BorderSide(color: colorScheme.primary, width: 1.0),
+                        borderSide: BorderSide(
+                          color: colorScheme.primary,
+                          width: 1.0,
+                        ),
                       ),
                       isDense: true,
                       contentPadding: const EdgeInsets.symmetric(
-                          vertical: 4, horizontal: 4),
+                        vertical: 4,
+                        horizontal: 4,
+                      ),
                     ),
                     validator: (value) {
                       final n = int.tryParse(value ?? '') ?? 0;
@@ -618,7 +639,9 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
   }
 
   Future<void> _generateQuiz(
-      BuildContext blocContext, ColorScheme colorScheme) async {
+    BuildContext blocContext,
+    ColorScheme colorScheme,
+  ) async {
     final currentUser = getIt<AuthRepository>().currentUser;
 
     final minutes = int.tryParse(_minutesController.text) ?? 0;
@@ -661,16 +684,16 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
       }
 
       blocContext.read<AiQuizBloc>().add(
-            AiQuizGenerateFromFileRequested(
-              file: file,
-              numQuestions: numQuestions,
-              userId: currentUser?.id,
-              durationSeconds: durationSeconds,
-              extraInstructions: _extraInfoController.text.trim().isEmpty
-                  ? null
-                  : _extraInfoController.text.trim(),
-            ),
-          );
+        AiQuizGenerateFromFileRequested(
+          file: file,
+          numQuestions: numQuestions,
+          userId: currentUser?.id,
+          durationSeconds: durationSeconds,
+          extraInstructions: _extraInfoController.text.trim().isEmpty
+              ? null
+              : _extraInfoController.text.trim(),
+        ),
+      );
     } else {
       final text = _textController.text.trim();
       if (text.isEmpty) {
@@ -684,13 +707,13 @@ class _GenerateQuizScreenState extends State<QuizGenerateScreen> {
       }
 
       blocContext.read<AiQuizBloc>().add(
-            AiQuizGenerateFromTextRequested(
-              text: text,
-              numQuestions: numQuestions,
-              userId: currentUser?.id,
-              durationSeconds: durationSeconds,
-            ),
-          );
+        AiQuizGenerateFromTextRequested(
+          text: text,
+          numQuestions: numQuestions,
+          userId: currentUser?.id,
+          durationSeconds: durationSeconds,
+        ),
+      );
     }
   }
 }

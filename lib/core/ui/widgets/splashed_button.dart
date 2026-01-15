@@ -19,19 +19,15 @@ class SplashedButton extends StatelessWidget {
     return IntrinsicWidth(
       child: Material(
         clipBehavior: Clip.antiAlias,
-        shape: shape ??
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
+        shape:
+            shape ??
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
         color: colorScheme.primary,
         child: InkWell(
           borderRadius: BorderRadius.circular(12.0),
           onTap: onTap,
           child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 18.0,
-              vertical: 10,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10),
             child: childWidget,
           ),
         ),

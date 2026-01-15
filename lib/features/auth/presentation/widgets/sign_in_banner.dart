@@ -24,7 +24,7 @@ class SignInBanner extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             colorScheme.primary.withValues(alpha: 0.55),
-            colorScheme.primary
+            colorScheme.primary,
           ],
           begin: Alignment.centerLeft,
           end: Alignment.center,
@@ -51,9 +51,9 @@ class SignInBanner extends StatelessWidget {
                   Text(
                     "You’re in guest mode",
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: colorScheme.onPrimary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      color: colorScheme.onPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
@@ -61,8 +61,8 @@ class SignInBanner extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: colorScheme.onPrimary.withValues(alpha: 0.9),
-                        ),
+                      color: colorScheme.onPrimary.withValues(alpha: 0.9),
+                    ),
                   ),
                 ],
               ),

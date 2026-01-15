@@ -24,8 +24,8 @@ class QuizListItem extends StatelessWidget {
     final timerText = minutesInt == 0
         ? '${secondsInt}s'
         : secondsInt == 0
-            ? '${minutesInt}m'
-            : '${minutesInt}m ${secondsInt}s';
+        ? '${minutesInt}m'
+        : '${minutesInt}m ${secondsInt}s';
 
     return Card(
       color: colorScheme.surfaceContainer,
@@ -38,8 +38,11 @@ class QuizListItem extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(Icons.play_arrow_rounded,
-                  color: colorScheme.primary, size: 32),
+              Icon(
+                Icons.play_arrow_rounded,
+                color: colorScheme.primary,
+                size: 32,
+              ),
               const SizedBox(width: 12),
               Flexible(
                 child: Column(

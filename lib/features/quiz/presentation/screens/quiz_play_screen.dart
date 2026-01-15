@@ -40,8 +40,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
     _quizTimeSeconds = widget.quiz.durationSeconds;
     _questions = List<Question>.from(widget.quiz.questions);
 
-    _shuffledAnswers =
-        _questions.map((q) => List<String>.from(q.answers)..shuffle()).toList();
+    _shuffledAnswers = _questions
+        .map((q) => List<String>.from(q.answers)..shuffle())
+        .toList();
 
     _selectedAnswers = List<String?>.filled(_questions.length, null);
     _startTimeMillis = DateTime.now().millisecondsSinceEpoch;
@@ -91,8 +92,11 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
                   clipBehavior: Clip.antiAlias,
                   child: InkWell(
                     child: Padding(
-                      padding:
-                          const EdgeInsets.only(left: 6, top: 8, bottom: 8),
+                      padding: const EdgeInsets.only(
+                        left: 6,
+                        top: 8,
+                        bottom: 8,
+                      ),
                       child: Icon(
                         Icons.arrow_back_ios,
                         color: colorScheme.onPrimary,
@@ -134,8 +138,9 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
               child: LinearProgressIndicator(
                 value: progressRate,
                 backgroundColor: colorScheme.onSecondary,
-                valueColor:
-                    AlwaysStoppedAnimation<Color>(colorScheme.secondary),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  colorScheme.secondary,
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -147,8 +152,10 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
                 children: [
                   Text(
                     'Q: $currentQuestionNumber of $totalNumberOfQuestions',
-                    style:
-                        TextStyle(color: colorScheme.secondary, fontSize: 16),
+                    style: TextStyle(
+                      color: colorScheme.secondary,
+                      fontSize: 16,
+                    ),
                   ),
                   BlinkingTimer(
                     duration: Duration(seconds: _quizTimeSeconds),
@@ -218,8 +225,10 @@ class _QuizPlayScreenState extends State<QuizPlayScreen> {
                   ),
                   Text(
                     "$progressValue%",
-                    style:
-                        TextStyle(color: colorScheme.secondary, fontSize: 16),
+                    style: TextStyle(
+                      color: colorScheme.secondary,
+                      fontSize: 16,
+                    ),
                   ),
                 ],
               ),
