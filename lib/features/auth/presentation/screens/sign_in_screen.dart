@@ -87,9 +87,9 @@ class _SignInScreenState extends State<SignInScreen> {
                     Text(
                       'Welcome back',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: cs.primary,
-                          ),
+                        fontWeight: FontWeight.w700,
+                        color: cs.primary,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
@@ -190,11 +190,11 @@ class _SignInScreenState extends State<SignInScreen> {
 
     try {
       context.read<AuthBloc>().add(
-            AuthSignInWithEmailRequested(
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-            ),
-          );
+        AuthSignInWithEmailRequested(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        ),
+      );
       if (!mounted) return;
       context.pop(); // go back to previous screen
     } catch (e) {

@@ -71,11 +71,7 @@ class ProfileScreen extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
             children: [
-              ProfileHeaderCard(
-                user: user,
-                isGuest: isGuest,
-                stats: stats,
-              ),
+              ProfileHeaderCard(user: user, isGuest: isGuest, stats: stats),
               const SizedBox(height: 16),
               if (!isGuest) ...[
                 SyncStatusPanel(
@@ -157,8 +153,9 @@ class ProfileScreen extends StatelessWidget {
                       label: 'Last played',
                       helper: 'Most recent quiz',
                       value: stats.lastPlayedAt != null
-                          ? DateFormat('MMM d, h:mm a')
-                              .format(stats.lastPlayedAt!)
+                          ? DateFormat(
+                              'MMM d, h:mm a',
+                            ).format(stats.lastPlayedAt!)
                           : '–',
                       color: colorScheme.outline,
                     ),
@@ -198,10 +195,7 @@ class ProfileScreen extends StatelessWidget {
             },
             child: const Text('Yes'),
           ),
-          TextButton(
-            onPressed: () => context.pop(),
-            child: const Text('No'),
-          ),
+          TextButton(onPressed: () => context.pop(), child: const Text('No')),
         ],
       ),
     );

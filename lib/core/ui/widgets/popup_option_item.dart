@@ -16,18 +16,9 @@ class PopupOptionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          iconData,
-          size: 20,
-          color: color,
-        ),
+        Icon(iconData, size: 20, color: color),
         SizedBox(width: 8),
-        Text(
-          title,
-          style: TextStyle(
-            color: color,
-          ),
-        ),
+        Text(title, style: TextStyle(color: color)),
       ],
     );
   }

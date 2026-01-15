@@ -33,10 +33,7 @@ class ScrollToButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
               color: colorScheme.primary,
             ),
-            child: Icon(
-              iconData,
-              color: colorScheme.onPrimary,
-            ),
+            child: Icon(iconData, color: colorScheme.onPrimary),
           ),
         ),
       ),

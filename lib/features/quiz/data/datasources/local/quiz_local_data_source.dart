@@ -27,8 +27,8 @@ class HiveLocalDataSource implements QuizLocalDataSource {
   HiveLocalDataSource({
     required Box<QuizModel> quizBox,
     required Box<QuizHistoryModel> quizHistoryBox,
-  })  : _quizBox = quizBox,
-        _historyBox = quizHistoryBox;
+  }) : _quizBox = quizBox,
+       _historyBox = quizHistoryBox;
 
   @override
   Future<void> addQuiz(QuizModel quiz) async {

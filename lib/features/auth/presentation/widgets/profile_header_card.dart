@@ -20,8 +20,8 @@ class ProfileHeaderCard extends StatelessWidget {
     final displayName = isGuest
         ? 'Guest user'
         : (user!.displayName?.trim().isEmpty == true
-            ? user!.email
-            : (user!.displayName ?? user!.email));
+              ? user!.email
+              : (user!.displayName ?? user!.email));
 
     return Card(
       color: colorScheme.surfaceContainer,

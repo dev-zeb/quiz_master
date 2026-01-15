@@ -22,10 +22,11 @@ class StartScreen extends StatelessWidget {
     final displayName = user == null
         ? 'Guest'
         : (user.displayName?.trim().isEmpty == true
-            ? user.email
-            : (user.displayName ?? user.email));
+              ? user.email
+              : (user.displayName ?? user.email));
 
-    final effectiveUser = user ??
+    final effectiveUser =
+        user ??
         const AppUser(
           id: 'guest-local',
           email: '',

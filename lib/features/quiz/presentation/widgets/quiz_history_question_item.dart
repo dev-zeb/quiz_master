@@ -39,10 +39,10 @@ class QuizHistoryQuestionItem extends StatelessWidget {
             Text(
               'Q${questionIndex + 1}: ${question.text}',
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
-                  ),
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: colorScheme.primary,
+              ),
             ),
             const SizedBox(height: 12),
             ...question.answers.map((ans) {
@@ -58,23 +58,14 @@ class QuizHistoryQuestionItem extends StatelessWidget {
                 bg = colorScheme.tertiary;
                 fontColor = colorScheme.onTertiary;
                 fontSize = 16;
-                icon = Icon(
-                  Icons.check_circle,
-                  color: colorScheme.onTertiary,
-                );
+                icon = Icon(Icons.check_circle, color: colorScheme.onTertiary);
               } else if (isSelected && !isCorrect) {
                 bg = colorScheme.error;
                 fontColor = colorScheme.onError;
-                icon = Icon(
-                  Icons.cancel,
-                  color: colorScheme.onError,
-                );
+                icon = Icon(Icons.cancel, color: colorScheme.onError);
               } else if (isCorrect) {
                 bg = colorScheme.tertiary.withValues(alpha: 0.2);
-                icon = Icon(
-                  Icons.check,
-                  color: colorScheme.tertiary,
-                );
+                icon = Icon(Icons.check, color: colorScheme.tertiary);
               } else {
                 bg = colorScheme.primary.withValues(alpha: 0.05);
                 icon = null;

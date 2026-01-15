@@ -16,24 +16,22 @@ class QuizModelAdapter extends TypeAdapter<QuizModel> {
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-
     return QuizModel(
       id: fields[0] as String,
       title: fields[1] as String,
-      questions:
-          (fields[2] as List?)?.cast<QuestionModel>() ?? <QuestionModel>[],
+      questions: (fields[2] as List).cast<QuestionModel>(),
       durationSeconds: fields[3] as int?,
       userId: fields[4] as String?,
       lastSyncedAt: fields[5] as DateTime?,
-      syncStatus: (fields[6] as String?) ?? 'pending',
-      isPublic: (fields[7] as bool?) ?? false,
+      syncStatus: fields[6] as String,
+      isPublic: fields[7] as bool,
       createdByUserId: fields[8] as String?,
       createdAt: fields[9] as DateTime?,
-      playCount: (fields[10] as int?) ?? 0,
-      sumScorePercent: (fields[11] as double?) ?? 0.0,
-      sumCorrectAnswers: (fields[12] as int?) ?? 0,
-      sumTotalQuestions: (fields[13] as int?) ?? 0,
-      isAiGenerated: (fields[14] as bool?) ?? false,
+      playCount: fields[10] as int,
+      sumScorePercent: fields[11] as double,
+      sumCorrectAnswers: fields[12] as int,
+      sumTotalQuestions: fields[13] as int,
+      isAiGenerated: fields[14] as bool,
     );
   }
 

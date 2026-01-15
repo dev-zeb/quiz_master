@@ -26,17 +26,9 @@ class DialogButtonWidget extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                buttonIcon,
-                color: buttonColor,
-              ),
+              Icon(buttonIcon, color: buttonColor),
               const SizedBox(width: 8),
-              Text(
-                buttonText,
-                style: TextStyle(
-                  color: buttonColor,
-                ),
-              ),
+              Text(buttonText, style: TextStyle(color: buttonColor)),
             ],
           ),
         ),

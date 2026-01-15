@@ -21,11 +21,7 @@ class QuizTimeWidget extends StatelessWidget {
       children: [
         Text(
           optionTitle,
-          style: TextStyle(
-            color: colorScheme.primary,
-            fontSize: 14,
-            height: 1,
-          ),
+          style: TextStyle(color: colorScheme.primary, fontSize: 14, height: 1),
         ),
         const SizedBox(height: 4),
         Text(

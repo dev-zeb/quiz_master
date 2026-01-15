@@ -42,11 +42,11 @@ class AiQuizGenerateFromFileRequested extends AiQuizEvent {
 
   @override
   List<Object?> get props => [
-        file.name,
-        file.size,
-        numQuestions,
-        durationSeconds,
-        userId,
-        extraInstructions
-      ];
+    file.name,
+    file.size,
+    numQuestions,
+    durationSeconds,
+    userId,
+    extraInstructions,
+  ];
 }

@@ -9,10 +9,7 @@ import 'quiz_text_field.dart';
 class QuizFormQuestionItem extends StatefulWidget {
   final Question? question;
 
-  const QuizFormQuestionItem({
-    super.key,
-    this.question,
-  });
+  const QuizFormQuestionItem({super.key, this.question});
 
   @override
   State<QuizFormQuestionItem> createState() => QuizFormQuestionItemState();
@@ -74,10 +71,7 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
           ),
         ),
         const SizedBox(height: 16),
-        Text(
-          AppStrings.options,
-          style: TextStyle(color: colorScheme.primary),
-        ),
+        Text(AppStrings.options, style: TextStyle(color: colorScheme.primary)),
         const SizedBox(height: 8),
         for (var i = 0; i < _optionControllers.length; i++)
           QuestionOptionItem(
@@ -109,17 +103,11 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      Icon(
-                        Icons.add,
-                        color: colorScheme.onPrimary,
-                        size: 20,
-                      ),
+                      Icon(Icons.add, color: colorScheme.onPrimary, size: 20),
                       const SizedBox(width: 4),
                       Text(
                         AppStrings.addOption,
-                        style: TextStyle(
-                          color: colorScheme.onPrimary,
-                        ),
+                        style: TextStyle(color: colorScheme.onPrimary),
                       ),
                       const SizedBox(width: 4),
                     ],
@@ -136,11 +124,7 @@ class QuizFormQuestionItemState extends State<QuizFormQuestionItem> {
 
   void _addOption({String? optionText}) {
     setState(() {
-      _optionControllers.add(
-        TextEditingController(
-          text: optionText,
-        ),
-      );
+      _optionControllers.add(TextEditingController(text: optionText));
     });
   }
 

@@ -157,11 +157,19 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
         const SizedBox(height: 16),
         _buildTag(Icons.list_alt, "Total", total, colorScheme.primary),
         const SizedBox(height: 4),
-        _buildTag(Icons.check_circle_outline, "Correct", correct,
-            colorScheme.tertiary),
+        _buildTag(
+          Icons.check_circle_outline,
+          "Correct",
+          correct,
+          colorScheme.tertiary,
+        ),
         const SizedBox(height: 4),
         _buildTag(
-            Icons.cancel_outlined, "Wrong", total - correct, colorScheme.error),
+          Icons.cancel_outlined,
+          "Wrong",
+          total - correct,
+          colorScheme.error,
+        ),
       ],
     );
   }
@@ -171,19 +179,21 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
     final elapsedTime = quizHistory.elapsedTimeSeconds;
     final remainingTime = quizHistory.totalDurationSeconds - elapsedTime;
 
-    final [remainingMinutes, remainingSeconds] =
-        getMinutesAndSeconds(remainingTime);
+    final [remainingMinutes, remainingSeconds] = getMinutesAndSeconds(
+      remainingTime,
+    );
     final [elapsedMinutes, elapsedSeconds] = getMinutesAndSeconds(elapsedTime);
-    final [totalMinutes, totalSeconds] =
-        getMinutesAndSeconds(quizHistory.totalDurationSeconds);
+    final [totalMinutes, totalSeconds] = getMinutesAndSeconds(
+      quizHistory.totalDurationSeconds,
+    );
 
     final progress = elapsedTime / quizHistory.totalDurationSeconds;
     final remainingProgress = 1 - progress;
     final progressColor = remainingProgress <= 0.2
         ? colorScheme.error
         : remainingProgress <= 0.5
-            ? AppColors.warningOrange
-            : colorScheme.primary;
+        ? AppColors.warningOrange
+        : colorScheme.primary;
 
     return QuizChartItem(
       chartTitle: 'Time Stats',
@@ -203,8 +213,10 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Total Time',
-                  style: TextStyle(fontSize: 14, color: colorScheme.primary)),
+              Text(
+                'Total Time',
+                style: TextStyle(fontSize: 14, color: colorScheme.primary),
+              ),
               Text(
                 '$totalMinutes:${totalSeconds.toString().padLeft(2, '0')}',
                 style: TextStyle(
@@ -246,8 +258,9 @@ class _QuizResultScreenState extends State<QuizResultScreen> {
             text: 'Restart Quiz',
             icon: Icons.restart_alt_outlined,
             onTap: () {
-              final quiz =
-                  context.read<QuizBloc>().getQuizById(quizHistory.quizId);
+              final quiz = context.read<QuizBloc>().getQuizById(
+                quizHistory.quizId,
+              );
               if (quiz == null) return;
               context.go('/play', extra: quiz);
             },

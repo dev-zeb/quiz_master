@@ -29,18 +29,11 @@ class EmptyListWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              iconData,
-              size: 100,
-              color: colorScheme.primary,
-            ),
+            Icon(iconData, size: 100, color: colorScheme.primary),
             const SizedBox(height: 16),
             Text(
               title,
-              style: TextStyle(
-                color: colorScheme.primary,
-                fontSize: 24,
-              ),
+              style: TextStyle(color: colorScheme.primary, fontSize: 24),
             ),
             const SizedBox(height: 8),
             Text(
@@ -55,11 +48,7 @@ class EmptyListWidget extends StatelessWidget {
             SplashedButton(
               childWidget: Row(
                 children: [
-                  Icon(
-                    buttonIcon,
-                    color: colorScheme.onPrimary,
-                    size: 24,
-                  ),
+                  Icon(buttonIcon, color: colorScheme.onPrimary, size: 24),
                   SizedBox(width: 4),
                   Text(
                     buttonText,

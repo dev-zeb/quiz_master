@@ -15,11 +15,8 @@ class QuizState extends Equatable {
     this.error,
   });
 
-  factory QuizState.initial() => const QuizState(
-        isLoading: true,
-        quizzes: [],
-        histories: [],
-      );
+  factory QuizState.initial() =>
+      const QuizState(isLoading: true, quizzes: [], histories: []);
 
   QuizState copyWith({
     bool? isLoading,

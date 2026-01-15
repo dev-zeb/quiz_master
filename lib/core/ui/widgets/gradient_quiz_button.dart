@@ -10,10 +10,7 @@ class GradientQuizButton extends StatelessWidget {
   const GradientQuizButton({
     super.key,
     required this.onTap,
-    this.gradientColors = const [
-      Color(0xFF667EEA),
-      Color(0xFF764BA2),
-    ],
+    this.gradientColors = const [Color(0xFF667EEA), Color(0xFF764BA2)],
     this.size = 56,
     this.iconSize = 32,
     this.customShadow,
@@ -23,10 +20,7 @@ class GradientQuizButton extends StatelessWidget {
   factory GradientQuizButton.aiPurple({required VoidCallback onTap}) {
     return GradientQuizButton(
       onTap: onTap,
-      gradientColors: const [
-        Color(0xFF667EEA),
-        Color(0xFF764BA2),
-      ],
+      gradientColors: const [Color(0xFF667EEA), Color(0xFF764BA2)],
       customShadow: [
         BoxShadow(
           color: Colors.purple.withValues(alpha: 0.4),
@@ -40,10 +34,7 @@ class GradientQuizButton extends StatelessWidget {
   factory GradientQuizButton.aiBlue({required VoidCallback onTap}) {
     return GradientQuizButton(
       onTap: onTap,
-      gradientColors: const [
-        Color(0xFF4FACFE),
-        Color(0xFF00F2FE),
-      ],
+      gradientColors: const [Color(0xFF4FACFE), Color(0xFF00F2FE)],
       customShadow: [
         BoxShadow(
           color: Colors.blue.withValues(alpha: 0.4),
@@ -57,10 +48,7 @@ class GradientQuizButton extends StatelessWidget {
   factory GradientQuizButton.aiNeon({required VoidCallback onTap}) {
     return GradientQuizButton(
       onTap: onTap,
-      gradientColors: const [
-        Color(0xFFA8FF78),
-        Color(0xFF78FFD6),
-      ],
+      gradientColors: const [Color(0xFFA8FF78), Color(0xFF78FFD6)],
       customShadow: [
         BoxShadow(
           color: Colors.green.withValues(alpha: 0.4),
@@ -86,7 +74,8 @@ class GradientQuizButton extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(size / 2),
-          boxShadow: customShadow ??
+          boxShadow:
+              customShadow ??
               [
                 BoxShadow(
                   color: gradientColors.first.withValues(alpha: 0.4),

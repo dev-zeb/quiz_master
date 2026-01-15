@@ -17,10 +17,7 @@ class ProfileErrorState extends StatelessWidget {
             const SizedBox(height: 12),
             const Text('Unable to load profile data'),
             const SizedBox(height: 16),
-            FilledButton(
-              onPressed: onRetry,
-              child: const Text('Try again'),
-            ),
+            FilledButton(onPressed: onRetry, child: const Text('Try again')),
           ],
         ),
       ),

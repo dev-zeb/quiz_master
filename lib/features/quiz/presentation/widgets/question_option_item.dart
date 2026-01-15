@@ -11,7 +11,7 @@ class QuestionOptionItem extends StatelessWidget {
   final GlobalKey<FormState> optionFormKey = GlobalKey();
 
   final TextEditingController optionTextController;
-  final void Function(int?)? onRadioButtonTap;
+  final ValueChanged<int?>? onRadioButtonTap;
   final void Function(int index) onRemoveOptionIconTap;
 
   QuestionOptionItem({
@@ -32,18 +32,22 @@ class QuestionOptionItem extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          Radio<int>(
-            value: radioButtonValue,
+          RadioGroup(
             groupValue: selectedAnswerIndex,
-            fillColor: WidgetStateProperty.resolveWith<Color>(
-              (Set<WidgetState> states) {
+            onChanged: (val) {
+              if (onRadioButtonTap != null) onRadioButtonTap?.call(val);
+            },
+            child: Radio<int>(
+              value: radioButtonValue,
+              fillColor: WidgetStateProperty.resolveWith<Color>((
+                Set<WidgetState> states,
+              ) {
                 if (states.contains(WidgetState.selected)) {
                   return colorScheme.primary;
                 }
                 return colorScheme.primary.withValues(alpha: 0.6);
-              },
+              }),
             ),
-            onChanged: onRadioButtonTap,
           ),
           Expanded(
             child: Form(

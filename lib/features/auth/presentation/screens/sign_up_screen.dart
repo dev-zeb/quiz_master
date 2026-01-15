@@ -61,8 +61,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Icon(Icons.error_outline, color: cs.onErrorContainer),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text(_error!,
-                        style: TextStyle(color: cs.onErrorContainer)),
+                    child: Text(
+                      _error!,
+                      style: TextStyle(color: cs.onErrorContainer),
+                    ),
                   ),
                   IconButton(
                     icon: Icon(Icons.close, color: cs.onErrorContainer),
@@ -86,9 +88,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Text(
                       'Create your account',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: cs.primary,
-                          ),
+                        fontWeight: FontWeight.w700,
+                        color: cs.primary,
+                      ),
                     ),
                     const SizedBox(height: 12),
                     TextFormField(
@@ -126,9 +128,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: IconButton(
                           onPressed: () => setState(() => _obscure = !_obscure),
-                          icon: Icon(_obscure
-                              ? Icons.visibility
-                              : Icons.visibility_off),
+                          icon: Icon(
+                            _obscure ? Icons.visibility : Icons.visibility_off,
+                          ),
                         ),
                       ),
                       validator: (v) => (v ?? '').length < 6
@@ -144,10 +146,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         prefixIcon: const Icon(Icons.lock_person_outlined),
                         suffixIcon: IconButton(
                           onPressed: () => setState(
-                              () => _obscureConfirm = !_obscureConfirm),
-                          icon: Icon(_obscureConfirm
-                              ? Icons.visibility
-                              : Icons.visibility_off),
+                            () => _obscureConfirm = !_obscureConfirm,
+                          ),
+                          icon: Icon(
+                            _obscureConfirm
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
                         ),
                       ),
                       validator: (v) => (v ?? '') != _passwordController.text
@@ -163,7 +168,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               height: 18,
                               width: 18,
                               child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: cs.onPrimary),
+                                strokeWidth: 2,
+                                color: cs.onPrimary,
+                              ),
                             )
                           : const Text('Create account'),
                     ),
@@ -187,14 +194,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     try {
       context.read<AuthBloc>().add(
-            AuthSignUpWithEmailRequested(
-              email: _emailController.text.trim(),
-              password: _passwordController.text,
-              displayName: _nameController.text.trim().isEmpty
-                  ? null
-                  : _nameController.text.trim(),
-            ),
-          );
+        AuthSignUpWithEmailRequested(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+          displayName: _nameController.text.trim().isEmpty
+              ? null
+              : _nameController.text.trim(),
+        ),
+      );
       if (!mounted) return;
       context.pop();
     } catch (e) {

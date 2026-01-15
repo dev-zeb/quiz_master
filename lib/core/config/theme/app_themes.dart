@@ -5,10 +5,7 @@ class AppFonts {
   static var langarTextFont = GoogleFonts.langarTextTheme();
 }
 
-enum AppTheme {
-  light,
-  dark,
-}
+enum AppTheme { light, dark }
 
 class AppColors {
   /// Light Theme Colors
@@ -49,62 +46,62 @@ class AppColors {
 
 class AppThemes {
   static ThemeData get lightTheme => ThemeData(
-        useMaterial3: true,
-        colorScheme: const ColorScheme(
-          brightness: Brightness.light,
-          primary: AppColors.primary,
-          onPrimary: AppColors.onPrimary,
-          secondary: AppColors.secondary,
-          onSecondary: AppColors.surfaceContainer,
-          error: AppColors.error,
-          onError: AppColors.onError,
-          surface: AppColors.primaryDark,
-          onSurface: AppColors.onPrimaryDark,
-          primaryContainer: AppColors.primaryVariant,
-          secondaryContainer: AppColors.secondaryVariant,
-          surfaceContainer: AppColors.surfaceContainer,
-          tertiary: AppColors.successGreen,
-          onTertiary: AppColors.onSuccessGreen,
-        ),
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.surface,
-          foregroundColor: AppColors.onSurface,
-        ),
-        highlightColor: AppColors.transparent,
-        iconTheme: const IconThemeData(color: AppColors.primary),
-        scaffoldBackgroundColor: AppColors.surface,
-        splashColor: AppColors.secondaryVariant.withValues(alpha: 0.5),
-        splashFactory: InkRipple.splashFactory,
-        textTheme: AppFonts.langarTextFont,
-      );
+    useMaterial3: true,
+    colorScheme: const ColorScheme(
+      brightness: Brightness.light,
+      primary: AppColors.primary,
+      onPrimary: AppColors.onPrimary,
+      secondary: AppColors.secondary,
+      onSecondary: AppColors.surfaceContainer,
+      error: AppColors.error,
+      onError: AppColors.onError,
+      surface: AppColors.primaryDark,
+      onSurface: AppColors.onPrimaryDark,
+      primaryContainer: AppColors.primaryVariant,
+      secondaryContainer: AppColors.secondaryVariant,
+      surfaceContainer: AppColors.surfaceContainer,
+      tertiary: AppColors.successGreen,
+      onTertiary: AppColors.onSuccessGreen,
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.surface,
+      foregroundColor: AppColors.onSurface,
+    ),
+    highlightColor: AppColors.transparent,
+    iconTheme: const IconThemeData(color: AppColors.primary),
+    scaffoldBackgroundColor: AppColors.surface,
+    splashColor: AppColors.secondaryVariant.withValues(alpha: 0.5),
+    splashFactory: InkRipple.splashFactory,
+    textTheme: AppFonts.langarTextFont,
+  );
 
   static ThemeData get darkTheme => ThemeData(
-        useMaterial3: true,
-        colorScheme: const ColorScheme(
-          brightness: Brightness.dark,
-          primary: AppColors.primaryDark,
-          onPrimary: AppColors.onPrimaryDark,
-          secondary: AppColors.secondaryDark,
-          onSecondary: AppColors.onSecondaryDark,
-          error: AppColors.errorDark,
-          onError: AppColors.onErrorDark,
-          surface: AppColors.surfaceDark,
-          onSurface: AppColors.onSurfaceDark,
-          primaryContainer: AppColors.primaryVariantDark,
-          secondaryContainer: AppColors.secondaryVariantDark,
-          surfaceContainer: AppColors.surfaceContainerDark,
-          tertiary: AppColors.successGreenDark,
-          onTertiary: AppColors.onSuccessGreenDark,
-        ),
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.surfaceDark,
-          foregroundColor: AppColors.onSurfaceDark,
-        ),
-        highlightColor: AppColors.transparent,
-        iconTheme: const IconThemeData(color: AppColors.surfaceContainer),
-        scaffoldBackgroundColor: AppColors.surfaceDark,
-        splashColor: AppColors.onPrimaryDark.withValues(alpha: 0.3),
-        splashFactory: InkRipple.splashFactory,
-        textTheme: AppFonts.langarTextFont,
-      );
+    useMaterial3: true,
+    colorScheme: const ColorScheme(
+      brightness: Brightness.dark,
+      primary: AppColors.primaryDark,
+      onPrimary: AppColors.onPrimaryDark,
+      secondary: AppColors.secondaryDark,
+      onSecondary: AppColors.onSecondaryDark,
+      error: AppColors.errorDark,
+      onError: AppColors.onErrorDark,
+      surface: AppColors.surfaceDark,
+      onSurface: AppColors.onSurfaceDark,
+      primaryContainer: AppColors.primaryVariantDark,
+      secondaryContainer: AppColors.secondaryVariantDark,
+      surfaceContainer: AppColors.surfaceContainerDark,
+      tertiary: AppColors.successGreenDark,
+      onTertiary: AppColors.onSuccessGreenDark,
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: AppColors.surfaceDark,
+      foregroundColor: AppColors.onSurfaceDark,
+    ),
+    highlightColor: AppColors.transparent,
+    iconTheme: const IconThemeData(color: AppColors.surfaceContainer),
+    scaffoldBackgroundColor: AppColors.surfaceDark,
+    splashColor: AppColors.onPrimaryDark.withValues(alpha: 0.3),
+    splashFactory: InkRipple.splashFactory,
+    textTheme: AppFonts.langarTextFont,
+  );
 }

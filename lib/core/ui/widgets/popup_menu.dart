@@ -52,11 +52,7 @@ class TopRightPopupMenuIcon<T> extends StatelessWidget {
       },
       child: Padding(
         padding: const EdgeInsets.all(4.0),
-        child: Icon(
-          icon,
-          size: iconSize,
-          color: iconColor,
-        ),
+        child: Icon(icon, size: iconSize, color: iconColor),
       ),
     );
   }

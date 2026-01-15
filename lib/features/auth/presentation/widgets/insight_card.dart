@@ -49,8 +49,9 @@ class InsightsCard extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundColor:
-                          colorScheme.primaryContainer.withValues(alpha: 0.2),
+                      backgroundColor: colorScheme.primaryContainer.withValues(
+                        alpha: 0.2,
+                      ),
                       child: Icon(item.icon, color: colorScheme.primary),
                     ),
                     const SizedBox(width: 12),
@@ -70,8 +71,9 @@ class InsightsCard extends StatelessWidget {
                           Text(
                             item.helper,
                             style: TextStyle(
-                              color:
-                                  colorScheme.primary.withValues(alpha: 0.75),
+                              color: colorScheme.primary.withValues(
+                                alpha: 0.75,
+                              ),
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),

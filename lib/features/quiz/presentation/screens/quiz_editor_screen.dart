@@ -98,8 +98,10 @@ class _QuizEditorScreenState extends State<QuizEditorScreen> {
                   thumbVisibility: true,
                   child: SingleChildScrollView(
                     controller: _scrollController,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 4,
+                    ),
                     child: Form(
                       key: _formKey,
                       child: Column(

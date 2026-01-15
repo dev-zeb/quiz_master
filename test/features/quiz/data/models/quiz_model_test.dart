@@ -13,7 +13,7 @@ void main() {
             'id': 'qq1',
             'text': 'What is Flutter?',
             'answers': ['SDK', 'IDE'],
-          }
+          },
         ],
         // durationSeconds missing
         // userId missing
@@ -57,12 +57,12 @@ void main() {
           {
             'id': 'qq1',
             'text': 'A?',
-            'answers': ['1', '2']
+            'answers': ['1', '2'],
           },
           {
             'id': 'qq2',
             'text': 'B?',
-            'answers': ['x', 'y']
+            'answers': ['x', 'y'],
           },
         ],
       };

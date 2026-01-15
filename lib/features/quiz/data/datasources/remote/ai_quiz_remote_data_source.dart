@@ -14,10 +14,7 @@ class AiQuizRemoteDataSource {
   }) async {
     final uri = Uri.parse(BackendConfig.quizFromText);
 
-    final body = {
-      'text': text,
-      'num_questions': numQuestions,
-    };
+    final body = {'text': text, 'num_questions': numQuestions};
 
     final resp = await _client.post(
       uri,

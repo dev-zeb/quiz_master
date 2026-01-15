@@ -34,18 +34,18 @@ class QuizHistoryDetail extends StatelessWidget {
                     TextSpan(
                       text: 'Quiz Title: ',
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color: colorScheme.primary.withValues(alpha: 0.75),
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        color: colorScheme.primary.withValues(alpha: 0.75),
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     TextSpan(
                       text: quizHistory.quizTitle,
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            color: colorScheme.primary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        color: colorScheme.primary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),

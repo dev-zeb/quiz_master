@@ -2,10 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 /// Maps low-level FirebaseAuthException codes into UX-friendly messages
 /// that are safe to show to end users.
-String mapAuthErrorToMessage(
-  Object error, {
-  required bool isSignIn,
-}) {
+String mapAuthErrorToMessage(Object error, {required bool isSignIn}) {
   if (error is FirebaseAuthException) {
     switch (error.code) {
       case 'invalid-email':

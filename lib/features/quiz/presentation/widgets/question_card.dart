@@ -38,9 +38,7 @@ class QuestionCard extends StatelessWidget {
               children: [
                 Text(
                   'Question ${questionIndex + 1}',
-                  style: TextStyle(
-                    color: colorScheme.primary,
-                  ),
+                  style: TextStyle(color: colorScheme.primary),
                 ),
                 IconButton(
                   icon: Icon(

@@ -4,11 +4,7 @@ import 'package:quiz_master/features/auth/presentation/data/quiz_stats.dart';
 import 'package:quiz_master/features/auth/presentation/widgets/status_info_chip.dart';
 
 class SyncStatusPanel extends StatelessWidget {
-  const SyncStatusPanel({
-    super.key,
-    required this.stats,
-    required this.onSync,
-  });
+  const SyncStatusPanel({super.key, required this.stats, required this.onSync});
 
   final QuizStats stats;
   final VoidCallback onSync;
@@ -35,8 +31,9 @@ class SyncStatusPanel extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 20,
-                      backgroundColor:
-                          colorScheme.primary.withValues(alpha: 0.15),
+                      backgroundColor: colorScheme.primary.withValues(
+                        alpha: 0.15,
+                      ),
                       child: Icon(
                         Icons.cloud_sync_outlined,
                         color: colorScheme.primary,
@@ -83,10 +80,7 @@ class SyncStatusPanel extends StatelessWidget {
                   message: 'Sync now',
                   child: IconButton(
                     onPressed: onSync,
-                    icon: Icon(
-                      Icons.sync,
-                      size: 28,
-                    ),
+                    icon: Icon(Icons.sync, size: 28),
                   ),
                 ),
               ],

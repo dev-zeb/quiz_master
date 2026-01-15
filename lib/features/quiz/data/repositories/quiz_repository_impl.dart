@@ -15,8 +15,10 @@ class QuizRepositoryImpl implements QuizRepository {
   @override
   Future<void> addQuiz(Quiz quiz) async {
     final now = DateTime.now();
-    final pendingQuiz =
-        quiz.copyWith(lastSyncedAt: now, syncStatus: SyncStatus.pending);
+    final pendingQuiz = quiz.copyWith(
+      lastSyncedAt: now,
+      syncStatus: SyncStatus.pending,
+    );
     await quizLocalDataSource.addQuiz(QuizModel.fromEntity(pendingQuiz));
     await _syncQuizIfPossible(pendingQuiz);
   }
@@ -98,8 +100,9 @@ class QuizRepositoryImpl implements QuizRepository {
         }
         await _syncQuizIfPossible(localQuiz);
       } else if (local == null && remote != null) {
-        final remoteQuiz =
-            remote.toEntity().copyWith(syncStatus: SyncStatus.synced);
+        final remoteQuiz = remote.toEntity().copyWith(
+          syncStatus: SyncStatus.synced,
+        );
         await quizLocalDataSource.addQuiz(QuizModel.fromEntity(remoteQuiz));
       } else if (local != null && remote != null) {
         final localDate =
@@ -114,15 +117,18 @@ class QuizRepositoryImpl implements QuizRepository {
               userId: userId,
               lastSyncedAt: DateTime.now(),
             );
-            await quizLocalDataSource
-                .updateQuiz(QuizModel.fromEntity(localQuiz));
+            await quizLocalDataSource.updateQuiz(
+              QuizModel.fromEntity(localQuiz),
+            );
           }
           await _syncQuizIfPossible(localQuiz);
         } else {
-          final remoteQuiz =
-              remote.toEntity().copyWith(syncStatus: SyncStatus.synced);
-          await quizLocalDataSource
-              .updateQuiz(QuizModel.fromEntity(remoteQuiz));
+          final remoteQuiz = remote.toEntity().copyWith(
+            syncStatus: SyncStatus.synced,
+          );
+          await quizLocalDataSource.updateQuiz(
+            QuizModel.fromEntity(remoteQuiz),
+          );
         }
       }
     }

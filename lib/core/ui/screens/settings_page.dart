@@ -45,9 +45,10 @@ class SettingsScreen extends StatelessWidget {
                       onChanged: (value) {
                         context.read<ThemeBloc>().add(ThemeToggled(value));
                       },
-                      activeColor: colorScheme.primary,
-                      activeTrackColor:
-                          colorScheme.primary.withValues(alpha: 0.5),
+                      activeThumbColor: colorScheme.primary,
+                      activeTrackColor: colorScheme.primary.withValues(
+                        alpha: 0.5,
+                      ),
                       inactiveThumbColor: colorScheme.primary,
                       inactiveTrackColor: colorScheme.onPrimary,
                     ),

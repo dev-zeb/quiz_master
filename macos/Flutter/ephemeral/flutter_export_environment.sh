@@ -1,6 +1,6 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/zeb/fvm/versions/3.27.3"
+export "FLUTTER_ROOT=/Users/zeb/fvm/versions/3.38.3"
 export "FLUTTER_APPLICATION_PATH=/Users/zeb/dev-zeb/Pet-Projects/quiz_master"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
